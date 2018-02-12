@@ -1,0 +1,4 @@
+- Transfer function
+V 1 0 Vin
+C 2 0 C1
+R 1 2 R1
