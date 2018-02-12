@@ -15,16 +15,16 @@ class netlist;
 
 enum component_types
 {
-    ct_resistor = 1,
-    ct_capacitor = 2,
-    ct_inductor = 4,
-    ct_voltage_source = 8,
-    ct_current_source = 16,
-    ct_opamp = 32,
-    ct_voltage_controlled_voltage_source = 64,
-    ct_current_controlled_voltage_source = 128,
-    ct_voltage_controlled_current_source = 256,
-    ct_current_controlled_current_source = 512
+    ct_resistor                          = 1 << 0,
+    ct_capacitor                         = 1 << 1,
+    ct_inductor                          = 1 << 2,
+    ct_voltage_source                    = 1 << 3,
+    ct_current_source                    = 1 << 4,
+    ct_opamp                             = 1 << 5,
+    ct_voltage_controlled_voltage_source = 1 << 6,
+    ct_current_controlled_voltage_source = 1 << 7,
+    ct_voltage_controlled_current_source = 1 << 8,
+    ct_current_controlled_current_source = 1 << 9
 };
 inline component_types operator|(component_types a, component_types b)
 {
@@ -47,30 +47,67 @@ const char component_names[] = {
 class component
 {
     public:
-        component() { }
-        component(GiNaC::ex value) :
-            value(value)
+        component(unsigned int number_of_terminals, const std::string& line) :
+            nodes(number_of_terminals, 0)
         {
+            std::istringstream stream(line);
 
+            char type;
+            stream >> type;
+            for(unsigned int i = 0; i < nodes.size(); ++i)
+            {
+                unsigned int node;
+                stream >> node;
+                nodes[i] = node;
+            }
+            std::string v;
+            stream >> v;
+            value = get_symbol(v);
         }
         virtual ~component() { }
 
         virtual component_types type() const = 0;
         virtual char short_type() const = 0;
-        virtual std::string to_string() const = 0;
-        virtual std::vector<unsigned int> get_nodes() const = 0;
-        virtual unsigned int get_max_node() const = 0;
-        void reset_stamp();
+
+        virtual std::string to_string() const
+        {
+            std::ostringstream stream;
+            stream << component_names[type()];
+            for(unsigned int i = 0; i < nodes.size(); ++i)
+            {
+                stream << ':' << nodes[i] << '-';
+            }
+            stream << nodes[nodes.size() - 1];
+            stream << " (" << value << ")";
+            return stream.str();
+        }
+
+        const std::vector<unsigned int>& get_nodes() const
+        {
+            return nodes;
+        }
+
+        virtual unsigned int get_max_node() const
+        {
+            auto result = std::minmax_element(nodes.begin(), nodes.end());
+            return nodes[result.second - nodes.begin()];
+        }
+
+        void reset_stamp()
+        {
+            stamps.clear();
+        }
+
         virtual void set_stamp(netlist&) = 0;
+
         const std::vector<stamp>& get_stamps() const
         {
             return stamps;
         }
 
         const GiNaC::ex& get_value() const { return value; }
-
-        virtual /* TODO: magic type */ void get_stamp() const = 0;
     protected:
+        std::vector<unsigned int> nodes;
         GiNaC::ex value;
         std::vector<stamp> stamps;
 };
@@ -78,130 +115,28 @@ class component
 class two_terminal_device : public component
 {
     public:
-        explicit two_terminal_device(const std::string& line)
+        explicit two_terminal_device(const std::string& line) :
+            component(2, line)
         {
-            std::string v;
-            std::istringstream stream(line);
-            char type;
-            stream >> type >> node1 >> node2 >> v;
-            value = get_symbol(v);
         }
-
-        explicit two_terminal_device(unsigned int node1, unsigned int node2, GiNaC::ex value) :
-            component(value), node1(node1), node2(node2)
-        {
-
-        }
-
-        explicit two_terminal_device(unsigned int node1, unsigned int node2, const std::string& value) :
-            component(get_symbol(value)), node1(node1), node2(node2)
-        {
-
-        }
-
-        virtual std::string to_string() const override
-        {
-            std::ostringstream stream;
-            stream << component_names[type()] << ':' << node1 << '-' << node2 << " (" << value << ")";
-            return stream.str();
-        }
-        
-        virtual std::vector<unsigned int> get_nodes() const
-        {
-            return { node1, node2 };
-        }
-         
-        virtual unsigned int get_max_node() const
-        {
-            return std::max(node1, node2);
-        }
-
-        virtual /* TODO: magic type */ void get_stamp() const override
-        {
-
-        }
-    protected:
-        unsigned int node1;
-        unsigned int node2;
 };
 
 class three_terminal_device : public component
 {
     public:
-        explicit three_terminal_device(const std::string& line)
+        explicit three_terminal_device(const std::string& line) :
+            component(3, line)
         {
-            std::string v;
-            std::istringstream stream(line);
-            char type;
-            stream >> type >> node1 >> node2 >> node3 >> v;
-            value = get_symbol(v);
         }
-
-        virtual std::string to_string() const override
-        {
-            std::ostringstream stream;
-            stream << component_names[type()] << ':' << node1 << '-' << node2 << ':' << node3 << " (" << value << ")";
-            return stream.str();
-        }
-
-        virtual std::vector<unsigned int> get_nodes() const
-        {
-            return { node1, node2, node3 };
-        }
-
-        virtual unsigned int get_max_node() const
-        {
-            return std::max(std::max(node1, node2), node3);
-        }
-
-        virtual /* TODO: magic type */ void get_stamp() const override
-        {
-
-        }
-    protected:
-        unsigned int node1;
-        unsigned int node2;
-        unsigned int node3;
 };
 
 class four_terminal_device : public component
 {
     public:
-        explicit four_terminal_device(const std::string& line)
+        explicit four_terminal_device(const std::string& line) :
+            component(4, line)
         {
-            std::string v;
-            std::istringstream stream(line);
-            char type;
-            stream >> type >> node1 >> node2 >> node3 >> node4 >> v;
-            value = get_symbol(v);
         }
-
-        virtual std::string to_string() const override
-        {
-            std::ostringstream stream;
-            stream << component_names[type()] << ':' << node1 << '-' << node2 << ' ' << node3 << '-' << node4 << " (" << value << ")";
-            return stream.str();
-        }
-
-        virtual std::vector<unsigned int> get_nodes() const
-        {
-            return { node1, node2, node3, node4 };
-        }
-
-        virtual unsigned int get_max_node() const
-        {
-            return std::max(std::max(node1, node2), std::max(node3, node4));
-        }
-
-        virtual /* TODO: magic type */ void get_stamp() const override
-        {
-
-        }
-    protected:
-        unsigned int node1;
-        unsigned int node2;
-        unsigned int node3;
-        unsigned int node4;
 };
 
 class resistor : public two_terminal_device
