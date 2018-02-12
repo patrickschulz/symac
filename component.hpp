@@ -62,7 +62,14 @@ class component
             }
             std::string v;
             stream >> v;
-            value = get_symbol(v);
+            if(v.find_first_not_of("0123456789.-") == std::string::npos)
+            {
+                value = std::stod(v);
+            }
+            else
+            {
+                value = get_symbol(v);
+            }
         }
         virtual ~component() { }
 
