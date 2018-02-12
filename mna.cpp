@@ -108,7 +108,7 @@ GiNaC::matrix create_z_vector(const netlist& nlist)
         }
         if(nodes[1] > 0)
         {
-            z(nodes[1] - 1, 0) += c->get_value();
+            z(nodes[1] - 1, 0) -= c->get_value();
         }
     }
     // voltage sources
@@ -116,7 +116,8 @@ GiNaC::matrix create_z_vector(const netlist& nlist)
     unsigned int row = 0;
     for(auto c : nlist.get_devices(ct_voltage_source))
     {
-        z(row + offset, 0) = c->get_value();
+        z(row + offset, 0) += c->get_value();
+        ++row;
     }
 
     return z;
