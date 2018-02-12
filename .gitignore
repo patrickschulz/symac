@@ -1,0 +1,7 @@
+*.un~
+.internal_solve.m
+*.o
+*.dep
+.tag
+symac
+.build
