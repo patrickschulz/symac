@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <boost/format.hpp>
 
+/*
 void print_matrix(const GiNaC::matrix& m, const std::string& header)
 {
     std::cout << header << ":\n";
@@ -47,6 +48,7 @@ void print_matrix(const GiNaC::matrix& m)
         std::cout << '\n';
     }
 }
+*/
 
 void print_results(const netlist& nlist, const GiNaC::matrix& m, const GiNaC::matrix& x, const std::vector<result>& results)
 {

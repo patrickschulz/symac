@@ -11,6 +11,7 @@
 #include "stamp.hpp"
 #include "util.hpp"
 #include "options.hpp"
+#include "solver.hpp"
 
 int main(int argc, char** argv)
 {
@@ -24,17 +25,17 @@ int main(int argc, char** argv)
 
         if(nlist)
         {
-            GiNaC::matrix A = create_A_matrix(nlist);
-            GiNaC::matrix x = create_x_vector(nlist);
-            GiNaC::matrix z = create_z_vector(nlist);
-
+            const std::string mode = commandline_options["mode"].as<std::string>();
+            solver S(mode, nlist);
+            S.mna();
             if(commandline_options.count("print"))
             {
-                print_matrix(A, "A matrix");
-                print_matrix(x, "x vector");
-                print_matrix(z, "z vector");
+                S.print_matrices();
             }
+            S.solve();
+            S.print();
 
+            /*
             GiNaC::matrix res;
             if(!commandline_options.count("nosolve"))
             {
@@ -49,6 +50,7 @@ int main(int argc, char** argv)
             {
                 create_report(nlist, res);
             }
+            */
         }
         else
         {

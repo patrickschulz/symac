@@ -34,6 +34,25 @@ void print_information()
               << '\n';
 }
 
+void print_devices()
+{
+    std::cout << "Available devices:\n"
+              << "Two-terminal devices:\n"
+              << "  Voltage sources: V N1 N2 VALUE\n"
+              << "  Current sources: I N1 N2 VALUE\n"
+              << "  Resistors:       R N1 N2 VALUE\n"
+              << "  Capacitors:      C N1 N2 VALUE\n"
+              << "  Inductors:       L N1 N2 VALUE\n"
+              << "Three-terminal devices:\n"
+              << "  Operational amplifiers: O IN1 IN2 OUT VALUE\n"
+              << "Four-terminal devices (Cx are the controlling terminals (plus and minus)):\n"
+              << "  Voltage-controlled voltage sources: E N1 N2 C1 C2 VALUE\n"
+              << "  Current-controlled voltage sources: F N1 N2 C1 C2 VALUE\n"
+              << "  Voltage-controlled current sources: G N1 N2 C1 C2 VALUE\n"
+              << "  Current-controlled current sources: H N1 N2 C1 C2 VALUE\n"
+              ;
+}
+
 class options
 {
     public:
@@ -46,9 +65,10 @@ class options
                 ("version,v" , "show version")
                 ("print,p"   , "print network matrices")
                 ("info,i"    , "print information about the network matrices")
+                ("devices,D" , "print information about the usage of all components")
                 ("nosolve,s" , "don't solve the network")
                 ("report,r"  , "create a report")
-                ("mode,m", value<std::string>(), "simulation mode (possible values: ac (default), sp (S-Parameters), tf (transfer function)")
+                ("mode,m", value<std::string>()->default_value("ac"), "simulation mode (possible values: ac (default), sp (S-Parameters), tf (transfer function)")
                 ("result"    , "which results should be shown? (show all if none are given)")
                 ;
 
@@ -109,6 +129,11 @@ class options
             if(commandline_options.count("info"))
             {
                 print_information();
+                exit(0);
+            }
+            if(commandline_options.count("devices"))
+            {
+                print_devices();
                 exit(0);
             }
         }
