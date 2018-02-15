@@ -15,6 +15,7 @@ class netlist;
 
 enum component_types
 {
+    ct_none                              = 0,
     ct_resistor                          = 1 << 0,
     ct_capacitor                         = 1 << 1,
     ct_inductor                          = 1 << 2,

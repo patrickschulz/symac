@@ -45,51 +45,37 @@ namespace mna {
             std::string str = fmter.str();
             x(row, 0) = get_symbol(str);
         }
-        for(auto c : nlist.get_devices(ct_resistor | ct_capacitor | ct_inductor))
+
+        std::vector<std::tuple<component_types, std::vector<std::string>>> dev_formats = {
+            std::make_tuple<component_types, std::vector<std::string>>(ct_resistor | ct_capacitor | ct_inductor, {"Iz"}),
+            std::make_tuple<component_types, std::vector<std::string>>(ct_voltage_source, {"Iv"}),
+            std::make_tuple<component_types, std::vector<std::string>>(ct_opamp, {"Iop"}),
+            std::make_tuple<component_types, std::vector<std::string>>(ct_voltage_controlled_voltage_source, {"Ie"}),
+            std::make_tuple<component_types, std::vector<std::string>>(ct_current_controlled_current_source, {"Ihin"}),
+            std::make_tuple<component_types, std::vector<std::string>>(ct_current_controlled_voltage_source, {"Ifin", "Ifout"})
+        };
+
+        component_types prev_components = ct_none;
+        for(const auto& dev : dev_formats)
         {
-            char shorttype = c->short_type();
-            boost::format fmter = boost::format("I%c%d") % shorttype % (row + 1 - nlist.number_of_nodes());
-            std::string str = fmter.str();
-            x(row, 0) = get_symbol(str);
-            ++row;
-        }
-        for(unsigned int i = 0; i < nlist.number_of_devices(ct_voltage_source); ++i)
-        {
-            boost::format fmter = boost::format("Iv%d") % (i + 1);
-            std::string str = fmter.str();
-            x(row, 0) = get_symbol(str);
-            ++row;
-        }
-        for(unsigned int i = 0; i < nlist.number_of_devices(ct_opamp); ++i)
-        {
-            boost::format fmter = boost::format("Iop%d") % (i + 1);
-            std::string str = fmter.str();
-            x(row, 0) = get_symbol(str);
-            ++row;
-        }
-        for(unsigned int i = 0; i < nlist.number_of_devices(ct_voltage_controlled_voltage_source); ++i)
-        {
-            boost::format fmter = boost::format("Ie%d") % (i + 1);
-            std::string str = fmter.str();
-            x(row, 0) = get_symbol(str);
-            ++row;
-        }
-        for(unsigned int i = 0; i < nlist.number_of_devices(ct_current_controlled_voltage_source); i += 2)
-        {
-            boost::format fmter1 = boost::format("Ifin%d") % (i + 1);
-            std::string str1 = fmter1.str();
-            boost::format fmter2 = boost::format("Ifout%d") % (i + 1);
-            std::string str2 = fmter2.str();
-            x(row, 0) = get_symbol(str1);
-            x(row + 1, 0) = get_symbol(str2);
-            row += 2;
-        }
-        for(unsigned int i = 0; i < nlist.number_of_devices(ct_current_controlled_current_source); ++i)
-        {
-            boost::format fmter = boost::format("Ihin%d") % (i + 1);
-            std::string str = fmter.str();
-            x(row, 0) = get_symbol(str);
-            ++row;
+            component_types ct;
+            std::vector<std::string> currents;
+            std::tie(ct, currents) = dev;
+
+            for(unsigned int i = 0; i < nlist.number_of_devices(ct); ++i)
+            {
+                //for(const auto& current : currents)
+                for(unsigned int cur = 0; cur < currents.size(); ++cur)
+                {
+                    std::string current = currents[cur];
+                    unsigned int num = nlist.number_of_nodes() + nlist.number_of_devices(prev_components);
+                    boost::format fmter = boost::format("%s%d") % current % (row + 1 - num);
+                    std::string str = fmter.str();
+                    x(row + cur, 0) = get_symbol(str);
+                }
+                ++row;
+            }
+            prev_components = prev_components | ct;
         }
 
         return x;
