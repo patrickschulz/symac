@@ -1,6 +1,7 @@
 #include "solver.hpp"
 
 #include <boost/format.hpp>
+#include <numeric>
 
 #include "mna.hpp"
 
@@ -114,6 +115,7 @@ void print_matrix(const GiNaC::matrix& m, const std::string& header)
 void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, const GiNaC::matrix& z)
 {
     const unsigned int sep = 3;
+    const unsigned skip = 10;
 
     unsigned int size = A.cols();
 
@@ -148,9 +150,23 @@ void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, cons
 
     // output starts here
     std::cout << '\n';
-    //unsigned int Awidth = std::accumulate(maxlengths.begin(), maxlengths.end() - 2, 0) + sep * (maxlengths.end() - maxlengths.begin() - 2);
-    //std::cout << std::string(Awidth/2, ' ') << 'A' << std::string(Awidth/2, ' ') << std::string(
-    //std::cout << std::string(Awidth, '-') << '\n';
+    unsigned int Awidth = std::accumulate(maxlengths.begin(), maxlengths.end() - 2, 0) + sep * (maxlengths.size() - 2);
+    std::cout << std::string(Awidth/2, ' ') << 'A' << std::string(Awidth/2, ' ');
+
+    unsigned int xwidth = *(maxlengths.end() - 2) + sep;
+    std::cout << std::string(xwidth/2 + skip + sep/2, ' ') << 'x' << std::string(xwidth/2, ' ');
+
+    unsigned int zwidth = *(maxlengths.end() - 1) + sep;
+    std::cout << std::string(zwidth/2 + skip, ' ') << 'z' << std::string(zwidth/2, ' ');
+
+    std::cout << '\n';
+    // separation line
+    std::cout << std::string(Awidth, '-');
+    std::cout << std::string(skip + sep/2, ' ');
+    std::cout << std::string(xwidth, '-');
+    std::cout << std::string(skip, ' ');
+    std::cout << std::string(zwidth, '-');
+    std::cout << '\n';
     for(unsigned int row = 0; row < size; ++row)
     {
         for(unsigned int column = 0; column < size + 2; ++column)
@@ -164,12 +180,12 @@ void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, cons
             if(column == size)
             {
                 stream << format << x(row, 0);
-                width += 10;
+                width += skip;
             }
             if(column > size)
             {
                 stream << format << z(row, 0);
-                width += 10;
+                width += skip;
             }
             std::cout << std::setw(width + sep) << stream.str();
         }
@@ -180,8 +196,5 @@ void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, cons
 
 void solver::print_matrices()
 {
-    //print_matrix(A, "A matrix");
-    //print_matrix(x, "x vector");
-    //print_matrix(z, "z vector");
     print_network_matrices(A, x, z);
 }
