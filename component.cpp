@@ -104,6 +104,8 @@ void voltage_source::set_stamp(netlist& nlist)
 void current_source::set_stamp(netlist& nlist)
 {
     // a current source has no stamp (no changes in the network matrix)
+    // suppress unused parameter warnings
+    (void)nlist;
 }
 
 void opamp::set_stamp(netlist& nlist)
@@ -201,6 +203,8 @@ void voltage_controlled_current_source::set_stamp(netlist& nlist)
             stamps.push_back(stamp(nodes[1], nodes[3], -value));
         }
     }
+    // suppress unused parameter warning
+    (void)nlist;
 }
 
 void current_controlled_current_source::set_stamp(netlist& nlist)
