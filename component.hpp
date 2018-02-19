@@ -63,7 +63,7 @@ class component
             }
             std::string v;
             stream >> v;
-            if(v.find_first_not_of("0123456789.-") == std::string::npos)
+            if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos)
             {
                 value = std::stod(v);
             }
