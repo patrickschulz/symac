@@ -4,39 +4,34 @@
 #include <sstream>
 #include <fstream>
 #include <algorithm>
+#include <regex>
 
 static bool is_comment(char type)
 {
     return type == '*';
 }
 
-static bool is_two_terminal_device(char type)
+static bool is_two_terminal_device(const std::string& line)
 {
-    const char component_types[5] = {
-        'V', 'I', 'R', 'C', 'L'
-    };
-    return std::find(std::begin(component_types), std::end(component_types), type) != std::end(component_types);
+    std::regex rx(R"(^\s*[VIRCL]\s+\d+\s+\d+\s+\w+\s*$)");
+    return std::regex_search(line, rx);
 }
 
-static bool is_three_terminal_device(char type)
+static bool is_three_terminal_device(const std::string& line)
 {
-    const char component_types[1] = {
-        'O'
-    };
-    return std::find(std::begin(component_types), std::end(component_types), type) != std::end(component_types);
+    std::regex rx(R"(^\s*[O]\s+\d+\s+\d+\s+\d+\s*$)");
+    return std::regex_match(line, rx);
 }
 
-static bool is_four_terminal_device(char type)
+static bool is_four_terminal_device(const std::string& line)
 {
-    const char component_types[4] = {
-        'E', 'F', 'G', 'H'
-    };
-    return std::find(std::begin(component_types), std::end(component_types), type) != std::end(component_types);
+    std::regex rx(R"(^\s*[EFGH]\s+\d+\s+\d+\s+\d+\s+\d+\s+\w+\s*$)");
+    return std::regex_match(line, rx);
 }
 
-static bool is_component(char type)
+static bool is_component(const std::string& line)
 {
-    return is_two_terminal_device(type) || is_three_terminal_device(type) || is_four_terminal_device(type);
+    return is_two_terminal_device(line) || is_three_terminal_device(line) || is_four_terminal_device(line);
 }
 
 netlist::netlist() :
@@ -98,7 +93,7 @@ void netlist::read(std::string filename)
         // TODO: check for empty line
         // TODO: strip leading whitespace
         if(is_comment(line[0])); // ignore
-        else if(is_component(line[0]))
+        else if(is_component(line))
         {
             components.push_back(create_component(line));
         }

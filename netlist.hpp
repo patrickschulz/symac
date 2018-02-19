@@ -4,6 +4,7 @@
 #include <vector>
 #include <iterator>
 #include <memory>
+#include <map>
 
 #include "component.hpp"
 
@@ -52,6 +53,8 @@ class netlist
 
         bool valid;
         std::vector<std::unique_ptr<component>> components;
+
+        std::map<std::string, unsigned int> nodemap;
 
         // network state
         unsigned int numnodes;
