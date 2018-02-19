@@ -170,7 +170,7 @@ class capacitor : public two_terminal_device
     public:
         using two_terminal_device::two_terminal_device;
 
-        virtual void set_stamp(netlist&);
+        virtual void set_stamp(netlist&) override;
 
         virtual component_types type() const override
         {
@@ -188,7 +188,7 @@ class inductor : public two_terminal_device
     public:
         using two_terminal_device::two_terminal_device;
 
-        virtual void set_stamp(netlist&);
+        virtual void set_stamp(netlist&) override;
 
         virtual component_types type() const override
         {
@@ -206,7 +206,7 @@ class voltage_source : public two_terminal_device
     public:
         using two_terminal_device::two_terminal_device;
 
-        virtual void set_stamp(netlist&);
+        virtual void set_stamp(netlist&) override;
 
         virtual component_types type() const override
         {
@@ -224,7 +224,7 @@ class current_source : public two_terminal_device
     public:
         using two_terminal_device::two_terminal_device;
 
-        virtual void set_stamp(netlist&);
+        virtual void set_stamp(netlist&) override;
 
         virtual component_types type() const override
         {
@@ -242,7 +242,7 @@ class opamp : public three_terminal_device
     public:
         using three_terminal_device::three_terminal_device;
 
-        virtual void set_stamp(netlist&);
+        virtual void set_stamp(netlist&) override;
 
         virtual component_types type() const override
         {
@@ -260,7 +260,7 @@ class voltage_controlled_voltage_source : public four_terminal_device
     public:
         using four_terminal_device::four_terminal_device;
 
-        virtual void set_stamp(netlist&);
+        virtual void set_stamp(netlist&) override;
 
         virtual component_types type() const override
         {
@@ -278,7 +278,7 @@ class current_controlled_voltage_source : public four_terminal_device
     public:
         using four_terminal_device::four_terminal_device;
 
-        virtual void set_stamp(netlist&);
+        virtual void set_stamp(netlist&) override;
 
         virtual component_types type() const override
         {
@@ -296,7 +296,7 @@ class voltage_controlled_current_source : public four_terminal_device
     public:
         using four_terminal_device::four_terminal_device;
 
-        virtual void set_stamp(netlist&);
+        virtual void set_stamp(netlist&) override;
 
         virtual component_types type() const override
         {
@@ -314,7 +314,7 @@ class current_controlled_current_source : public four_terminal_device
     public:
         using four_terminal_device::four_terminal_device;
 
-        virtual void set_stamp(netlist&);
+        virtual void set_stamp(netlist&) override;
 
         virtual component_types type() const override
         {
@@ -323,7 +323,7 @@ class current_controlled_current_source : public four_terminal_device
 
         virtual char short_type() const override
         {
-            return 'G';
+            return 'H';
         }
 };
 
