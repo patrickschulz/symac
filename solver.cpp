@@ -25,91 +25,59 @@ void solver::solve()
 
 void solver::print()
 {
-    std::cout << "Results:\n";
-    std::cout << GiNaC::csrc;
-    unsigned int row = 0;
-
-    std::vector<std::tuple<std::string, component_types, std::vector<std::string>>> dev_formats = {
-        std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through impedances", ct_resistor | ct_capacitor | ct_inductor, {"Iz"}),
-        std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through voltage sources", ct_voltage_source, {"Iv"}),
-        std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents into opamps (output)", ct_opamp, {"Iop"}),
-        std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through vcvs", ct_voltage_controlled_voltage_source, {"Ie"}),
-        std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through cccs", ct_current_controlled_current_source, {"Ihin"}),
-        std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through ccvs", ct_current_controlled_voltage_source, {"Ifin", "Ifout"})
-    };
-
-    std::cout << "    Node voltages:\n";
-    for(; row < nlist.number_of_nodes(); ++row)
+    if(mode == "ac")
     {
-        boost::format fmter = boost::format("        Node %d:\t\t") % (row + 1);
-        std::string str = fmter.str();
-        std::cout << str << results(row, 0) << '\n';
-    }
-    std::cout << '\n';
-    for(const auto& dev : dev_formats)
-    {
-        std::string header;
-        component_types ct;
-        std::vector<std::string> currents;
-        std::tie(header, ct, currents) = dev;
-        unsigned int size = nlist.number_of_devices(ct);
-        if(size > 0)
+        std::cout << "Results:\n";
+        std::cout << GiNaC::csrc;
+        unsigned int row = 0;
+
+        std::vector<std::tuple<std::string, component_types, std::vector<std::string>>> dev_formats = {
+            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through impedances", ct_resistor | ct_capacitor | ct_inductor, {"Iz"}),
+            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through voltage sources", ct_voltage_source, {"Iv"}),
+            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents into opamps (output)", ct_opamp, {"Iop"}),
+            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through vcvs", ct_voltage_controlled_voltage_source, {"Ie"}),
+            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through cccs", ct_current_controlled_current_source, {"Ihin"}),
+            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through ccvs", ct_current_controlled_voltage_source, {"Ifin", "Ifout"})
+        };
+
+        std::cout << "    Node voltages:\n";
+        for(; row < nlist.number_of_nodes(); ++row)
         {
-            std::cout << "    " << header << ":\n";
-            for(unsigned int i = 0; i < size; ++i)
-            {
-                for(const auto& current : currents)
-                {
-                    boost::format fmter = boost::format("        %s%d:\t\t") % current % (i + 1);
-                    std::string str = fmter.str();
-                    std::cout << str << results(row, 0) << '\n';
-                    ++row;
-                }
-            }
-            std::cout << '\n';
-        }
-    }
-}
-
-void print_matrix(const GiNaC::matrix& m)
-{
-    const unsigned int sep = 3;
-
-    std::vector<unsigned int> maxlengths(m.cols(), 0);
-
-    // output format
-    auto format = GiNaC::dflt;
-
-    for(unsigned int column = 0; column < m.cols(); ++column)
-    {
-        std::string::size_type maxcollength = 0;
-        for(unsigned int row = 0; row < m.rows(); ++row)
-        {
-            std::ostringstream stream;
-            stream << format << m(row, column);
-            maxcollength = std::max(maxcollength, stream.str().size());
-        }
-        maxlengths[column] = maxcollength;
-    }
-
-    for(unsigned int row = 0; row < m.rows(); ++row)
-    {
-        for(unsigned int column = 0; column < m.cols(); ++column)
-        {
-            const unsigned int width = maxlengths[column];
-            std::ostringstream stream;
-            stream << format << m(row, column);
-            std::cout << std::setw(width + sep) << stream.str();
+            boost::format fmter = boost::format("        Node %d:\t\t") % (row + 1);
+            std::string str = fmter.str();
+            std::cout << str << results(row, 0) << '\n';
         }
         std::cout << '\n';
+        for(const auto& dev : dev_formats)
+        {
+            std::string header;
+            component_types ct;
+            std::vector<std::string> currents;
+            std::tie(header, ct, currents) = dev;
+            unsigned int size = nlist.number_of_devices(ct);
+            if(size > 0)
+            {
+                std::cout << "    " << header << ":\n";
+                for(unsigned int i = 0; i < size; ++i)
+                {
+                    for(const auto& current : currents)
+                    {
+                        boost::format fmter = boost::format("        %s%d:\t\t") % current % (i + 1);
+                        std::string str = fmter.str();
+                        std::cout << str << results(row, 0) << '\n';
+                        ++row;
+                    }
+                }
+                std::cout << '\n';
+            }
+        }
     }
-}
-
-void print_matrix(const GiNaC::matrix& m, const std::string& header)
-{
-    std::cout << header << ":\n";
-    print_matrix(m);
-    std::cout << '\n';
+    if(mode == "tf")
+    {
+        unsigned int node1 = 1;
+        unsigned int node2 = 2;
+        std::cout << "H(s) = " << results(node2 - 1, 0) / results(node1 - 1, 0) << '\n';
+    }
 }
 
 void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, const GiNaC::matrix& z)
