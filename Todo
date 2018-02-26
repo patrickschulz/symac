@@ -1,0 +1,34 @@
+Here is a list of stuff i want to implement, in no particular order:
+    - simplification of terms with approximate value, e.g.:
+        set prop a > c
+        set prop a > d
+        set prop b > c
+        set prop b > d
+        x = a * b + c * d
+         => x == a * b
+        This is easy to resolve since we have to product of two big numbers and the product of two small numbers. This becomes harder if we mix individual terms. 
+        This will need some kind of level of aggresiveness.
+
+    - plot tool to show (qualitively) how the result behaves with regard to frequency/component values/...
+        This of course needs numeric values as start, here one could work with a bunch of default values (say the gate cap is always around this value...)
+    
+    - Implement transfer functions for all voltage nodes but also for all currents so that impedances are possible too
+
+    - Implement a result selection filter where the wanted values (can also include values which have to be calculated) are specified
+
+    - Implement S-parameter simulation
+
+    - Implement subciruits
+        This could be combined with making transistors available: there should be a standard set of transistor models (only gm; gm and rout; gm, rout and cgs; etc.) that can be selected via commandline switch.
+        This could be useful to re-simulate in different complexity without changing the netlist
+
+    - Implement naming of components:
+        R 1 0 R0   <-- before
+        R1 1 0 R0  <-- after
+        Not present names will be auto-assigned
+
+    - Implement string names for nets, not only unsigned integers:
+        R 1 0 R0       <-- before
+        R vin vgate R0 <-- after
+
+    - Enhance readability of output, similar perhaps to sympy. Also improve (and implement correctly) the latex report, because this provides the best output.
