@@ -53,6 +53,11 @@ void print_devices()
               ;
 }
 
+void print_version()
+{
+    std::cout << "Symac 0.1\n";
+}
+
 class options
 {
     public:
@@ -134,6 +139,11 @@ class options
             if(commandline_options.count("devices"))
             {
                 print_devices();
+                exit(0);
+            }
+            if(commandline_options.count("version"))
+            {
+                print_version();
                 exit(0);
             }
         }
