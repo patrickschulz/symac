@@ -32,3 +32,5 @@ Here is a list of stuff i want to implement, in no particular order:
         R vin vgate R0 <-- after
 
     - Enhance readability of output, similar perhaps to sympy. Also improve (and implement correctly) the latex report, because this provides the best output.
+
+    - Add a utility to generate matlab/octave files in order to postprocess the results.

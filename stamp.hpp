@@ -10,10 +10,10 @@
 class stamp
 {
     public:
-        stamp(int r, int c, GiNaC::ex v) :
+        stamp(int r, int c, const GiNaC::ex& v) :
             row(r), column(c), value(v)
         { }
-        stamp(int r, int c, std::string str) :
+        stamp(int r, int c, const std::string& str) :
             row(r), column(c), value(get_symbol(str))
         { }
         int get_row() const { return row; };
