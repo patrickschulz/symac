@@ -6,9 +6,11 @@
 #include <algorithm>
 #include <regex>
 
-static bool is_comment(char type)
+#include "util.hpp"
+
+static bool is_comment(const std::string& line)
 {
-    return type == '*';
+    return line[0] == '*';
 }
 
 static bool is_two_terminal_device(const std::string& line)
@@ -75,8 +77,6 @@ void netlist::read(std::string filename)
     std::ifstream file(filename);
     if(!file.is_open())
     {
-        std::stringstream str;
-        str << "could not open netlist '" << filename << '\'';
         valid = false;
         return;
     }
@@ -90,9 +90,12 @@ void netlist::read(std::string filename)
         {
             break;
         }
-        // TODO: check for empty line
-        // TODO: strip leading whitespace
-        if(is_comment(line[0])); // ignore
+        trim(line); // remove whitespace
+        if(line.empty())
+        {
+            continue;
+        }
+        if(is_comment(line)); // ignore
         else if(is_component(line))
         {
             components.push_back(create_component(line));
