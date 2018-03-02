@@ -28,7 +28,8 @@ void solver::print()
     if(mode == "ac")
     {
         std::cout << "Results:\n";
-        std::cout << GiNaC::csrc;
+        //std::cout << GiNaC::csrc;
+        std::cout << GiNaC::latex;
         unsigned int row = 0;
 
         std::vector<std::tuple<std::string, component_types, std::vector<std::string>>> dev_formats = {
@@ -72,11 +73,16 @@ void solver::print()
             }
         }
     }
-    if(mode == "tf")
+    else if(mode == "tf")
     {
         unsigned int node1 = 1;
         unsigned int node2 = 2;
         std::cout << "H(s) = " << results(node2 - 1, 0) / results(node1 - 1, 0) << '\n';
+    }
+    else
+    {
+        std::cerr << "unknown mode '" << mode << "' given\n";
+        exit(1);
     }
 }
 

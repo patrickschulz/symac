@@ -34,23 +34,6 @@ int main(int argc, char** argv)
             }
             S.solve();
             S.print();
-
-            /*
-            GiNaC::matrix res;
-            if(!commandline_options.count("nosolve"))
-            {
-                res = A.solve(x, z, GiNaC::solve_algo::gauss);
-                //std::vector<result> results;
-                //results.push_back(result("v2"));
-                //print_results(nlist, res, x, results);
-                print_results(nlist, res);
-                std::cout << '\n';
-            }
-            if(commandline_options.count("report"))
-            {
-                create_report(nlist, res);
-            }
-            */
         }
         else
         {

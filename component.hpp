@@ -63,7 +63,7 @@ class component
             }
             std::string v;
             stream >> v;
-            if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos)
+            if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
             {
                 value = std::stod(v);
             }
@@ -152,7 +152,7 @@ class resistor : public two_terminal_device
     public:
         using two_terminal_device::two_terminal_device;
 
-        virtual void set_stamp(netlist&);
+        virtual void set_stamp(netlist&) override;
 
         virtual component_types type() const override
         {
