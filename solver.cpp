@@ -28,8 +28,7 @@ void solver::print()
     if(mode == "ac")
     {
         std::cout << "Results:\n";
-        //std::cout << GiNaC::csrc;
-        std::cout << GiNaC::latex;
+        std::cout << GiNaC::csrc;
         unsigned int row = 0;
 
         std::vector<std::tuple<std::string, component_types, std::vector<std::string>>> dev_formats = {
