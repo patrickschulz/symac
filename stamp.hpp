@@ -7,13 +7,13 @@
 
 #include "symbol.hpp"
 
-class stamp
+class element
 {
     public:
-        stamp(int r, int c, const GiNaC::ex& v) :
+        element(int r, int c, const GiNaC::ex& v) :
             row(r), column(c), value(v)
         { }
-        stamp(int r, int c, const std::string& str) :
+        element(int r, int c, const std::string& str) :
             row(r), column(c), value(get_symbol(str))
         { }
         int get_row() const { return row; };
@@ -23,6 +23,18 @@ class stamp
         int row;
         int column;
         GiNaC::ex value;
+};
+
+class stamp
+{
+    public:
+        void write(unsigned int node1, unsigned int node2, const GiNaC::ex& value);
+        void clear();
+        std::vector<element>::const_iterator begin() const;
+        std::vector<element>::const_iterator end() const;
+
+    private:
+        std::vector<element> elements;
 };
 
 #endif // STAMP_HPP

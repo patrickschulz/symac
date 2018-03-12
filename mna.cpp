@@ -13,10 +13,10 @@ namespace mna {
         GiNaC::matrix A(networksize, networksize);
         for(const auto& c : nlist.get_components())
         {
-            for(const stamp& st : c->get_stamps())
+            for(const element& elem : c->get_stamp())
             {
                 // GiNaC matrices are 0-indexed, so we need to decrement the indices by 1
-                A(st.get_row() - 1, st.get_column() - 1) += st.get_value();
+                A(elem.get_row() - 1, elem.get_column() - 1) += elem.get_value();
             }
         }
         return A;

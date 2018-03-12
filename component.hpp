@@ -102,21 +102,21 @@ class component
 
         void reset_stamp()
         {
-            stamps.clear();
+            stmp.clear();
         }
 
         virtual void set_stamp(netlist&) = 0;
 
-        const std::vector<stamp>& get_stamps() const
+        const stamp& get_stamp() const
         {
-            return stamps;
+            return stmp;
         }
 
         const GiNaC::ex& get_value() const { return value; }
     protected:
         std::vector<unsigned int> nodes;
         GiNaC::ex value;
-        std::vector<stamp> stamps;
+        stamp stmp;
 };
 
 class two_terminal_device : public component
