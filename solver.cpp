@@ -5,7 +5,7 @@
 
 #include "mna.hpp"
 
-solver::solver(const std::string& mode, netlist& nlist) :
+solver::solver(const std::string& mode, const netlist& nlist) :
     mode(mode), nlist(nlist)
 {
 
