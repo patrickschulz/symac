@@ -146,12 +146,22 @@ class four_terminal_device : public component
         }
 };
 
-class resistor : public two_terminal_device
+class impedance : public two_terminal_device
 {
     public:
         using two_terminal_device::two_terminal_device;
 
         virtual void set_stamp(netlist&) override;
+};
+
+class resistor : public impedance
+{
+    public:
+        resistor(const std::string& line) :
+            impedance(line)
+        {
+            value = 1/value; // convert the raw value to an conductance
+        }
 
         virtual component_types type() const override
         {
@@ -159,12 +169,15 @@ class resistor : public two_terminal_device
         }
 };
 
-class capacitor : public two_terminal_device
+class capacitor : public impedance
 {
     public:
-        using two_terminal_device::two_terminal_device;
-
-        virtual void set_stamp(netlist&) override;
+        capacitor(const std::string& line) :
+            impedance(line)
+        {
+            GiNaC::ex s = get_symbol("s");
+            value = s * value; // convert the raw value to an conductance
+        }
 
         virtual component_types type() const override
         {
@@ -172,12 +185,15 @@ class capacitor : public two_terminal_device
         }
 };
 
-class inductor : public two_terminal_device
+class inductor : public impedance
 {
     public:
-        using two_terminal_device::two_terminal_device;
-
-        virtual void set_stamp(netlist&) override;
+        inductor(const std::string& line) :
+            impedance(line)
+        {
+            GiNaC::ex s = get_symbol("s");
+            value = 1 / (s * value); // convert the raw value to an conductance
+        }
 
         virtual component_types type() const override
         {

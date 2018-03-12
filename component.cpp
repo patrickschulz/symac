@@ -32,54 +32,18 @@ std::unique_ptr<component> create_component(const std::string& line)
     }
 }
 
-void resistor::set_stamp(netlist& nlist)
+void impedance::set_stamp(netlist& nlist)
 {
     unsigned int offset = nlist.number_of_nodes() + nlist.get_current_impedance();
     nlist.increment_current_impedance();
     if(nodes[0] > 0)
     {
-        stamps.push_back(stamp(offset, nodes[0], 1/value));
+        stamps.push_back(stamp(offset, nodes[0], value));
         stamps.push_back(stamp(nodes[0], offset, 1));
     }
     if(nodes[1] > 0)
     {
-        stamps.push_back(stamp(offset, nodes[1], -1/value));
-        stamps.push_back(stamp(nodes[1], offset, -1));
-    }
-    stamps.push_back(stamp(offset, offset, -1));
-}
-
-void capacitor::set_stamp(netlist& nlist)
-{
-    GiNaC::ex s = get_symbol("s");
-    unsigned int offset = nlist.number_of_nodes() + nlist.get_current_impedance();
-    nlist.increment_current_impedance();
-    if(nodes[0] > 0)
-    {
-        stamps.push_back(stamp(offset, nodes[0], value * s));
-        stamps.push_back(stamp(nodes[0], offset, 1));
-    }
-    if(nodes[1] > 0)
-    {
-        stamps.push_back(stamp(offset, nodes[1], -value * s));
-        stamps.push_back(stamp(nodes[1], offset, -1));
-    }
-    stamps.push_back(stamp(offset, offset, -1));
-}
-
-void inductor::set_stamp(netlist& nlist)
-{
-    GiNaC::ex s = get_symbol("s");
-    unsigned int offset = nlist.number_of_nodes() + nlist.get_current_impedance();
-    nlist.increment_current_impedance();
-    if(nodes[0] > 0)
-    {
-        stamps.push_back(stamp(offset, nodes[0], 1/(value * s)));
-        stamps.push_back(stamp(nodes[0], offset, 1));
-    }
-    if(nodes[1] > 0)
-    {
-        stamps.push_back(stamp(offset, nodes[1], -1/(value * s)));
+        stamps.push_back(stamp(offset, nodes[1], -value));
         stamps.push_back(stamp(nodes[1], offset, -1));
     }
     stamps.push_back(stamp(offset, offset, -1));
