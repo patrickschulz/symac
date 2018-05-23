@@ -10,6 +10,7 @@
 #include <ginac/ginac.h>
 
 #include "stamp.hpp"
+#include "map.hpp"
 
 class netlist;
 
@@ -48,7 +49,7 @@ const char component_names[] = {
 class component
 {
     public:
-        component(unsigned int number_of_terminals, const std::string& line) :
+        component(unsigned int number_of_terminals,const std::string& line) :
             nodes(number_of_terminals, 0)
         {
             std::istringstream stream(line);
@@ -63,6 +64,7 @@ class component
             }
             std::string v;
             stream >> v;
+            
             if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
             {
                 value = std::stod(v);
@@ -72,22 +74,23 @@ class component
                 value = get_symbol(v);
             }
         }
-        virtual ~component() { }
+//         virtual ~component() { }
 
         virtual component_types type() const = 0;
+        virtual char short_type() const = 0;
 
-        virtual std::string to_string() const
-        {
-            std::ostringstream stream;
-            stream << component_names[type()];
-            for(unsigned int i = 0; i < nodes.size(); ++i)
-            {
-                stream << ':' << nodes[i] << '-';
-            }
-            stream << nodes[nodes.size() - 1];
-            stream << " (" << value << ")";
-            return stream.str();
-        }
+          virtual std::string to_string() const
+          {             
+              std::ostringstream stream;
+              stream << component_names[type()];
+              for(unsigned int i = 0; i < nodes.size(); ++i)
+              {
+                  stream << ':' << nodes[i] << '-';
+              }
+              stream << nodes[nodes.size() - 1];
+              stream << " (" << value << ")";
+              return stream.str();
+         }
 
         const std::vector<unsigned int>& get_nodes() const
         {
@@ -102,28 +105,28 @@ class component
 
         void reset_stamp()
         {
-            stmp.clear();
+            stamps.clear();
         }
 
         virtual void set_stamp(netlist&) = 0;
 
-        const stamp& get_stamp() const
+        const std::vector<stamp>& get_stamps() const
         {
-            return stmp;
+            return stamps;
         }
 
         const GiNaC::ex& get_value() const { return value; }
     protected:
         std::vector<unsigned int> nodes;
         GiNaC::ex value;
-        stamp stmp;
+        std::vector<stamp> stamps;
 };
 
 class two_terminal_device : public component
 {
     public:
         explicit two_terminal_device(const std::string& line) :
-            component(2, line)
+            component(2,line)
         {
         }
 };
@@ -132,7 +135,7 @@ class three_terminal_device : public component
 {
     public:
         explicit three_terminal_device(const std::string& line) :
-            component(3, line)
+            component(3,line)
         {
         }
 };
@@ -141,63 +144,62 @@ class four_terminal_device : public component
 {
     public:
         explicit four_terminal_device(const std::string& line) :
-            component(4, line)
+            component(4,line)
         {
         }
 };
 
-class impedance : public two_terminal_device
+class resistor : public two_terminal_device
 {
     public:
         using two_terminal_device::two_terminal_device;
 
-        virtual void set_stamp(netlist&) override;
-};
-
-class resistor : public impedance
-{
-    public:
-        resistor(const std::string& line) :
-            impedance(line)
-        {
-            value = 1/value; // convert the raw value to an conductance
-        }
+        virtual void set_stamp(netlist&);
 
         virtual component_types type() const override
         {
             return component_types::ct_resistor;
         }
+
+        virtual char short_type() const override
+        {
+            return 'R';
+        }
 };
 
-class capacitor : public impedance
+class capacitor : public two_terminal_device
 {
     public:
-        capacitor(const std::string& line) :
-            impedance(line)
-        {
-            GiNaC::ex s = get_symbol("s");
-            value = s * value; // convert the raw value to an conductance
-        }
+        using two_terminal_device::two_terminal_device;
+
+        virtual void set_stamp(netlist&) override;
 
         virtual component_types type() const override
         {
             return component_types::ct_capacitor;
         }
+
+        virtual char short_type() const override
+        {
+            return 'C';
+        }
 };
 
-class inductor : public impedance
+class inductor : public two_terminal_device
 {
     public:
-        inductor(const std::string& line) :
-            impedance(line)
-        {
-            GiNaC::ex s = get_symbol("s");
-            value = 1 / (s * value); // convert the raw value to an conductance
-        }
+        using two_terminal_device::two_terminal_device;
+
+        virtual void set_stamp(netlist&) override;
 
         virtual component_types type() const override
         {
             return component_types::ct_inductor;
+        }
+
+        virtual char short_type() const override
+        {
+            return 'L';
         }
 };
 
@@ -212,6 +214,11 @@ class voltage_source : public two_terminal_device
         {
             return component_types::ct_voltage_source;
         }
+
+        virtual char short_type() const override
+        {
+            return 'V';
+        }
 };
 
 class current_source : public two_terminal_device
@@ -224,6 +231,11 @@ class current_source : public two_terminal_device
         virtual component_types type() const override
         {
             return component_types::ct_current_source;
+        }
+
+        virtual char short_type() const override
+        {
+            return 'I';
         }
 };
 
@@ -238,6 +250,11 @@ class opamp : public three_terminal_device
         {
             return component_types::ct_opamp;
         }
+
+        virtual char short_type() const override
+        {
+            return 'O';
+        }
 };
 
 class voltage_controlled_voltage_source : public four_terminal_device
@@ -250,6 +267,11 @@ class voltage_controlled_voltage_source : public four_terminal_device
         virtual component_types type() const override
         {
             return component_types::ct_voltage_controlled_voltage_source;
+        }
+
+        virtual char short_type() const override
+        {
+            return 'E';
         }
 };
 
@@ -264,6 +286,11 @@ class current_controlled_voltage_source : public four_terminal_device
         {
             return component_types::ct_current_controlled_voltage_source;
         }
+
+        virtual char short_type() const override
+        {
+            return 'F';
+        }
 };
 
 class voltage_controlled_current_source : public four_terminal_device
@@ -277,6 +304,11 @@ class voltage_controlled_current_source : public four_terminal_device
         {
             return component_types::ct_voltage_controlled_current_source;
         }
+
+        virtual char short_type() const override
+        {
+            return 'G';
+        }
 };
 
 class current_controlled_current_source : public four_terminal_device
@@ -289,6 +321,11 @@ class current_controlled_current_source : public four_terminal_device
         virtual component_types type() const override
         {
             return component_types::ct_current_controlled_current_source;
+        }
+
+        virtual char short_type() const override
+        {
+            return 'H';
         }
 };
 

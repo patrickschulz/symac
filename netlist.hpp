@@ -7,6 +7,7 @@
 #include <map>
 
 #include "component.hpp"
+#include "map.hpp"
 
 class netlist
 {
@@ -15,7 +16,7 @@ class netlist
         netlist(const std::string& filename);
 
         void add_component(std::unique_ptr<component>&&);
-
+        std::string to_string();
         void read(std::string filename);
         void print_all_components() const;
         unsigned int number_of_nodes() const;
@@ -56,6 +57,7 @@ class netlist
 
         std::map<std::string, unsigned int> nodemap;
 
+
         // network state
         unsigned int numnodes;
         unsigned int numsources;
@@ -70,7 +72,7 @@ class netlist
         unsigned int current_opamp;
         unsigned int current_vcvs;
         unsigned int current_ccvs;
-        unsigned int current_cccs;
+        unsigned int current_cccs;   
 };
 
 #endif //NETLIST_HPP

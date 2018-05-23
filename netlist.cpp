@@ -5,6 +5,7 @@
 #include <fstream>
 #include <algorithm>
 #include <regex>
+#include <ginac/ginac.h>
 
 #include "util.hpp"
 
@@ -72,9 +73,18 @@ void netlist::add_component(std::unique_ptr<component>&& comp)
     }
 }
 
+std::string netlist::to_string(std::vector<unsigned int> n)
+{
+    std::stringstream v ;
+    std::string s;
+    copy(n.begin(),n.end(), ostream_iterator<unsigned int> (v," ");    
+    s = v.str();
+    return s;
+}
 void netlist::read(std::string filename)
 {
     std::ifstream file(filename);
+    std::map<std::string, unsigned int> map.nodemap;
     if(!file.is_open())
     {
         valid = false;
@@ -98,7 +108,27 @@ void netlist::read(std::string filename)
         if(is_comment(line)); // ignore
         else if(is_component(line))
         {
-            components.push_back(create_component(line));
+            
+            GiNaC::ex value;
+            std::istringstream stream(line);
+            std::vector<unsigned int> nodes;
+            char type;
+            stream >> type;
+            switch()//type ?
+            {
+                case is_two_terminal_device     :   number_terminals = 2;
+                case is_three_terminal_device   :   number_terminals = 3;
+                case is_four_terminal_device    :   number_terminals = 4;
+            }
+            //-> give it to map functions
+            my_map.add_to_map(number_terminals,line,nodemap);
+            nodes = nodemap.get_calc_nodes();
+            value = nodemap.get_map_value();
+//          kind of zip it ? 
+//          std::tuple<char,unsigned int,GiNaC::ex> comp_arg= std::make_tuple(type, nodes, value); 
+//                          
+            std::string comp_arg = type + to_string(nodes) + value;
+            components.push_back(create_component(comp_arg));
         }
         else 
         {
@@ -208,7 +238,7 @@ void netlist::reset()
 
 void netlist::update()
 {
-    numnodes = number_of_nodes();
+    numnodes       = number_of_nodes();
     numsources     = number_of_devices(ct_voltage_source);
     numimpedances  = number_of_devices(ct_resistor) + number_of_devices(ct_capacitor) + number_of_devices(ct_inductor);
     numopamps      = number_of_devices(ct_opamp);
