@@ -2,36 +2,22 @@
 #define MAP_HPP
 
 
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <algorithm>
-#include <vector>
-#include <memory>
-#include <map>
-#include <ginac/ginac.h>
 
-#include "stamp.hpp"
+#include <string>
+#include <map>
+
 
 class map
 {   
     public:
-    map();
-    map(std::map<std::string, unsigned int> mappy);
-    void add_to_map (unsigned int, const std::string&, std::map< std::string, unsigned int> );       
-
-    unsigned int get_max_node();
-    std::vector<std::string> get_user_nodes();
-    std::vector<unsigned int> get_calc_nodes();
-    GiNaC::ex& get_map_value();
-    
-    
+        map();
+        void add_to_map(std::string snode);
+        unsigned int get_map_node();
+        unsigned int get_number_nodes() const;
+        
     private:
-    std::vector<std::string> input_nodes;
-    std::vector<unsigned int> output_nodes;
-    unsigned int node;
-    GiNaC::ex value;
+        std::map<std::string, unsigned int> mappy;
+        unsigned int mapped_node;
 };
-
 
 #endif

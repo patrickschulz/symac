@@ -1,75 +1,68 @@
 #include "map.hpp"
 
-
-#include <map>
-#include <string>
 #include <vector>
-#include <memory>
-#include <iostream>
 #include <sstream>
-#include <algorithm>
 
 #include "netlist.hpp"
 
-void map::add_to_map(unsigned int numbr_terminals, const std::string& line, std::map< std::string, unsigned int> my_map)
+map::map()
+{ 
+    mappy["0"]=0;
+}
+void map::add_to_map(std::string snode)
 {
-    std::string v;
-    unsigned int node= 0;
-    std::vector<unsigned int> output_nodes(numbr_terminals);
-    std::vector<std::string> input_nodes(numbr_terminals);
-    GiNaC::ex value;
-    std::istringstream stream(line);
-    stream >> v;
-    std::map< std::string, unsigned int>::iterator it =my_map.begin(); 
-    for (unsigned int i=0; i<numbr_terminals; ++i)
-    {
-        stream >> v;
-        input_nodes.push_back(v);
-        it = my_map.find(v);
-        if(it != my_map.end())
+    
+    unsigned int inode;
+    std::map<std::string, unsigned int>::iterator it =mappy.begin(); 
+    
+        
+        it = mappy.find(snode);
+        if(it != mappy.end())
         {
-            output_nodes.push_back(it -> second);
+            mapped_node = it -> second;
         }
-        else if((v == "0" || v == "GND") && it == my_map.end())
+        else if(snode == "0" ||snode  == "GND" || snode == "gnd" || snode == "Gnd")
         {
-            my_map.insert(std::make_pair(v,0)).first->second;
-            output_nodes.push_back(0);
-            input_nodes.push_back("0");
+            mapped_node = 0;
         }    
         else
         {
-            it = my_map.end();
+            it = mappy.end();
             --it;
-            node = it -> second;
-            node++;
-            my_map.insert(std::make_pair(v,node)).first->second;
-            output_nodes.push_back(node);
-            input_nodes.push_back(v);
-            
-        }    
-    }
-    if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
-            {
-                value = std::stod(v);
-            }
-            else
-            {
-                value = get_symbol(v);
-            }
-}
-std::vector<std::string> map::get_user_nodes(){return input_nodes;}
-std::vector<unsigned int> map::get_calc_nodes(){return output_nodes;}
-GiNaC::ex& map::get_map_value(){ return value;}
-unsigned int map::get_max_node()
+            inode = it -> second;
+            inode++;
+            mappy.insert(std::make_pair(snode,inode)).first->second;
+            mapped_node = inode;
+        } 
+}    
+unsigned int map::get_map_node(){ return mapped_node;}
+unsigned int map::get_number_nodes() const
 {
-    auto result = std::minmax_element(output_nodes.begin(), output_nodes.end());
-    return output_nodes[result.second - output_nodes.begin()];
+    unsigned int i = 0;
+    i = mappy.rbegin()->second;
+    return i;
 }
+// TODO : put funct in netlist
+// unsigned int map::get_max_node()
+// {
+//     auto result = std::minmax_element(output_nodes.begin(), output_nodes.end());
+//     return output_nodes[result.second - output_nodes.begin()];
+// }
 
-
-
-
-
-
-
-
+// std::string map::get_user_node(unsigned int unode)
+// {
+//     std::map<unsigned int, std::string > reverse;
+//     std::string usernode = "Error: Could not find";
+//     std::map<std::string, unsigned int>::iterator i;
+//     std::map<unsigned int,std::string>::iterator h;
+//     for ( i = mappy.begin(); i != mappy.end(); ++i)
+//     {
+//         reverse[i->second] = i->first;
+//     }
+//     h = reverse.find(unode);
+//     if(h != reverse.end())
+//     {
+//         usernode= i -> second;
+//     }
+//     return usernode;
+// }

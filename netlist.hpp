@@ -8,23 +8,26 @@
 
 #include "component.hpp"
 #include "map.hpp"
+#include "subckt.hpp"
 
 class netlist
 {
     public:
         netlist();
         netlist(const std::string& filename);
-
+        
+        void component_read_in(const std::string& line);
         void add_component(std::unique_ptr<component>&&);
         std::string to_string();
         void read(std::string filename);
         void print_all_components() const;
+        unsigned int numbr_terminals(char type);
         unsigned int number_of_nodes() const;
         const std::vector<const component*> get_devices(component_types type) const;
         unsigned int number_of_devices(component_types type) const;
         unsigned int number_of_impedances() const;
         int number_of_voltage_sources() const;
-
+        
         unsigned int full_network_size() const;
 
         unsigned int get_current_impedance() { return current_impedance; }
@@ -47,6 +50,8 @@ class netlist
         }
 
         operator bool();
+        void add_to_output_map(unsigned int node, std::string snode);
+        std::string get_output_node(unsigned int node) const;
 
     private:
         void reset();
@@ -54,10 +59,12 @@ class netlist
 
         bool valid;
         std::vector<std::unique_ptr<component>> components;
-
-        std::map<std::string, unsigned int> nodemap;
-
-
+        map nmap;
+        std::map<unsigned int, std::string> output_map;
+        
+        //subcircuit
+        std::vector<subcircuit> subckt_vector;
+        
         // network state
         unsigned int numnodes;
         unsigned int numsources;
@@ -73,6 +80,7 @@ class netlist
         unsigned int current_vcvs;
         unsigned int current_ccvs;
         unsigned int current_cccs;   
+
 };
 
 #endif //NETLIST_HPP
