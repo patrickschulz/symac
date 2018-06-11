@@ -17,8 +17,12 @@ class netlist
         netlist(const std::string& filename);
         
         void component_read_in(const std::string& line);
+        std::string change_sub_line(std::string line, std::vector<std::string>);
+        std::string to_String(unsigned int u);
+        
+        
         void add_component(std::unique_ptr<component>&&);
-        std::string to_string();
+//         std::string to_string();
         void read(std::string filename);
         void print_all_components() const;
         unsigned int numbr_terminals(char type);
@@ -64,6 +68,7 @@ class netlist
         
         //subcircuit
         std::vector<subcircuit> subckt_vector;
+        unsigned int number_subckt;
         
         // network state
         unsigned int numnodes;

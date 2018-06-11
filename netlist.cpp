@@ -39,7 +39,11 @@ static bool is_component(const std::string& line)
 {
     return is_two_terminal_device(line) || is_three_terminal_device(line) || is_four_terminal_device(line);
 }
-
+static bool is_subckt_line(std::string s)
+{
+    std::regex rx("[A-Z]");
+    return std::regex_match(s,rx);
+}
 unsigned int netlist::numbr_terminals(char type)
 {
     unsigned int number_terminals;
@@ -150,7 +154,7 @@ void netlist::read(std::string filename)
             std::istringstream stream(line);
             char dot;
             std::string v;
-            
+
             stream >> dot;
             stream >> v;
             if (v=="subckt")
@@ -161,15 +165,17 @@ void netlist::read(std::string filename)
                 stream >> subcktname;
                 while(stream >> tname)
                 {
-                    sub_terminal_names.push_back(tname);
+                    sub_terminal_names.push_back(std::move (tname));
                 }
-                
-                subckt_vector.push_back(subcircuit(subcktname, sub_terminal_names));
+                subcircuit subckt(subcktname,sub_terminal_names);
+                subckt_vector.push_back(subckt);
             }
-            else if (v=="[A-Z]")
+            else if (is_subckt_line(v))
             {
                 line.erase(line.begin()); //delete the dot
-                subckt_vector.at(number_subckt).add_line(line); //save it in vector in object
+                std::vector <std::string> terminals = subckt_vector.at(number_subckt).get_terminals();
+                std::string changed_sub_line = change_sub_line(line,terminals);// maybe in netlist?
+                subckt_vector.at(number_subckt).add_line(changed_sub_line); //save it in vector in object                
             }
             else if (v=="end")
             { 
@@ -190,23 +196,24 @@ void netlist::read(std::string filename)
                         id = i;
                     }
                 }
-                
-                subckt_vector.at(id).change_lines();
-                std::vector<std::string> sub_terminal_names = subckt_vector.at(number_subckt).get_terminals();
-                std::vector<std::string> slines =  subckt_vector.at(number_subckt).get_sublines();
-                for(unsigned int i = 0 ; i< sub_terminal_names.size();i++)
+                std::vector<std::string> sub_terminal_names = subckt_vector.at(id).get_terminals();
+                std::vector<std::string> slines =  subckt_vector.at(id).get_sublines();
+                unsigned int tnumber = 0;
+                while (stream >> terminal_name)
                 {
-                    stream >> terminal_name;
                     
-                    std::string sub_name = sub_terminal_names[i];
-                    auto pos = std::find(slines.begin(),slines.end(), sub_name);
-                    for (;pos != slines.end();)
+                    for(unsigned int i = 0 ; i< slines.size();i++)
                     {
-                        slines[pos-slines.begin()]= terminal_name;
-                        pos=std::find(slines.begin(),slines.end(), sub_name);
-                        
+                        std::string sline = slines.at(i);
+                        size_t pos = sline.find(sub_terminal_names.at(tnumber));
+                        while ( pos != std::string::npos)
+                        {
+                            sline.replace(pos, 1 , terminal_name);
+                            pos = sline.find(sub_terminal_names.at(tnumber));
+                        }
+                        slines[i] = sline;
                     }
-                    i++;
+                    tnumber++;
                 }
                 for(unsigned int i=0; i<slines.size();i++)
                 {
@@ -380,8 +387,48 @@ void netlist::component_read_in(const std::string& line)
     }
     components.push_back(create_component(type,nodes,value));
 }
-
-
+std::string netlist::change_sub_line(std::string line, std::vector<std::string> terminals)
+{
+        std::stringstream stream (line);
+        std::string oline;
+        char type;
+        std::string buf;
+        
+        stream >> type;
+        oline= type;
+        oline.append(" ");
+        unsigned int nterminals = numbr_terminals(type);
+        
+        for (unsigned int i = 0 ; i< nterminals; i++)
+        {   
+            
+            stream >> buf;
+            if(std::find(terminals.begin(),terminals.end(), buf) == terminals.end())
+            {
+                
+                unsigned int unode = std::stoi(buf);
+                unode += 42 ;
+                std::string snode = to_String(unode);
+                oline.append(snode);
+                oline.append(" ");
+            }
+            else
+            {
+                oline.append(buf);
+                oline.append(" ");
+                
+            }
+        }
+        stream >> buf;
+        oline += buf;
+        return oline;
+}
+std::string netlist::to_String(unsigned int u)
+{
+    std::ostringstream stream;
+    stream << u;
+    return stream.str();
+}
 
 
 
