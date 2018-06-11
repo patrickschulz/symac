@@ -1,8 +1,9 @@
 *Test for subckts
 .subckt sub p n 
 .R p 1 R0
-.C 1 C1 n
+.C 1 n C1
 .end
 
 V 1 0 Vin
 .sub 1 0 
+.sub 1 0
