@@ -49,120 +49,66 @@ const char component_names[] = {
 class component
 {
     public:
-        component(std::vector<unsigned int> nodes, GiNaC::ex& value) :
-        nodes(nodes), value(value)
+        component(const std::vector<unsigned int>& nodes, const GiNaC::ex& value) :
+            nodes(nodes), value(value)
         {   }
         
-        
-//         component(unsigned int number_of_terminals,const std::string& line) :
-//             nodes(number_of_terminals, 0)
-//         {
-//             std::istringstream stream(line);
-// 
-//             char type;
-//             stream >> type;
-//             for(unsigned int i = 0; i < nodes.size(); ++i)
-//             {
-//                 unsigned int node;
-//                 stream >> node;
-//                 nodes[i] = node;
-//             }
-//             std::string v;
-//             stream >> v;
-//             
-//             if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
-//             {
-//                 value = std::stod(v);
-//             }
-//             else
-//             {
-//                 value = get_symbol(v);
-//             }
-//         }
-//         virtual ~component() { }
-
         virtual component_types type() const = 0;
         virtual char short_type() const = 0;
 
-          virtual std::string to_string() const
-          {             
-              std::ostringstream stream;
-              stream << component_names[type()];
-              for(unsigned int i = 0; i < nodes.size(); ++i)
-              {
-                  stream << ':' << nodes[i] << '-';
-              }
-              stream << nodes[nodes.size() - 1];
-              stream << " (" << value << ")";
-              return stream.str();
-         }
+        virtual std::string to_string() const
+        {             
+            std::ostringstream stream;
+            stream << component_names[type()];
+            for(unsigned int i = 0; i < nodes.size(); ++i)
+            {
+                stream << ':' << nodes[i] << '-';
+            }
+            stream << nodes[nodes.size() - 1];
+            stream << " (" << value << ")";
+            return stream.str();
+        }
 
         const std::vector<unsigned int>& get_nodes() const
         {
             return nodes;
         }
 
-//         virtual unsigned int get_max_node() const
-//         {
-//             auto result = std::minmax_element(nodes.begin(), nodes.end());
-//             return nodes[result.second - nodes.begin()];
-//         }
-
         void reset_stamp()
         {
-            stamps.clear();
+            stmp.clear();
         }
 
         virtual void set_stamp(netlist&) = 0;
 
-        const std::vector<element>& get_stamp() const
+        const stamp& get_stamp() const
         {
-            return stamps;
+            return stmp;
         }
 
         const GiNaC::ex& get_value() const { return value; }
     protected:
         std::vector<unsigned int> nodes;
         GiNaC::ex value;
-        std::vector<element> stamps;
+        stamp stmp;
 };
 
-class two_terminal_device : public component
+class impedance : public component
 {
     public:
         using component::component;
-//         explicit two_terminal_device(const std::string& line) :
-//             component(2,line)
-//         {
-//         }
+
+        virtual void set_stamp(netlist& nlist) override;
 };
 
-class three_terminal_device : public component
+class resistor : public impedance
 {
     public:
-        using component::component;
-//         explicit three_terminal_device(const std::string& line) :
-//             component(3,line)
-//         {
-//         }
-};
-
-class four_terminal_device : public component
-{
-    public:
-        using component::component;
-//         explicit four_terminal_device(const std::string& line) :
-//             component(4,line)
-//         {
-//         }
-};
-
-class resistor : public two_terminal_device
-{
-    public:
-        using two_terminal_device::two_terminal_device;
-
-        virtual void set_stamp(netlist& nlist);
+        resistor(const std::vector<unsigned int>& nodes, const GiNaC::ex& value) :
+            impedance(nodes, value)
+        {   
+            this->value = 1 / value;
+        }
 
         virtual component_types type() const override
         {
@@ -175,12 +121,15 @@ class resistor : public two_terminal_device
         }
 };
 
-class capacitor : public two_terminal_device
+class capacitor : public impedance
 {
     public:
-        using two_terminal_device::two_terminal_device;
-
-        virtual void set_stamp(netlist& nlist);
+        capacitor(const std::vector<unsigned int>& nodes, const GiNaC::ex& value) :
+            impedance(nodes, value)
+        {   
+            GiNaC::ex s = get_symbol("s");
+            this->value = s * value;
+        }
 
         virtual component_types type() const override
         {
@@ -193,12 +142,15 @@ class capacitor : public two_terminal_device
         }
 };
 
-class inductor : public two_terminal_device
+class inductor : public impedance
 {
     public:
-        using two_terminal_device::two_terminal_device;
-
-        virtual void set_stamp(netlist&) ;
+        inductor(const std::vector<unsigned int>& nodes, const GiNaC::ex& value) :
+            impedance(nodes, value)
+        {   
+            GiNaC::ex s = get_symbol("s");
+            this->value = 1 / (s * value);
+        }
 
         virtual component_types type() const override
         {
@@ -211,10 +163,10 @@ class inductor : public two_terminal_device
         }
 };
 
-class voltage_source : public two_terminal_device
+class voltage_source : public component
 {
     public:
-        using two_terminal_device::two_terminal_device;
+        using component::component;
 
         virtual void set_stamp(netlist&) override;
 
@@ -229,10 +181,10 @@ class voltage_source : public two_terminal_device
         }
 };
 
-class current_source : public two_terminal_device
+class current_source : public component
 {
     public:
-        using two_terminal_device::two_terminal_device;
+        using component::component;
 
         virtual void set_stamp(netlist&) override;
 
@@ -247,10 +199,10 @@ class current_source : public two_terminal_device
         }
 };
 
-class opamp : public three_terminal_device
+class opamp : public component
 {
     public:
-        using three_terminal_device::three_terminal_device;
+        using component::component;
 
         virtual void set_stamp(netlist&) override;
 
@@ -265,10 +217,10 @@ class opamp : public three_terminal_device
         }
 };
 
-class voltage_controlled_voltage_source : public four_terminal_device
+class voltage_controlled_voltage_source : public component
 {
     public:
-        using four_terminal_device::four_terminal_device;
+        using component::component;
 
         virtual void set_stamp(netlist&) override;
 
@@ -283,10 +235,10 @@ class voltage_controlled_voltage_source : public four_terminal_device
         }
 };
 
-class current_controlled_voltage_source : public four_terminal_device
+class current_controlled_voltage_source : public component
 {
     public:
-        using four_terminal_device::four_terminal_device;
+        using component::component;
 
         virtual void set_stamp(netlist&) override;
 
@@ -301,10 +253,10 @@ class current_controlled_voltage_source : public four_terminal_device
         }
 };
 
-class voltage_controlled_current_source : public four_terminal_device
+class voltage_controlled_current_source : public component
 {
     public:
-        using four_terminal_device::four_terminal_device;
+        using component::component;
 
         virtual void set_stamp(netlist&) override;
 
@@ -319,10 +271,10 @@ class voltage_controlled_current_source : public four_terminal_device
         }
 };
 
-class current_controlled_current_source : public four_terminal_device
+class current_controlled_current_source : public component
 {
     public:
-        using four_terminal_device::four_terminal_device;
+        using component::component;
 
         virtual void set_stamp(netlist&) override;
 

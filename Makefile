@@ -2,13 +2,13 @@ TARGET   := ./symac
 CXXFLAGS := -g -Wextra -Wall -Wno-long-long -pedantic-errors -std=c++17
 CXX      := g++
 INCLUDES := 
-LIBS     := -lginac -lboost_program_options
+LIBS     := -lginac
 EXT      := cpp
 BUILDDIR := .build
 
 override BUILDDIR := $(strip $(BUILDDIR))
 SOURCES  := $(wildcard *.$(EXT))
-#SOURCES  += $(wildcard program_options/*.$(EXT))
+SOURCES  += $(wildcard program_options/*.$(EXT))
 OBJECTS  := $(patsubst %.$(EXT), $(BUILDDIR)/%.o, $(SOURCES))
 DEPS     := $(patsubst %.$(EXT), $(BUILDDIR)/%.dep, $(SOURCES))
 
