@@ -1,36 +1,6 @@
 #include "component.hpp"
 #include "netlist.hpp"
 #include <utility>
-std::unique_ptr<component> create_component(char type, std::vector< unsigned int> nodes, GiNaC::ex& value)
-{ 
-    
-    switch(type)
-    {
-        case 'R':
-            return std::make_unique<resistor>(nodes,value);
-        case 'C':
-            return std::make_unique<capacitor>(nodes,value);
-        case 'L':
-            return std::make_unique<inductor>(nodes,value);
-        case 'V':
-            return std::make_unique<voltage_source>(nodes,value);
-        case 'I':
-            return std::make_unique<current_source>(nodes,value);
-        case 'E':
-            return std::make_unique<voltage_controlled_voltage_source>(nodes,value);
-        case 'O':
-            return std::make_unique<opamp>(nodes,value);
-        case 'F':
-            return std::make_unique<current_controlled_voltage_source>(nodes,value);
-        case 'G':
-            return std::make_unique<voltage_controlled_current_source>(nodes,value);
-        case 'H':
-            return std::make_unique<current_controlled_current_source>(nodes,value);
-        default:
-            std::cerr << "Unknown component: '" << type << "'\n";
-            return NULL;
-    }
-}
 
 void impedance::set_stamp(netlist& nlist)
 {
@@ -118,6 +88,36 @@ void current_controlled_current_source::set_stamp(netlist& nlist)
     stmp.write(offset, nodes[3], -1);
     stmp.write(nodes[3], offset, -1);
     nlist.increment_current_ccvs();
+}
+
+std::unique_ptr<component> create_component(char type, std::vector< unsigned int> nodes, GiNaC::ex& value)
+{ 
+    switch(type)
+    {
+        case 'R':
+            return std::make_unique<resistor>(nodes,value);
+        case 'C':
+            return std::make_unique<capacitor>(nodes,value);
+        case 'L':
+            return std::make_unique<inductor>(nodes,value);
+        case 'V':
+            return std::make_unique<voltage_source>(nodes,value);
+        case 'I':
+            return std::make_unique<current_source>(nodes,value);
+        case 'E':
+            return std::make_unique<voltage_controlled_voltage_source>(nodes,value);
+        case 'O':
+            return std::make_unique<opamp>(nodes,value);
+        case 'F':
+            return std::make_unique<current_controlled_voltage_source>(nodes,value);
+        case 'G':
+            return std::make_unique<voltage_controlled_current_source>(nodes,value);
+        case 'H':
+            return std::make_unique<current_controlled_current_source>(nodes,value);
+        default:
+            std::cerr << "Unknown component: '" << type << "'\n";
+            return NULL;
+    }
 }
 
 // vim: nowrap

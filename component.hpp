@@ -56,19 +56,6 @@ class component
         virtual component_types type() const = 0;
         virtual char short_type() const = 0;
 
-        virtual std::string to_string() const
-        {             
-            std::ostringstream stream;
-            stream << component_names[type()];
-            for(unsigned int i = 0; i < nodes.size(); ++i)
-            {
-                stream << ':' << nodes[i] << '-';
-            }
-            stream << nodes[nodes.size() - 1];
-            stream << " (" << value << ")";
-            return stream.str();
-        }
-
         const std::vector<unsigned int>& get_nodes() const
         {
             return nodes;
@@ -86,7 +73,11 @@ class component
             return stmp;
         }
 
-        const GiNaC::ex& get_value() const { return value; }
+        const GiNaC::ex& get_value() const
+        {
+            return value;
+        }
+
     protected:
         std::vector<unsigned int> nodes;
         GiNaC::ex value;

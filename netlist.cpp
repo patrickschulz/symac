@@ -76,21 +76,7 @@ unsigned int netlist::numbr_terminals(char type)
     
 }
 netlist::netlist() :
-    valid(false),
-    numnodes(0),
-    numsources(0),
-    numimpedances(0),
-    numopamps(0),
-    numvcvs(0),
-    numccvs(0),
-    numcccs(0),
-
-    current_impedance(1),
-    current_source(1),
-    current_opamp(1),
-    current_vcvs(1),
-    current_ccvs(1),
-    current_cccs(1)
+    valid(false)
 {
 }
 
@@ -289,21 +275,7 @@ int netlist::number_of_voltage_sources() const
 
 unsigned int netlist::full_network_size() const
 {
-    return numnodes       + 
-           numsources     + 
-           numimpedances  + 
-           numopamps      + 
-           numvcvs        +
-           numccvs * 2    +
-           numcccs;
-}
-
-void netlist::print_all_components() const
-{
-    for(const auto& component : components)
-    {
-        std::cout << component->to_string() << '\n';
-    }
+    return state.full_size();
 }
 
 netlist::operator bool()
@@ -317,23 +289,18 @@ void netlist::reset()
     {
         c->reset_stamp();
     }
-    current_impedance = 1;
-    current_source = 1;
-    current_opamp = 1;
-    current_vcvs = 1;
-    current_ccvs = 1;
-    current_cccs = 1;
+    state.reset();
 }
 
 void netlist::update()
 {
-    numnodes       = number_of_nodes();
-    numsources     = number_of_devices(ct_voltage_source);
-    numimpedances  = number_of_devices(ct_resistor) + number_of_devices(ct_capacitor) + number_of_devices(ct_inductor);
-    numopamps      = number_of_devices(ct_opamp);
-    numvcvs        = number_of_devices(ct_voltage_controlled_voltage_source);
-    numccvs        = number_of_devices(ct_current_controlled_voltage_source);
-    numcccs        = number_of_devices(ct_current_controlled_current_source);
+    state.numnodes       = number_of_nodes();
+    state.numsources     = number_of_devices(ct_voltage_source);
+    state.numimpedances  = number_of_devices(ct_resistor) + number_of_devices(ct_capacitor) + number_of_devices(ct_inductor);
+    state.numopamps      = number_of_devices(ct_opamp);
+    state.numvcvs        = number_of_devices(ct_voltage_controlled_voltage_source);
+    state.numccvs        = number_of_devices(ct_current_controlled_voltage_source);
+    state.numcccs        = number_of_devices(ct_current_controlled_current_source);
 }
 
 void netlist::add_to_output_map(unsigned int unode, std::string snode)
