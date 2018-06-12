@@ -311,6 +311,7 @@ void netlist::add_to_output_map(unsigned int unode, std::string snode)
         output_map.insert(std::make_pair(unode, snode)).first ->second;
     }
 }
+
 std::string netlist::get_output_node(unsigned int unode) const
 {
     std::string snode = "Not found";
@@ -321,6 +322,7 @@ std::string netlist::get_output_node(unsigned int unode) const
     }    
     return snode;
 }
+
 void netlist::component_read_in(const std::string& line)
 {
     GiNaC::ex value;
@@ -354,6 +356,7 @@ void netlist::component_read_in(const std::string& line)
     }
     components.push_back(create_component(type,nodes,value));
 }
+
 std::string netlist::change_sub_line(std::string line, std::vector<std::string> terminals)
 {
         std::stringstream stream (line);
@@ -390,13 +393,11 @@ std::string netlist::change_sub_line(std::string line, std::vector<std::string> 
         oline += buf;
         return oline;
 }
+
 std::string netlist::to_String(unsigned int u)
 {
     std::ostringstream stream;
     stream << u;
     return stream.str();
 }
-
-
-
 
