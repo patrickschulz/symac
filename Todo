@@ -45,3 +45,4 @@ Subcircuits:
             C n2 n3 C0
         .ENDS
 
+    - change read-in logic for subcircuits: Don't read subcircuits in the standard manner of the netlist, rather create a new method for netlist which only reads subcircuits.
