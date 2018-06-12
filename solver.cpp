@@ -43,7 +43,7 @@ void solver::print()
         std::cout << "    Node voltages:\n";
         for(; row < nlist.number_of_nodes(); ++row)
         {
-            std::string usernode = nlist.get_output_node(row+1);
+            std::string usernode = nlist.get_output_node(row + 1);
             boost::format fmter = boost::format("        Node %s:\t\t") % (usernode);
             std::string str = fmter.str();
             std::cout << str << results(row, 0) << '\n';
