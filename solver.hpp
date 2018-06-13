@@ -2,6 +2,7 @@
 #define SOLVER_HPP
 
 #include <string>
+#include <vector>
 
 #include <ginac/ginac.h>
 
@@ -15,6 +16,7 @@ class solver
         void solve();
         void print();
         void print_matrices();
+        void mat_export();
 
     private:
         std::string mode;

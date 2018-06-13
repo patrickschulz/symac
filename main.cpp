@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 
         if(nlist)
         {
-            const std::string mode = commandline_options["mode"].as<std::string>();
+            const std::string mode  = commandline_options["mode"].as<std::string>();
             solver S(mode, nlist);
             S.mna();
             if(commandline_options.count("print"))

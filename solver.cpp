@@ -4,6 +4,7 @@
 #include <numeric>
 
 #include "mna.hpp"
+#include "netlist.hpp"
 
 solver::solver(const std::string& mode, const netlist& nlist) :
     mode(mode), nlist(nlist)
@@ -75,9 +76,10 @@ void solver::print()
     }
     else if(mode == "tf")
     {
-        unsigned int node1 = 1;
-        unsigned int node2 = 2;
-        std::cout << "H(s) = " << results(node2 - 1, 0) / results(node1 - 1, 0) << '\n';
+        unsigned int first = 1;
+        unsigned int second= 2;
+        
+        std::cout << "H(s) = " << results(second, 0) / results(first, 0) << '\n';
     }
     else
     {

@@ -17,7 +17,7 @@ class netlist
         netlist(const std::string& filename);
         
         void component_read_in(const std::string& line);
-        std::string change_sub_line(std::string line, std::vector<std::string>);
+        std::string change_sub_line(std::string line, std::vector<std::string> terminals, std::string subckt_name);
         std::string to_String(unsigned int u);
         
         
@@ -56,7 +56,7 @@ class netlist
         operator bool();
         void add_to_output_map(unsigned int node, std::string snode);
         std::string get_output_node(unsigned int node) const;
-
+        unsigned int get_unode(std::string snode) const;
     private:
         void reset();
         void update();

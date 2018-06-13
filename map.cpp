@@ -42,6 +42,34 @@ unsigned int map::get_number_nodes() const
     i = mappy.rbegin()->second;
     return i;
 }
+unsigned int map::find_node(std::string snode) const
+{
+     unsigned int unode;
+
+     auto it = mappy.find(snode);
+     if (it != mappy.end())
+     {
+         unode = it-> second;
+     }
+     else
+     {
+         unode = 0;
+     }
+     return unode;
+}
+            
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
 // TODO : put funct in netlist
 // unsigned int map::get_max_node()
 // {

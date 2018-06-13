@@ -174,7 +174,8 @@ void netlist::read(std::string filename)
             {
                 line.erase(line.begin()); //delete the dot
                 std::vector <std::string> terminals = subckt_vector.at(number_subckt).get_terminals();
-                std::string changed_sub_line = change_sub_line(line,terminals);// maybe in netlist?
+                std::string subckt_name = subckt_vector.at(number_subckt).get_name();
+                std::string changed_sub_line = change_sub_line(line,terminals,subckt_name);
                 subckt_vector.at(number_subckt).add_line(changed_sub_line); //save it in vector in object                
             }
             else if (v=="end")
@@ -214,7 +215,7 @@ void netlist::read(std::string filename)
                         slines[i] = sline;
                     }
                     tnumber++;
-                }
+                }           
                 for(unsigned int i=0; i<slines.size();i++)
                 {
                     component_read_in(slines[i]);
@@ -354,6 +355,12 @@ std::string netlist::get_output_node(unsigned int unode) const
     }    
     return snode;
 }
+unsigned int netlist::get_unode( std::string snode) const
+{
+    unsigned int unode = nmap.find_node(snode);
+    return unode;
+}
+    
 void netlist::component_read_in(const std::string& line)
 {
     GiNaC::ex value;
@@ -387,7 +394,7 @@ void netlist::component_read_in(const std::string& line)
     }
     components.push_back(create_component(type,nodes,value));
 }
-std::string netlist::change_sub_line(std::string line, std::vector<std::string> terminals)
+std::string netlist::change_sub_line(std::string line, std::vector<std::string> terminals,std::string subckt_name)
 {
         std::stringstream stream (line);
         std::string oline;
@@ -405,11 +412,9 @@ std::string netlist::change_sub_line(std::string line, std::vector<std::string> 
             stream >> buf;
             if(std::find(terminals.begin(),terminals.end(), buf) == terminals.end())
             {
-                
-                unsigned int unode = std::stoi(buf);
-                unode += 42 ;
-                std::string snode = to_String(unode);
-                oline.append(snode);
+                oline.append(subckt_name);
+                oline.append(":");
+                oline.append(buf);
                 oline.append(" ");
             }
             else
