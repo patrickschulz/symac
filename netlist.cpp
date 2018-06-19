@@ -226,33 +226,6 @@ void netlist::read(std::string filename)
                     }
                 slines[i] = ch_sline;
                 }
-                
-                
-//                 unsigned int tnumber = 0;
-//                 while (stream >> terminal_name)
-//                 {
-//                     
-//                     for(unsigned int i = 0 ; i< slines.size();i++)
-//                     {
-//                         std::string sline = slines.at(i);
-//                         size_t pos = sline.find(sub_terminal_names.at(tnumber));
-//                         while ( pos != std::string::npos)
-//                         {
-//                             sline.replace(pos, 1 , terminal_name);
-//                             pos = sline.find(sub_terminal_names.at(tnumber));
-//                         }
-//                         slines[i] = sline;
-//                     }
-//                     tnumber++;
-//                 }
-// //              TODO: Stream name of subckt in call
-//                 std::string subckt_value;
-//                 stream >> subckt_value;
-//                 for(unsigned int i=0; i<slines.size();i++)
-//                 {
-//                     std::string sline = slines.at(i);
-//                     std::string changed_sub_line = change_sub_line(sline,sub_terminal_names
-//                 
                 for(unsigned int i=0; i<slines.size();i++)
                 {
                     component_read_in(slines[i]);

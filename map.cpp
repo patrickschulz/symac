@@ -38,8 +38,8 @@ void map::add_to_map(std::string snode)
 unsigned int map::get_map_node(){ return mapped_node;}
 unsigned int map::get_number_nodes() const
 {
-    unsigned int i = 0;
-    i = mappy.rbegin()->second;
+    unsigned int i = mappy.size();
+    i--;
     return i;
 }
 unsigned int map::find_node(std::string snode) const
