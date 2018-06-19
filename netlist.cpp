@@ -325,10 +325,7 @@ std::string netlist::get_output_node(unsigned int unode) const
 
 void netlist::component_read_in(const std::string& line)
 {
-    GiNaC::ex value;
-    std::string snode;
     std::istringstream stream(line);
-    
             
     char type;
     stream >> type;
@@ -336,19 +333,18 @@ void netlist::component_read_in(const std::string& line)
     std::vector<unsigned int> nodes;
     for (unsigned int i = 0; i < number_terminals; i++)
     {
-        unsigned int n;
+        std::string snode;
         stream >> snode;
-        nmap.add_to_map(snode);
-        n = nmap.get_map_node();
-        nodes.push_back(std::move(n));
-        add_to_output_map(n,snode);                
+        unsigned int n = nmap.get_mapped_node(snode);
+        nodes.emplace_back(n);
+        add_to_output_map(n, snode);                
     }
     std::string v;
     stream >> v;
+    GiNaC::ex value;
     if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
     {
         value = std::stod(v);
-        
     }
     else
     {
