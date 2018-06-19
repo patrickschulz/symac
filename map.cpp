@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
 #include "netlist.hpp"
 
@@ -38,9 +39,16 @@ void map::add_to_map(std::string snode)
 unsigned int map::get_map_node(){ return mapped_node;}
 unsigned int map::get_number_nodes() const
 {
-    unsigned int i = 0;
-    i = mappy.rbegin()->second;
-    return i;
+    typedef std::pair<std::string, unsigned int> pair_type;
+
+    auto it = std::max_element
+    (
+         std::begin(mappy), std::end(mappy),
+         [] (const pair_type & p1, const pair_type & p2) {
+             return p1.second < p2.second;
+         }
+    );
+    return it->second;
 }
 // TODO : put funct in netlist
 // unsigned int map::get_max_node()
