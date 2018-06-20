@@ -75,6 +75,7 @@ class options
                 ("nosolve,s" , "don't solve the network")
                 ("report,r"  , "create a report")
                 ("mode,m", value<std::string>()->default_value("ac"), "simulation mode (possible values: ac (default), sp (S-Parameters), tf (transfer function)")
+                ("node,n", value<std::vector<std::string>>(), "nodes for transfer function (pass two times)")
                 ("result"    , "which results should be shown? (show all if none are given)")
                 ;
 

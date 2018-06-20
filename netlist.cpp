@@ -190,12 +190,12 @@ void netlist::read(std::string filename)
                     
                     for(unsigned int i = 0 ; i< slines.size();i++)
                     {
-                        std::string sline = slines.at(i);
-                        size_t pos = sline.find(sub_terminal_names.at(tnumber));
+                        std::string sline = slines[i];
+                        size_t pos = sline.find(sub_terminal_names[tnumber]);
                         while ( pos != std::string::npos)
                         {
-                            sline.replace(pos, 1 , terminal_name);
-                            pos = sline.find(sub_terminal_names.at(tnumber));
+                            sline.replace(pos, 1, terminal_name);
+                            pos = sline.find(sub_terminal_names[tnumber], pos + 1);
                         }
                         slines[i] = sline;
                     }

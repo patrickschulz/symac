@@ -18,6 +18,12 @@ int main(int argc, char** argv)
     options opt(argc, argv);
     auto commandline_options = opt.get_options();
 
+    for(auto e : commandline_options["node"].as<std::vector<std::string>>())
+    {
+        std::cout << e << ' ';
+    }
+    std::cout << '\n';
+
     if(commandline_options.count("netlist"))
     {
         std::string filename = commandline_options["netlist"].as<std::string>();
