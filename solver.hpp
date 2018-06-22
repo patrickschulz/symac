@@ -11,16 +11,17 @@
 class solver
 {
     public:
-        solver(const std::string& mode, const netlist&);
+        solver(const std::string& mode, const netlist&,const std::vector<std::string> nodes);
         void mna();
         void solve();
         void print();
         void print_matrices();
-        void mat_export();
+        void to_matlab(const std::string& filename);
 
     private:
         std::string mode;
         const netlist& nlist;
+        std::vector<std::string> nodes;
         GiNaC::matrix A;
         GiNaC::matrix x;
         GiNaC::matrix z;

@@ -10,7 +10,7 @@
 #include <ginac/ginac.h>
 
 #include "stamp.hpp"
-#include "map.hpp"
+
 
 class netlist;
 

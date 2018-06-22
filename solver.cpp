@@ -2,12 +2,14 @@
 
 #include <boost/format.hpp>
 #include <numeric>
+#include <fstream>
+
 
 #include "mna.hpp"
 #include "netlist.hpp"
 
-solver::solver(const std::string& mode, const netlist& nlist) :
-    mode(mode), nlist(nlist)
+solver::solver(const std::string& mode, const netlist& nlist, const std::vector< std::string> nodes) :
+    mode(mode), nlist(nlist), nodes(nodes)
 {
 
 }
@@ -74,12 +76,26 @@ void solver::print()
             }
         }
     }
-    else if(mode == "tf")
+    else if(mode == "VVtf")
     {
-        unsigned int first = 1;
-        unsigned int second= 2;
-        
-        std::cout << "H(s) = " << results(second, 0) / results(first, 0) << '\n';
+        if (nodes[0].empty() || nodes[1].empty())
+        {
+            std::cerr << "No Nodes given! \n";
+        }
+        else
+        {
+            unsigned int first = nlist.get_unode(nodes[0]);
+            unsigned int second = nlist.get_unode(nodes[1]);
+            first--;
+            second--;   
+            std::cout << "Node " << nodes[0] << " Voltage: \n";
+            std::cout << results(first,0) << '\n';
+            std::cout << "Node " << nodes[1] << " Voltage: \n";
+            std::cout << results(second,0) << '\n';
+            std::cout << "Transfer Function: Voltage-Voltage \n";
+            std::cout << '\n';
+            std::cout << "H(s) = " << results(second, 0) / results(first, 0) << '\n';
+        }
     }
     else
     {
@@ -173,4 +189,37 @@ void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, cons
 void solver::print_matrices()
 {
     print_network_matrices(A, x, z);
+}
+void solver::to_matlab(const std::string& filename)
+{
+    std::string a = filename;
+//     std::ofstream ofile(filename +".m", std::ofstream::out);
+//     ofile << "Matlab-Export " << std::endl;
+//     ofile << " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " << std::endl;
+//     ofile << " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " << std::endl;
+// 
+//     ofile << " Matrices:" << std::endl;
+//     // Print matrices A, x , z 
+//     unsigned int A_rows =  sizeof A / sizeof A[0];
+//     unsigned int A_cols = sizeof A[0] / sizeof(int);
+// 
+//     ofile << " A = [ " << std::endl;
+//     for (unsigned int i = 0;i < A_rows ;i++)
+//     {
+//         ofile << "    sym('" << A[i][1]<<"'), ";
+//         for( unsigned int j = 1 ; j < A_cols ; j++)
+//         {
+//             ofile <<"     sym('"<<A[i][j]<<"'), ";
+//         }
+//     }
+//     ofile << " ]" << std::endl;
+//     unsigned int z_rows = sizeof z / sizeof z[0];
+//     ofile << " z = [ " << std::endl;
+//     for (unsigned int i = 0 ; i < z_rows;i++)
+//     {
+//         ofile << ("  sym ('"<<z[i]<<"') ", );
+//     }
+//     ofile << " ] " << std::endl;
+//     ofile << " x = simplify ( inv(A) * z)" << std::endl;
+//     ofile.close();
 }

@@ -48,7 +48,7 @@ void print_devices()
               << "  Operational amplifiers: O IN1 IN2 OUT VALUE\n"
               << "Four-terminal devices (Cx are the controlling terminals (plus and minus)):\n"
               << "  Voltage-controlled voltage sources: E N1 N2 C1 C2 VALUE\n"
-              << "  Current-controlled voltage sources: F N1 N2 C1 C2 VALUE\n"
+              << "  Current-controlled voltage sources: F N1 N2 C1 C2 VALUE\n"  
               << "  Voltage-controlled current sources: G N1 N2 C1 C2 VALUE\n"
               << "  Current-controlled current sources: H N1 N2 C1 C2 VALUE\n"
               ;
@@ -74,7 +74,9 @@ class options
                 ("devices,D" , "print information about the usage of all components")
                 ("nosolve,s" , "don't solve the network")
                 ("report,r"  , "create a report")
-                ("mode,m", value<std::string>()->default_value("ac"), "simulation mode (possible values: ac (default), sp (S-Parameters), tf (transfer function)")
+                ("mode,m", value<std::string>()->default_value("ac"), "simulation mode (possible values: ac (default), sp (S-Parameters), tf(transfer function)")
+                ("node1", value<std::string>(),"node One for transfer function")
+                ("node2", value<std::string>(),"node Two for transfer function")
                 ("result"    , "which results should be shown? (show all if none are given)")
                 ;
 
