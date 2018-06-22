@@ -220,8 +220,10 @@ void netlist::read(std::string filename)
                         while ( pos != std::string::npos)
                         {
                             std::string terminal_name = terminal_names.at(j);
-                            ch_sline.replace(pos, 1 , terminal_name);
-                            pos = ch_sline.find(sub_terminal_names.at(j));
+                            terminal_name = " " + terminal_name + " ";
+                            ch_sline.erase(pos, 1);
+                            ch_sline.insert(pos, terminal_name);
+                            pos = ch_sline.find(sub_terminal_names.at(j),pos + terminal_name.size());
                         }
                     }
                 slines[i] = ch_sline;
