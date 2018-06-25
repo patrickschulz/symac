@@ -48,6 +48,3 @@ Subcircuits:
     - change read-in logic for subcircuits: Don't read subcircuits in the standard manner of the netlist, rather create a new method for netlist which only reads subcircuits.
 
     - subcircuits should support terminal names with more than one letter. Furthermore, the subcircuit logic can run into infinite loops, see while loop in netlist.cpp:188
-
-Proposal for subcircuit handling:
-    When instantiating a subcircuit, create a
