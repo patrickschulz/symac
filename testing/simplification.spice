@@ -1,0 +1,16 @@
+*Simplification Test & Style in second-order C-R Low-Pass
+* without subckt
+* with names for nodes
+* WITHOUT NAMES FOR COMPS
+* introduce Command  "simplify" before actual ckt --- like params, maybe usable for other commands
+
+*only greater than expected, not less than
+*take values
+simplify R1 >> R2 
+simplify C1 >> C2
+
+V in 0 Vin
+R in 1 R1
+C 1 0  C1
+R 1 out R2
+C out 0 C2

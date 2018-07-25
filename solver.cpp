@@ -8,10 +8,10 @@
 #include "mna.hpp"
 #include "netlist.hpp"
 
-solver::solver(const std::string& mode, const netlist& nlist, const std::vector< std::string> nodes) :
-    mode(mode), nlist(nlist), nodes(nodes)
-{
 
+solver::solver(const std::string& filename, const std::string& mode,std::vector<std::string> nodes, netlist& nlist, bool matlab_export) :
+    filename(filename),mode (mode),nodes(nodes), nlist(nlist), matlab_export(matlab_export)
+{
 }
 
 void solver::mna()
@@ -33,13 +33,13 @@ void solver::print()
         std::cout << "Results:\n";
         std::cout << GiNaC::csrc;
         unsigned int row = 0;
-
+        
         std::vector<std::tuple<std::string, component_types, std::vector<std::string>>> dev_formats = {
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through impedances", ct_resistor | ct_capacitor | ct_inductor, {"Iz"}),
+            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through impedances", ct_resistor | ct_capacitor | ct_inductor,{"Iz"}),
             std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through voltage sources", ct_voltage_source, {"Iv"}),
             std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents into opamps (output)", ct_opamp, {"Iop"}),
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through vcvs", ct_voltage_controlled_voltage_source, {"Ie"}),
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through cccs", ct_current_controlled_current_source, {"Ihin"}),
+            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through vcvs", ct_voltage_controlled_voltage_source, {"I_vcvs"}),
+            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through cccs", ct_current_controlled_current_source, {"I_cccs"}),
             std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through ccvs", ct_current_controlled_voltage_source, {"Ifin", "Ifout"})
         };
 
@@ -76,25 +76,32 @@ void solver::print()
             }
         }
     }
-    else if(mode == "VVtf")
+    else if(mode == "tf")
     {
-        if (nodes[0].empty() || nodes[1].empty())
-        {
-            std::cerr << "No Nodes given! \n";
+        if(nodes.size() != 2){
+            std::cerr << "You have to specify two nodes (by using the -n argument two times)"<< '\n';
+            exit(1);
         }
-        else
+        if(nodes[0] == "0" || nodes[1]== "0" || nodes[0] == "GND" || nodes[1] == "GND" )
         {
-            unsigned int first = nlist.get_unode(nodes[0]);
-            unsigned int second = nlist.get_unode(nodes[1]);
-            first--;
-            second--;   
-            std::cout << "Node " << nodes[0] << " Voltage: \n";
-            std::cout << results(first,0) << '\n';
-            std::cout << "Node " << nodes[1] << " Voltage: \n";
-            std::cout << results(second,0) << '\n';
-            std::cout << "Transfer Function: Voltage-Voltage \n";
-            std::cout << '\n';
-            std::cout << "H(s) = " << results(second, 0) / results(first, 0) << '\n';
+            std::cerr << " You can't use the GND node (node 0)" << '\n';
+            exit(1);
+        }
+        unsigned int first = nlist.get_unode(nodes[0]) - 1;
+        unsigned int second= nlist.get_unode(nodes[1]) - 1;
+        GiNaC::ex H = results(second, 0) / results(first, 0);
+        std::cout << "H(s) = " << H << '\n';
+        std::cout << "H(s) to Latex" << '\n';
+        std::cout << "H(s) = " <<GiNaC::latex << H << '\n';
+        if(matlab_export)
+        {
+            vvtf_matlab_export(filename,first,second);
+        }
+        if(nlist.is_simplification())
+        { 
+            std::string H_simple = vvtf_simplification(H);
+            std::cout << " Simplified (in Latex) "<< '\n';
+            std::cout << "H(s) = " << H_simple << '\n';
         }
     }
     else
@@ -190,36 +197,240 @@ void solver::print_matrices()
 {
     print_network_matrices(A, x, z);
 }
-void solver::to_matlab(const std::string& filename)
+void solver::matrices_to_matlab(const std::string& filename)
 {
     std::string a = filename;
-//     std::ofstream ofile(filename +".m", std::ofstream::out);
-//     ofile << "Matlab-Export " << std::endl;
-//     ofile << " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " << std::endl;
-//     ofile << " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " << std::endl;
-// 
-//     ofile << " Matrices:" << std::endl;
-//     // Print matrices A, x , z 
-//     unsigned int A_rows =  sizeof A / sizeof A[0];
-//     unsigned int A_cols = sizeof A[0] / sizeof(int);
-// 
-//     ofile << " A = [ " << std::endl;
-//     for (unsigned int i = 0;i < A_rows ;i++)
-//     {
-//         ofile << "    sym('" << A[i][1]<<"'), ";
-//         for( unsigned int j = 1 ; j < A_cols ; j++)
-//         {
-//             ofile <<"     sym('"<<A[i][j]<<"'), ";
-//         }
-//     }
-//     ofile << " ]" << std::endl;
-//     unsigned int z_rows = sizeof z / sizeof z[0];
-//     ofile << " z = [ " << std::endl;
-//     for (unsigned int i = 0 ; i < z_rows;i++)
-//     {
-//         ofile << ("  sym ('"<<z[i]<<"') ", );
-//     }
-//     ofile << " ] " << std::endl;
-//     ofile << " x = simplify ( inv(A) * z)" << std::endl;
-//     ofile.close();
+    std::ofstream ofile(filename +".m", std::ofstream::out);
+    ofile << "Matlab-Export " << std::endl;
+    ofile << " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " << std::endl;
+    ofile << " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " << std::endl;
+
+    ofile << " Matrices:" << std::endl;
+    // Print matrices A, x , z 
+    unsigned int A_rows =  A.rows();
+    unsigned int A_cols = A.cols();
+
+    ofile << " A = [ " << std::endl;
+    for (unsigned int i = 0;i < A_rows ;i++)
+    {
+        ofile << "    sym('" << A[i][1]<<"'), ";
+        for( unsigned int j = 1 ; j < A_cols ; j++)
+        {
+            ofile <<"     sym('"<<A[i][j]<<"'), ";
+        }
+    
+    }
+    ofile << " ]" << std::endl;
+    unsigned int z_rows = z.rows();
+    ofile << " z = [ " << std::endl;
+    for (unsigned int i = 0 ; i < z_rows;i++)
+    {
+        ofile << "  sym ('"<< z[i] <<"'), ";
+    }
+    ofile << " ] " << std::endl;
+    ofile << " x = simplify ( inv(A) * z)" << std::endl;
 }
+void solver::vvtf_matlab_export(std::string& filename, unsigned int first, unsigned int second)
+{
+    const char *path="/home/jan/Desktop";// make it relative ?
+    std::size_t slash = filename.find("/");
+    filename.erase(0,slash);
+    std::size_t dot = filename.find(".");
+    filename.erase(dot, std::string::npos);
+    std::string name = path + filename + ".m";
+    std::ofstream ofile(name, std::ofstream::out);
+    std::vector<std::string> values= nlist.get_values();
+    
+    ofile << "% Matlab-Export: " << std::endl;
+    ofile << "% Voltage-Voltage Transfer Function"<< std::endl;
+    ofile << " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " << std::endl;
+    ofile << " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " << std::endl;
+    
+    for(unsigned int i = 0 ; i< values.size();i++)
+    {
+        ofile << values[i] << " =  1e0 ; "<< std::endl;
+    }
+    GiNaC::ex  H = results(second,0)/results(first,0);
+    ofile << "s = tf('s'); "<< std::endl;
+    ofile << "H = " <<results(second,0)/results(first,0) << ";" <<std::endl;
+    ofile << std::endl;
+    ofile << std::endl;
+    ofile << std::endl;
+    ofile << "% Plot Parameters " << std::endl;
+    ofile << std::endl;
+    ofile << " % Bode-Plot" << std::endl;
+    ofile << " figure('Name','Bode-Diagram','NumberTitle','off'); " << std::endl;
+    ofile << " bode (H); " << std::endl;
+    ofile << " grid on ; " << std::endl;
+    ofile << std::endl;
+    ofile << std::endl;
+    ofile << " % Sprungantwort "<< std::endl;
+    ofile << " figure('Name','Step-, Impulse-response ','NumberTitle','off'); " << std::endl;
+    ofile << " subplot(2,1,1) " << std::endl;
+    ofile << " step(H)      " << std::endl;
+    ofile << " subplot(2,1,2) " << std::endl;
+    ofile << " impulse(H)   " << std::endl;
+    ofile << " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " << std::endl;
+    ofile << " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " << std::endl;
+    ofile << " % Transfer Function for Latex " << std::endl;
+    ofile << " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " << std::endl;
+    ofile << GiNaC::latex << results(second,0)/results(first,0)<< std::endl;
+    ofile << GiNaC::dflt  << std::endl;
+}
+std::string solver::vvtf_funct_to_latex_string(GiNaC::ex H)
+{
+    std::ostringstream s;
+    s << GiNaC::latex;
+    s << H;
+    s << GiNaC::dflt;
+    std::string string_funct = s.str();
+    return string_funct;
+}
+std::string solver::vvtf_simplification(GiNaC::ex H)
+{
+    std::string str_funct = vvtf_funct_to_latex_string(H);
+    // now happens the magic
+    // Ich erwarte einen /frac{....}{....} - befehl
+    // Ziel ist es alle Multiplikationsterme(getrennt durch whitespace), in denen nur die zu eliminierenden Komponenten
+    // vorkommen, zu löschen. Die Multiplikationsterme sind durch Additionen verbunden. 
+    
+    // some symbols that get used a lot
+
+    std::string frac("frac{");
+    std::string closed("}");
+    std::string opened("{");
+    
+    auto pos = str_funct.begin() + 1;
+    auto found_preambel = str_funct.find(frac);
+    if(found_preambel == std::string::npos)
+    {
+        std::cerr << "Error occured, while reading latex expression"<< '\n';
+    }
+    
+    //Now pos is pointing to first char in Nominator
+    pos = pos + frac.length();
+    auto start_nominator = pos-str_funct.begin();
+    auto found_opened = str_funct.find(opened,start_nominator);
+    auto found_closed = str_funct.find(closed,start_nominator);
+    
+    for(;found_opened < found_closed;)
+    {
+        found_opened = str_funct.find(opened,found_opened);
+        found_closed = str_funct.find(closed,found_closed);
+    }
+    std::string nominator = str_funct.substr(start_nominator, found_closed-start_nominator);
+    
+    pos = str_funct.begin() + found_opened +1;
+    auto start_denominator = pos-str_funct.begin();
+    found_opened = str_funct.find(opened,start_denominator);
+    found_closed = str_funct.find(closed,start_denominator);
+    for(;found_opened < found_closed;)
+    {
+        if(found_opened != std::string::npos)
+        {
+            found_opened = str_funct.find(opened,found_opened+1);
+            found_closed = str_funct.find(closed,found_closed+1);
+        }
+        else
+        {
+            break;
+        }
+    }
+    std::string denominator = str_funct.substr(start_denominator , found_closed-start_denominator);
+    
+    nominator = simplify_line(nominator);
+    denominator = simplify_line(denominator);
+    std::string sim_string;
+    
+    sim_string.append("\\");
+    sim_string.append(frac);
+    sim_string.append(nominator);
+    sim_string.append(closed);
+    sim_string.append(opened);
+    sim_string.append(denominator);
+    sim_string.append(closed);
+    return sim_string;
+}
+std::string solver::simplify_line(std::string s)
+{
+    std::string sim;
+   
+    std::vector<std::string> substrings;
+    std::string plus ("+");
+    std::size_t found_plus = s.find(plus);
+    auto pos = s.begin();
+    auto start = pos-s.begin();
+    if(found_plus == std::string::npos)
+    {
+        substrings.push_back(sim_replace(s));
+    }
+    else
+    {
+        std::string substring;
+        for(unsigned int i = 0 ;found_plus != std::string::npos; i++)
+        {
+            substring= s.substr(start,found_plus-start);
+            start =found_plus + 1;
+            substrings.emplace_back(sim_replace(substring));
+            found_plus=s.find(plus, found_plus+1);
+        }
+        substring = s.substr(start);
+        substrings.emplace_back(sim_replace(substring));
+        
+    }
+    
+    sim.append(substrings[0]);
+    for(unsigned int i = 1; i <substrings.size();i++)
+    {
+        std::string v = substrings[i];
+        if (!v.empty())
+        {
+            sim.append(plus);
+            sim.append(v);
+        }
+    }
+    
+    return sim;
+}
+std::string solver::sim_replace(std::string v)
+{
+    std::vector<std::string> vals_to_simplify = nlist.get_simplifications();
+    std::vector<std::string> vals = nlist.get_values();
+    std::stringstream stream(v);
+    std::string buf;
+    std::string sub;
+    bool comps_simpl = false;
+    bool comps_not_simpl = false;
+
+    stream >> buf;
+    for(;stream;)
+    {
+        
+        if (std::find (vals.begin(),vals.end(),buf) != vals.end())
+        {
+            if (std::find(vals_to_simplify.begin(),vals_to_simplify.end(),buf) != vals_to_simplify.end())
+            {
+                comps_simpl = true;
+            }
+            else
+            {
+                comps_not_simpl= true;
+            }
+        }
+        sub.append(buf);
+        sub.append(" ");
+        stream >> buf;
+    }
+    if ( comps_simpl && !comps_not_simpl)
+    {
+        sub.clear();
+    }
+    return sub;
+}
+
+
+
+
+
+
+

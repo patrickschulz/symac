@@ -78,6 +78,7 @@ class options
                 ("node1", value<std::string>(),"node One for transfer function")
                 ("node2", value<std::string>(),"node Two for transfer function")
                 ("result"    , "which results should be shown? (show all if none are given)")
+                ("matlab_export"," export results to MatLab-Script, Name must be given")
                 ;
 
             options_description hidden("Hidden options");

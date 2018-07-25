@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <sstream>
+#include <ostream>
 
 #include "netlist.hpp"
 
@@ -9,7 +10,7 @@ map::map()
 { 
     mappy["0"]=0;
 }
-void map::add_to_map(std::string snode)
+unsigned int map::get_map_node(std::string snode)
 {
     
     unsigned int inode;
@@ -19,23 +20,20 @@ void map::add_to_map(std::string snode)
         it = mappy.find(snode);
         if(it != mappy.end())
         {
-            mapped_node = it -> second;
+            inode = it -> second;
+            
         }
         else if(snode == "0" ||snode  == "GND" || snode == "gnd" || snode == "Gnd")
         {
-            mapped_node = 0;
+            inode =0;
         }    
         else
         {
-            it = mappy.end();
-            --it;
-            inode = it -> second;
-            inode++;
+            inode = mappy.size();
             mappy.insert(std::make_pair(snode,inode)).first->second;
-            mapped_node = inode;
         } 
+        return inode;
 }    
-unsigned int map::get_map_node(){ return mapped_node;}
 unsigned int map::get_number_nodes() const
 {
     unsigned int i = mappy.size();
@@ -53,7 +51,7 @@ unsigned int map::find_node(std::string snode) const
      }
      else
      {
-         unode = 0;
+         std::cerr<< "Node not existent!" << std::endl;
      }
      return unode;
 }

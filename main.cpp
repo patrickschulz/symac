@@ -25,8 +25,8 @@ int main(int argc, char** argv)
         netlist nlist(filename);
         if(nlist)
         {
+            bool to_matlab = false;
             const std::string mode  = commandline_options["mode"].as<std::string>();
-//             Nodes for tf
             std::vector<std::string> nodes;
             if(commandline_options.count("node1") && commandline_options.count("node2"))
             {
@@ -35,7 +35,11 @@ int main(int argc, char** argv)
                 nodes.push_back(node1);
                 nodes.push_back(node2);
             }
-            solver S(mode, nlist,nodes);
+            if(commandline_options.count("matlab_export"))
+            {
+                to_matlab = true;
+            }
+            solver S(filename, mode, nodes, nlist, to_matlab);
             S.mna();
             if(commandline_options.count("print"))
             {

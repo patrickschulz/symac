@@ -1,0 +1,17 @@
+*TestCase: Multiple Subckts
+*Multiple First Order TPs + Portname = Compname
+.subckt sub1 A B 
+.R A B R1
+.C B 0 C1
+.end
+
+.subckt sub2 A B
+.R A B R2
+.C B 0 C2
+.end
+
+V in 0 V1
+.sub1 in 2 TP1
+.sub2 2 out TP2
+
+

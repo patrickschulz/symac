@@ -17,8 +17,6 @@ class netlist
         netlist(const std::string& filename);
         
         void component_read_in(const std::string& line);
-        std::string change_sub_line(std::string line, std::vector<std::string> terminals, std::string subckt_name);
-        std::string to_String(unsigned int u);
         
         
         void add_component(std::unique_ptr<component>&&);
@@ -54,9 +52,21 @@ class netlist
         }
 
         operator bool();
+        // OUTPUT MAP
         void add_to_output_map(unsigned int node, std::string snode);
         std::string get_output_node(unsigned int node) const;
         unsigned int get_unode(std::string snode) const;
+        // subcircuit
+        std::string change_subline_nodes(std::string line, std::vector<std::string> terminals, std::string subckt_name);
+        std::string change_subline_terminals(std::string sline, std::vector<std::string> sub_t_names, std::vector<std::string> t_names);
+        //matlab export
+        void set_matlab_values(std::string v);
+        std::vector<std::string> get_values();
+        //command - simplification
+        bool is_simplification();
+        void set_simplification(const std::string& line);
+        std::vector<std::string> get_simplifications();
+        
     private:
         void reset();
         void update();
@@ -69,6 +79,9 @@ class netlist
         //subcircuit
         std::vector<subcircuit> subckt_vector;
         unsigned int number_subckt;
+        
+        //matlab output
+        std::vector<std::string> values;
         
         // network state
         unsigned int numnodes;
@@ -84,8 +97,11 @@ class netlist
         unsigned int current_opamp;
         unsigned int current_vcvs;
         unsigned int current_ccvs;
-        unsigned int current_cccs;   
-
+        unsigned int current_cccs;
+        
+        //command-simplification
+        bool simplification ;
+        std::vector<std::string> vals_simplify; 
 };
 
 #endif //NETLIST_HPP

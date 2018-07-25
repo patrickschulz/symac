@@ -44,30 +44,42 @@ static bool is_subckt_line(std::string s)
     std::regex rx("[A-Z]");
     return std::regex_match(s,rx);
 }
+static bool is_command_simplify(const std::string& line)
+{
+    if(line.find("simplify") != std::string::npos)
+    {   
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 unsigned int netlist::numbr_terminals(char type)
 {
     unsigned int number_terminals;
    switch(type)
     {
-        case 'R':
+        case 'R': // resistor
             return number_terminals = 2;
-        case 'C':
+        case 'C': // capacitor
             return number_terminals = 2;
-        case 'L':
+        case 'L': // inductor
             return number_terminals = 2;
-        case 'V':
+        case 'V': // voltage_source
             return number_terminals = 2;
-        case 'I':
+        case 'I': // current_source
             return number_terminals = 2;
-        case 'E':
+        case 'E': // voltage_controlled_voltage_source
             return number_terminals = 4;
-        case 'O':
+        case 'O': // opamp
             return number_terminals = 3;
-        case 'F':
+        case 'F': // current_controlled_voltage_source
             return number_terminals = 4;
-        case 'G':
+        case 'G': // voltage_controlled_current_source
             return number_terminals = 4;
-        case 'H':
+        case 'H': // current_controlled_current_source
             return number_terminals = 4;
         default:
             std::cerr << "Unknown component: '" << type << "'\n";
@@ -121,6 +133,7 @@ void netlist::add_component(std::unique_ptr<component>&& comp)
 // }
 void netlist::read(std::string filename)
 {
+    simplification = false;
     unsigned int number_subckt=0 ;
     std::ifstream file(filename);
     output_map.insert(std::make_pair(0 , "GND")).first -> second;
@@ -172,10 +185,7 @@ void netlist::read(std::string filename)
             }
             else if (is_subckt_line(v))
             {
-                line.erase(line.begin()); //delete the dot
-//                 std::vector <std::string> terminals = subckt_vector.at(number_subckt).get_terminals();
-//                 std::string subckt_name = subckt_vector.at(number_subckt).get_name();
-//                 std::string changed_sub_line = change_sub_line(line,terminals,subckt_name);
+                line.erase(line.begin()); 
                 subckt_vector.at(number_subckt).add_line(line); //save it in vector in object                
             }
             else if (v=="end")
@@ -213,20 +223,9 @@ void netlist::read(std::string filename)
                 for (unsigned int i = 0; i < slines.size(); i++)
                 {
                     std::string sline = slines.at(i);
-                    std::string ch_sline= change_sub_line(sline, sub_terminal_names, subckt_value);
-                    for(unsigned int j = 0; j < terminal_names.size(); j++)
-                    {
-                        size_t pos = ch_sline.find(sub_terminal_names.at(j));
-                        while ( pos != std::string::npos)
-                        {
-                            std::string terminal_name = terminal_names.at(j);
-                            terminal_name = " " + terminal_name + " ";
-                            ch_sline.erase(pos, 1);
-                            ch_sline.insert(pos, terminal_name);
-                            pos = ch_sline.find(sub_terminal_names.at(j),pos + terminal_name.size());
-                        }
-                    }
-                slines[i] = ch_sline;
+                    std::string ch_sline= change_subline_nodes(sline, sub_terminal_names, subckt_value);
+                    ch_sline = change_subline_terminals(sline,sub_terminal_names,terminal_names);
+                    slines[i] = ch_sline;
                 }
                 for(unsigned int i=0; i<slines.size();i++)
                 {
@@ -234,7 +233,12 @@ void netlist::read(std::string filename)
                 }
             }    
         }
-        else 
+        else if (is_command_simplify(line))
+        {
+            set_simplification(line);
+            simplification = true;
+        }
+        else
         {
             if(title_found)
             {
@@ -379,22 +383,21 @@ void netlist::component_read_in(const std::string& line)
     std::string snode;
     std::istringstream stream(line);
     
-            
-    char type;
-    stream >> type;
+    std::string name;
+    stream >> name;
+    char type = name[0];
     unsigned int number_terminals = numbr_terminals(type);
     std::vector<unsigned int> nodes;
     for (unsigned int i = 0; i < number_terminals; i++)
     {
-        unsigned int n;
         stream >> snode;
-        nmap.add_to_map(snode);
-        n = nmap.get_map_node();
+        unsigned int n = nmap.get_map_node(snode);
         nodes.push_back(std::move(n));
         add_to_output_map(n,snode);                
     }
     std::string v;
     stream >> v;
+    set_matlab_values(v);
     if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
     {
         value = std::stod(v);
@@ -406,7 +409,7 @@ void netlist::component_read_in(const std::string& line)
     }
     components.push_back(create_component(type,nodes,value));
 }
-std::string netlist::change_sub_line(std::string line, std::vector<std::string> terminals,std::string subckt_value)
+std::string netlist::change_subline_nodes(std::string line, std::vector<std::string> terminals,std::string subckt_value)
 {
         std::stringstream stream (line);
         std::string oline;
@@ -424,10 +427,18 @@ std::string netlist::change_sub_line(std::string line, std::vector<std::string> 
             stream >> buf;
             if(std::find(terminals.begin(),terminals.end(), buf) == terminals.end())
             {
-                oline.append(subckt_value);
-                oline.append(":");
-                oline.append(buf);
-                oline.append(" ");
+                if ( buf == "0" || buf == "GND" )
+                {
+                    oline.append(buf);
+                    oline.append(" ");
+                }
+                else
+                {
+                    oline.append(subckt_value);
+                    oline.append(":");
+                    oline.append(buf);
+                    oline.append(" ");
+                }
             }
             else
             {
@@ -440,11 +451,66 @@ std::string netlist::change_sub_line(std::string line, std::vector<std::string> 
         oline += buf;
         return oline;
 }
-std::string netlist::to_String(unsigned int u)
+std::string netlist::change_subline_terminals(std::string sline, std::vector<std::string> sub_t_names, std::vector<std::string> t_names)
 {
-    std::ostringstream stream;
-    stream << u;
-    return stream.str();
+    //create map of sub_t_names & t_names 
+    std::map<std::string,std::string> name_map;
+    for (unsigned int i = 0 ; i< sub_t_names.size();i++)
+    {
+        name_map[sub_t_names[i]]=t_names[i];
+    }
+    
+    std::stringstream stream(sline);
+    std::string buf;
+    std::string oline;
+    stream >> buf;
+    char type=buf[0];
+    oline = buf;
+    oline.append(" ");
+    unsigned int nterminals = numbr_terminals(type);
+    std::map<std::string,std::string>::iterator it;
+    for(unsigned int j = 0; j< nterminals; j++)
+    {
+        stream >> buf;
+        it = name_map.find(buf);
+        if(it != name_map.end())
+        {
+            buf = it -> second;
+        }
+        oline.append(buf);
+        oline.append(" ");
+    }
+    stream >> buf;
+    oline.append(buf);
+    return oline;
+}
+
+//Matlab Values for default settings
+std::vector<std::string> netlist::get_values()
+{
+    return values;
+}
+void netlist::set_matlab_values(std::string v)
+{
+    values.push_back(v);
+}
+void netlist::set_simplification(const std::string& line)
+{
+    std::stringstream stream (line);
+    std::string s;
+    stream >> s;//s = simplify
+    stream >> s;// s = R1,C1
+    stream >> s;// s = >>
+    stream >> s;// s = R2,C2
+    vals_simplify.push_back(s);
+}
+std::vector<std::string> netlist::get_simplifications()
+{
+    return vals_simplify;
+}
+bool netlist::is_simplification()
+{
+    return simplification;
 }
 
 
