@@ -6,13 +6,20 @@
 #include "sspace_symbols.hpp"
 #include "product.hpp"
 
+struct polelement
+{
+    product p;
+    bool valid;
+};
+
 class polynom
 {
     public:
         void add_product(const product& p, unsigned int degree)
         {
             vec.resize(degree + 1);
-            vec[degree] = vec[degree] * p;
+            vec[degree].p = vec[degree].p * p;
+            vec[degree].valid = true;
         }
 
         unsigned int degree()
@@ -23,18 +30,21 @@ class polynom
         friend std::ostream& operator<<(std::ostream& stream, const polynom& p);
 
     private:
-        std::vector<product> vec;
+        std::vector<polelement> vec;
 };
 
 std::ostream& operator<<(std::ostream& stream, const polynom& p)
 {
     for(unsigned int i = 0; i < p.vec.size(); ++i)
     {
-        stream << p.vec[i];
-        stream << " * s^" << i;
-        if(i != p.vec.size() - 1)
+        if(p.vec[i].valid)
         {
-            stream << " + ";
+            stream << p.vec[i].p;
+            stream << " * s^" << i;
+            if(i != p.vec.size() - 1)
+            {
+                stream << " + ";
+            }
         }
     }
     return stream;

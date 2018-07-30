@@ -13,7 +13,7 @@ int main()
     GiNaC::symbol C1 = GiNaC::symbol("C1");
     GiNaC::symbol C2 = GiNaC::symbol("C2");
 
-    GiNaC::ex tfex = ((1 + s * R1 * C1) / (1 + s * R1 * C2 + s * s * R1 * R2 * C1 * C2));
+    GiNaC::ex tfex = (1 + s)/(1 + s * s);
 
     transfer_function tf(tfex);
 
