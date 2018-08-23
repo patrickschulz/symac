@@ -4,15 +4,22 @@
 #include <ginac/ginac.h>
 
 #include "sspace_symbols.hpp"
-#include "product.hpp"
+#include "sum.hpp"
+
+struct polelement
+{
+    std::vector<sum> sums;
+    bool valid;
+};
 
 class polynom
 {
     public:
-        void add_product(const product& p, unsigned int degree)
+        void add_sum(const sum& p, unsigned int degree)
         {
             vec.resize(degree + 1);
-            vec[degree] = vec[degree] * p;
+            vec[degree].sums.push_back(p);
+            vec[degree].valid = true;
         }
 
         unsigned int degree()
@@ -23,18 +30,36 @@ class polynom
         friend std::ostream& operator<<(std::ostream& stream, const polynom& p);
 
     private:
-        std::vector<product> vec;
+        std::vector<polelement> vec;
 };
 
 std::ostream& operator<<(std::ostream& stream, const polynom& p)
 {
     for(unsigned int i = 0; i < p.vec.size(); ++i)
     {
-        stream << p.vec[i];
-        stream << " * s^" << i;
-        if(i != p.vec.size() - 1)
+        if(p.vec[i].valid)
         {
-            stream << " + ";
+            stream << "s^" << i << " * ";
+            if(p.vec[i].sums.size() > 1)
+            {
+                stream << '(';
+            }
+            for(unsigned int j = 0; j < p.vec[i].sums.size(); ++j)
+            {
+                stream << p.vec[i].sums[j];
+                if(j != p.vec[i].sums.size() - 1)
+                {
+                    stream << " + ";
+                }
+            }
+            if(p.vec[i].sums.size() > 1)
+            {
+                stream << ')';
+            }
+            if(i != p.vec.size() - 1)
+            {
+                stream << " + ";
+            }
         }
     }
     return stream;

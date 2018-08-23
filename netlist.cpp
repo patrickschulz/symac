@@ -59,10 +59,10 @@ unsigned int netlist::numbr_terminals(char type)
             return number_terminals = 2;
         case 'I':
             return number_terminals = 2;
-        case 'E':
-            return number_terminals = 4;
         case 'O':
             return number_terminals = 3;
+        case 'E':
+            return number_terminals = 4;
         case 'F':
             return number_terminals = 4;
         case 'G':
@@ -97,14 +97,6 @@ void netlist::add_component(std::unique_ptr<component>&& comp)
     }
 }
 
-// std::string netlist::to_string(std::vector<unsigned int> n)
-// {
-//     std::stringstream v ;
-//     std::string s;
-//     copy(n.begin(),n.end(), ostream_iterator<unsigned int> (v," ");    
-//     s = v.str();
-//     return s;
-// }
 void netlist::read(std::string filename)
 {
     unsigned int number_subckt=0 ;
@@ -173,7 +165,7 @@ void netlist::read(std::string filename)
                 unsigned int id;
                 
                 std::vector<std::string> sub_line;
-//              Check the possibly multiple subckts for the specific one
+                // Check the possibly multiple subckts for the specific one
                 for (unsigned int i = 0; i<subckt_vector.size();i++)
                 {
                     std::string name = subckt_vector.at(i).get_name();

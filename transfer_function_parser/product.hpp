@@ -26,14 +26,20 @@ class product
             prefix = prefix * num;
         }
 
-        product& operator*(const product& p)
+        void add_factor(const GiNaC::ex& expr)
         {
-            prefix = prefix * p.prefix;
-            std::copy(p.elements.begin(), p.elements.end(), std::back_inserter(elements));
-            return *this;
+            if(GiNaC::is_exactly_a<GiNaC::numeric>(expr))
+            {
+                add_factor(GiNaC::ex_to<GiNaC::numeric>(expr));
+            }
+            else
+            {
+                add_factor(GiNaC::ex_to<GiNaC::symbol>(expr));
+            }
         }
 
         friend std::ostream& operator<<(std::ostream& stream, const product& p);
+        friend product operator*(product left, product right);
 
     private:
         GiNaC::numeric prefix;
@@ -59,6 +65,15 @@ std::ostream& operator<<(std::ostream& stream, const product& p)
         }
     }
     return stream;
+}
+
+product operator*(product left, product right)
+{
+    product res;
+    res.prefix = left.prefix * right.prefix;
+    std::copy(left.elements.begin(), left.elements.end(), std::back_inserter(res.elements));
+    std::copy(right.elements.begin(), right.elements.end(), std::back_inserter(res.elements));
+    return res;
 }
 
 #endif // PRODUCT_HPP

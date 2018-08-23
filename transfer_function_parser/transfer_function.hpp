@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "sspace_symbols.hpp"
+#include "util.hpp"
 
 class transfer_function
 {
@@ -15,39 +16,43 @@ class transfer_function
             GiNaC::ex numex = e.numer();
             GiNaC::ex denex = e.denom();
 
+            /*
             for(int i = numex.ldegree(s); i <= numex.degree(s); ++i)
             {
                 GiNaC::ex expr = numex.coeff(s, i);
                 product p;
-                for(unsigned int j = 0; j < expr.nops(); ++j)
+                if(expr.nops() == 0)
                 {
-                    if(GiNaC::is_exactly_a<GiNaC::numeric>(expr.op(j)))
+                    p.add_factor(expr);
+                }
+                else
+                {
+                    for(unsigned int j = 0; j < expr.nops(); ++j)
                     {
-                        p.add_factor(GiNaC::ex_to<GiNaC::numeric>(expr.op(j)));
-                    }
-                    else
-                    {
-                        p.add_factor(GiNaC::ex_to<GiNaC::symbol>(expr.op(j)));
+                        p.add_factor(expr.op(j));
                     }
                 }
                 numerator.add_product(p, i);
             }
+            */
             for(int i = denex.ldegree(s); i <= denex.degree(s); ++i)
             {
                 GiNaC::ex expr = denex.coeff(s, i);
+                /*
                 product p;
-                for(unsigned int j = 0; j < expr.nops(); ++j)
+                if(expr.nops() == 0)
                 {
-                    if(GiNaC::is_exactly_a<GiNaC::numeric>(expr.op(j)))
+                    p.add_factor(expr);
+                }
+                else
+                {
+                    for(unsigned int j = 0; j < expr.nops(); ++j)
                     {
-                        p.add_factor(GiNaC::ex_to<GiNaC::numeric>(expr.op(j)));
-                    }
-                    else
-                    {
-                        p.add_factor(GiNaC::ex_to<GiNaC::symbol>(expr.op(j)));
+                        p.add_factor(expr.op(j));
                     }
                 }
                 denominator.add_product(p, i);
+                */
             }
         }
 

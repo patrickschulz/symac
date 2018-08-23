@@ -76,9 +76,7 @@ class netlist
         std::string change_sub_line(std::string line, std::vector<std::string>);
         std::string to_String(unsigned int u);
         
-        
         void add_component(std::unique_ptr<component>&&);
-//         std::string to_string();
         void read(std::string filename);
         void print_all_components() const;
         unsigned int numbr_terminals(char type);
