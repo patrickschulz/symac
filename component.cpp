@@ -68,8 +68,8 @@ void current_controlled_voltage_source::set_stamp(netlist& nlist)
 
 void voltage_controlled_current_source::set_stamp(netlist& nlist)
 {
-    // +--+ (regular)
-    // +-+- (inverted, what i want!)
+    // ++-- (regular)
+    // -++- (inverted, what i want!)
     stmp.write(nodes[0], nodes[2], -value);
     stmp.write(nodes[0], nodes[3], +value);
     stmp.write(nodes[1], nodes[2], +value);
