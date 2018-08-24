@@ -33,26 +33,29 @@ function map_subcircuit_nodes(netlist, subname)
     return components
 end
 
-function read_subcircuit_header(line, netlist)
+function read_subcircuit_header(line)
+    -- parse subcircuit line
     local name, rest = string.match(line, ".SUBCKT (%w+) (.+)$")
-    netlist.subcircuits[name] = { nodes = {}, components = {} }
+    local subcircuit = { nodes = {}, components = {} }
+    -- read in all nodes
     for node in string.gmatch(rest, "(%w+)") do
-        table.insert(netlist.subcircuits[name].nodes, node)
+        table.insert(subcircuit.nodes, node)
     end
-    netlist.state = "read_in"
-    netlist.currentsub = name
+    return subcircuit
 end
 
 function read_subcircuit_body(line, netlist)
+    -- either the line is a component or the end of the subcircuit definition
     if string.match(line, "%.ENDS") then
         netlist.state = "idle"
     else
-        local typ, n1, n2, value = string.match(line, "(.) ([%w!]+) ([%w!]+) (%w+)")
-        table.insert(netlist.subcircuits[netlist.currentsub].components, { typ = typ, nodes = { n1, n2 }, value = value })
+        -- read component
+        local component = read_component(line)
+        table.insert(netlist.currentsub.components, component)
     end
 end
 
-function instantiate_subcircuit(line, netlist)
+function translate_subcircuit(line, netlist)
     local subname, nodestring = string.match(line, "X(%w+)%s+(.*)$")
     netlist.subinstances[subname] = (netlist.subinstances[subname] and netlist.subinstances[subname] + 1) or 1
     local i = 1
@@ -61,14 +64,13 @@ function instantiate_subcircuit(line, netlist)
         i = i + 1
     end
     local components = map_subcircuit_nodes(netlist, subname)
-    for _, c in ipairs(components) do
-        table.insert(netlist.components, c)
-    end
+    return components
 end
 
-function read_component(line, netlist)
+function read_component(line)
     local typ, n1, n2, value = string.match(line, "(.) ([%w!]+) ([%w!]+) (%w+)")
-    table.insert(netlist.components, { typ = typ, nodes = { n1, n2 }, value = value })
+    local component = { typ = typ, nodes = { n1, n2 }, value = value }
+    return component
 end
 
 -- read netlist
@@ -80,14 +82,24 @@ local netlist = {
     subinstances = {},
     components = {}
 }
+
 for _, line in ipairs(netlistlines) do
     if netlist.state == "idle" then
         if string.match(line, "%.SUBCKT") then
-            read_subcircuit_header(line, netlist)
+            local subcircuit = read_subcircuit_header(line)
+            -- store subcircuit
+            netlist.subcircuits[name] = subcircuit
+            -- now the netlist parser is in read mode (subcircuits)
+            netlist.state = "read_in"
+            netlist.currentsub = subcircuit
         elseif string.match(line, "X(%w+)") then
-            instantiate_subcircuit(line, netlist)
+            local components = translate_subcircuit(line, netlist)
+            for _, c in ipairs(components) do
+                table.insert(netlist.components, c)
+            end
         else
-            read_component(line, netlist)
+            local component = read_component(line, netlist)
+            table.insert(netlist.components, component)
         end
     elseif netlist.state == "read_in" then
         read_subcircuit_body(line, netlist)
