@@ -99,9 +99,9 @@ void solver::print()
         }
         if(nlist.is_simplification())
         { 
-            std::string H_simple = vvtf_simplification(H);
+//             std::string H_simple = vvtf_simplification(H);
             std::cout << " Simplified (in Latex) "<< '\n';
-            std::cout << "H(s) = " << H_simple << '\n';
+//             std::cout << "H(s) = " << H_simple << '\n';
         }
     }
     else
@@ -286,147 +286,158 @@ std::string solver::vvtf_funct_to_latex_string(GiNaC::ex H)
     std::string string_funct = s.str();
     return string_funct;
 }
-std::string solver::vvtf_simplification(GiNaC::ex H)
-{
-    std::string str_funct = vvtf_funct_to_latex_string(H);
-    // now happens the magic
-    // Ich erwarte einen /frac{....}{....} - befehl
-    // Ziel ist es alle Multiplikationsterme(getrennt durch whitespace), in denen nur die zu eliminierenden Komponenten
-    // vorkommen, zu löschen. Die Multiplikationsterme sind durch Additionen verbunden. 
-    
-    // some symbols that get used a lot
 
-    std::string frac("frac{");
-    std::string closed("}");
-    std::string opened("{");
-    
-    auto pos = str_funct.begin() + 1;
-    auto found_preambel = str_funct.find(frac);
-    if(found_preambel == std::string::npos)
-    {
-        std::cerr << "Error occured, while reading latex expression"<< '\n';
-    }
-    
-    //Now pos is pointing to first char in Nominator
-    pos = pos + frac.length();
-    auto start_nominator = pos-str_funct.begin();
-    auto found_opened = str_funct.find(opened,start_nominator);
-    auto found_closed = str_funct.find(closed,start_nominator);
-    
-    for(;found_opened < found_closed;)
-    {
-        found_opened = str_funct.find(opened,found_opened);
-        found_closed = str_funct.find(closed,found_closed);
-    }
-    std::string nominator = str_funct.substr(start_nominator, found_closed-start_nominator);
-    
-    pos = str_funct.begin() + found_opened +1;
-    auto start_denominator = pos-str_funct.begin();
-    found_opened = str_funct.find(opened,start_denominator);
-    found_closed = str_funct.find(closed,start_denominator);
-    for(;found_opened < found_closed;)
-    {
-        if(found_opened != std::string::npos)
-        {
-            found_opened = str_funct.find(opened,found_opened+1);
-            found_closed = str_funct.find(closed,found_closed+1);
-        }
-        else
-        {
-            break;
-        }
-    }
-    std::string denominator = str_funct.substr(start_denominator , found_closed-start_denominator);
-    
-    nominator = simplify_line(nominator);
-    denominator = simplify_line(denominator);
-    std::string sim_string;
-    
-    sim_string.append("\\");
-    sim_string.append(frac);
-    sim_string.append(nominator);
-    sim_string.append(closed);
-    sim_string.append(opened);
-    sim_string.append(denominator);
-    sim_string.append(closed);
-    return sim_string;
-}
-std::string solver::simplify_line(std::string s)
-{
-    std::string sim;
-   
-    std::vector<std::string> substrings;
-    std::string plus ("+");
-    std::size_t found_plus = s.find(plus);
-    auto pos = s.begin();
-    auto start = pos-s.begin();
-    if(found_plus == std::string::npos)
-    {
-        substrings.push_back(sim_replace(s));
-    }
-    else
-    {
-        std::string substring;
-        for(unsigned int i = 0 ;found_plus != std::string::npos; i++)
-        {
-            substring= s.substr(start,found_plus-start);
-            start =found_plus + 1;
-            substrings.emplace_back(sim_replace(substring));
-            found_plus=s.find(plus, found_plus+1);
-        }
-        substring = s.substr(start);
-        substrings.emplace_back(sim_replace(substring));
-        
-    }
-    
-    sim.append(substrings[0]);
-    for(unsigned int i = 1; i <substrings.size();i++)
-    {
-        std::string v = substrings[i];
-        if (!v.empty())
-        {
-            sim.append(plus);
-            sim.append(v);
-        }
-    }
-    
-    return sim;
-}
-std::string solver::sim_replace(std::string v)
-{
-    std::vector<std::string> vals_to_simplify = nlist.get_simplifications();
-    std::vector<std::string> vals = nlist.get_values();
-    std::stringstream stream(v);
-    std::string buf;
-    std::string sub;
-    bool comps_simpl = false;
-    bool comps_not_simpl = false;
+//Level über Mittelwert
+//english - average < 1 
+//medium - 1 < average < 2 
+//well-done - 2 < average
 
-    stream >> buf;
-    for(;stream;)
-    {
-        
-        if (std::find (vals.begin(),vals.end(),buf) != vals.end())
-        {
-            if (std::find(vals_to_simplify.begin(),vals_to_simplify.end(),buf) != vals_to_simplify.end())
-            {
-                comps_simpl = true;
-            }
-            else
-            {
-                comps_not_simpl= true;
-            }
-        }
-        sub.append(buf);
-        sub.append(" ");
-        stream >> buf;
-    }
-    if ( comps_simpl && !comps_not_simpl)
-    {
-        sub.clear();
-    }
-    return sub;
-}
+
+
+
+
+
+// std::string solver::vvtf_simplification(GiNaC::ex H)
+// {
+//     std::string str_funct = vvtf_funct_to_latex_string(H);
+//     // now happens the magic
+//     // Ich erwarte einen /frac{....}{....} - befehl
+//     // Ziel ist es alle Multiplikationsterme(getrennt durch whitespace), in denen nur die zu eliminierenden Komponenten
+//     // vorkommen, zu löschen. Die Multiplikationsterme sind durch Additionen verbunden. 
+//     
+//     // some symbols that get used a lot
+// 
+//     std::string frac("frac{");
+//     std::string closed("}");
+//     std::string opened("{");
+//     
+//     auto pos = str_funct.begin() + 1;
+//     auto found_preambel = str_funct.find(frac);
+//     if(found_preambel == std::string::npos)
+//     {
+//         std::cerr << "Error occured, while reading latex expression"<< '\n';
+//     }
+//     
+//     //Now pos is pointing to first char in Nominator
+//     pos = pos + frac.length();
+//     auto start_nominator = pos-str_funct.begin();
+//     auto found_opened = str_funct.find(opened,start_nominator);
+//     auto found_closed = str_funct.find(closed,start_nominator);
+//     
+//     for(;found_opened < found_closed;)
+//     {
+//         found_opened = str_funct.find(opened,found_opened);
+//         found_closed = str_funct.find(closed,found_closed);
+//     }
+//     std::string nominator = str_funct.substr(start_nominator, found_closed-start_nominator);
+//     
+//     pos = str_funct.begin() + found_opened +1;
+//     auto start_denominator = pos-str_funct.begin();
+//     found_opened = str_funct.find(opened,start_denominator);
+//     found_closed = str_funct.find(closed,start_denominator);
+//     for(;found_opened < found_closed;)
+//     {
+//         if(found_opened != std::string::npos)
+//         {
+//             found_opened = str_funct.find(opened,found_opened+1);
+//             found_closed = str_funct.find(closed,found_closed+1);
+//         }
+//         else
+//         {
+//             break;
+//         }
+//     }
+//     std::string denominator = str_funct.substr(start_denominator , found_closed-start_denominator);
+//     
+//     nominator = simplify_line(nominator);
+//     denominator = simplify_line(denominator);
+//     std::string sim_string;
+//     
+//     sim_string.append("\\");
+//     sim_string.append(frac);
+//     sim_string.append(nominator);
+//     sim_string.append(closed);
+//     sim_string.append(opened);
+//     sim_string.append(denominator);
+//     sim_string.append(closed);
+//     return sim_string;
+// }
+// std::string solver::simplify_line(std::string s)
+// {
+//     std::string sim;
+//    
+//     std::vector<std::string> substrings;
+//     std::string plus ("+");
+//     std::size_t found_plus = s.find(plus);
+//     auto pos = s.begin();
+//     auto start = pos-s.begin();
+//     if(found_plus == std::string::npos)
+//     {
+//         substrings.push_back(sim_replace(s));
+//     }
+//     else
+//     {
+//         std::string substring;
+//         for(unsigned int i = 0 ;found_plus != std::string::npos; i++)
+//         {
+//             substring= s.substr(start,found_plus-start);
+//             start =found_plus + 1;
+//             substrings.emplace_back(sim_replace(substring));
+//             found_plus=s.find(plus, found_plus+1);
+//         }
+//         substring = s.substr(start);
+//         substrings.emplace_back(sim_replace(substring));
+//         
+//     }
+//     
+//     sim.append(substrings[0]);
+//     for(unsigned int i = 1; i <substrings.size();i++)
+//     {
+//         std::string v = substrings[i];
+//         if (!v.empty())
+//         {
+//             sim.append(plus);
+//             sim.append(v);
+//         }
+//     }
+//     
+//     return sim;
+// }
+// std::string solver::sim_replace(std::string v)
+// {
+//     std::vector<std::string> vals_to_simplify = nlist.get_simplifications();
+//     std::vector<std::string> vals = nlist.get_values();
+//     std::stringstream stream(v);
+//     std::string buf;
+//     std::string sub;
+//     bool comps_simpl = false;
+//     bool comps_not_simpl = false;
+// 
+//     stream >> buf;
+//     for(;stream;)
+//     {
+//         
+//         if (std::find (vals.begin(),vals.end(),buf) != vals.end())
+//         {
+//             if (std::find(vals_to_simplify.begin(),vals_to_simplify.end(),buf) != vals_to_simplify.end())
+//             {
+//                 comps_simpl = true;
+//             }
+//             else
+//             {
+//                 comps_not_simpl= true;
+//             }
+//         }
+//         sub.append(buf);
+//         sub.append(" ");
+//         stream >> buf;
+//     }
+//     if ( comps_simpl && !comps_not_simpl)
+//     {
+//         sub.clear();
+//     }
+//     return sub;
+// }
 
 
 

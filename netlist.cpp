@@ -13,10 +13,6 @@ static bool is_comment(const std::string& line)
 {
     return line[0] == '*';
 }
-static bool is_subcircuit(const std::string& line)
-{
-    return line[0] == '.';
-}
 static bool is_two_terminal_device(const std::string& line)
 {
     std::regex rx(R"(^\s*[VIRCL]\s+\w+\s+\w+\s+\w+\s*$)");
@@ -39,10 +35,60 @@ static bool is_component(const std::string& line)
 {
     return is_two_terminal_device(line) || is_three_terminal_device(line) || is_four_terminal_device(line);
 }
-static bool is_subckt_line(std::string s)
+//subckt_title bool
+static bool is_subckt_title(const std::string& line)
 {
-    std::regex rx("[A-Z]");
-    return std::regex_match(s,rx);
+    std::istringstream stream(line);
+    char dot;
+    std::string v;
+
+    stream >> dot;
+    stream >> v;
+    if(v == "subckt")
+    { 
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    
+}
+static bool is_subckt_end(const std::string& line)
+{
+    std::istringstream stream(line);
+    char dot;
+    std::string v;
+
+    stream >> dot;
+    stream >> v;
+    if(v == "end")
+    { 
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+bool netlist::is_subckt_call(const std::string& line)
+{
+    std::istringstream stream(line);
+    char dot;
+    std::string v;
+    bool call = false;
+
+    stream >> dot;
+    stream >> v;
+    for (unsigned int i = 0; i<subckt_vector.size();i++)
+    {
+        std::string name = subckt_vector[i].get_name();
+        if ( name == v)
+        {
+            call = true;
+        }
+    }
+    return call;
 }
 static bool is_command_simplify(const std::string& line)
 {
@@ -102,7 +148,9 @@ netlist::netlist() :
     current_opamp(1),
     current_vcvs(1),
     current_ccvs(1),
-    current_cccs(1)
+    current_cccs(1),
+    simplification (false)
+
 {
 }
 
@@ -133,10 +181,10 @@ void netlist::add_component(std::unique_ptr<component>&& comp)
 // }
 void netlist::read(std::string filename)
 {
-    simplification = false;
-    unsigned int number_subckt=0 ;
+
+ 
     std::ifstream file(filename);
-    output_map.insert(std::make_pair(0 , "GND")).first -> second;
+    output_map.insert(std::make_pair(0 , "GND"));
     if(!file.is_open())
     {
         valid = false;
@@ -144,6 +192,8 @@ void netlist::read(std::string filename)
     }
 
     bool title_found = false;
+    bool subckt = false;
+    unsigned int number_subckt=0;
     while(true)
     {
         std::string line;
@@ -157,86 +207,40 @@ void netlist::read(std::string filename)
         {
             continue;
         }
-        if(is_comment(line)); // ignore
-        else if(is_component(line))
+        if(is_comment(line))
         {
-            component_read_in(line);
+            continue;
+        }// ignore
+        else if(is_subckt_end(line))
+        {
+            subckt = false;
+            number_subckt++;
+            continue;
         }
-        else if(is_subcircuit(line))
+        if(subckt)
         {
-            std::istringstream stream(line);
-            char dot;
-            std::string v;
-
-            stream >> dot;
-            stream >> v;
-            if (v=="subckt")
-            { 
-                std::vector<std::string> sub_terminal_names;
-                std::string subcktname;
-                std::string tname;
-                stream >> subcktname;
-                while(stream >> tname)
-                {
-                    sub_terminal_names.push_back(std::move (tname));
-                }
-                subcircuit subckt(subcktname,sub_terminal_names);
-                subckt_vector.push_back(subckt);
-            }
-            else if (is_subckt_line(v))
-            {
-                line.erase(line.begin()); 
-                subckt_vector.at(number_subckt).add_line(line); //save it in vector in object                
-            }
-            else if (v=="end")
-            { 
-                number_subckt++;
-            }
-            else
-            {
-//              Call for subckt
-//              Values in call
-                std::vector<std::string> terminal_names;
-                std::string subckt_value;
-//              Check the possibly multiple subckts for the specific one
-                unsigned int id;
-                for (unsigned int i = 0; i<subckt_vector.size();i++)
-                {
-                    std::string name = subckt_vector.at(i).get_name();
-                    if ( name == v)
-                    {
-                        id = i;
-                    }
-                }
-                std::vector<std::string> sub_terminal_names = subckt_vector.at(id).get_terminals();
-                std::vector<std::string> slines =  subckt_vector.at(id).get_sublines();
-                std::string terminal_name;
-                for (unsigned int i = 0; i<sub_terminal_names.size();i++)
-                {
-                    stream >> terminal_name;
-                    terminal_names.push_back(terminal_name);
-                }
-
-                stream >> subckt_value;
-                
-                
-                for (unsigned int i = 0; i < slines.size(); i++)
-                {
-                    std::string sline = slines.at(i);
-                    std::string ch_sline= change_subline_nodes(sline, sub_terminal_names, subckt_value);
-                    ch_sline = change_subline_terminals(sline,sub_terminal_names,terminal_names);
-                    slines[i] = ch_sline;
-                }
-                for(unsigned int i=0; i<slines.size();i++)
-                {
-                    component_read_in(slines[i]);
-                }
-            }    
+            read_subckt_line(line, number_subckt);
+        }
+        else if(is_subckt_title(line))
+        {
+            subckt = true;
+            std::string init (".subckt");
+            std::string title = line;
+            title.erase(0,init.length());
+            read_subckt_title(title);
+        }
+        else if(is_subckt_call(line))
+        {
+            subckt_call(line);
         }
         else if (is_command_simplify(line))
         {
-            set_simplification(line);
+            save_simpl_line(line);
             simplification = true;
+        }
+        else if(is_component(line))
+        {
+            component_read_in(line);
         }
         else
         {
@@ -398,6 +402,8 @@ void netlist::component_read_in(const std::string& line)
     std::string v;
     stream >> v;
     set_matlab_values(v);
+    simpl_map.insert(std::make_pair(v, 0)).first ->second;
+    
     if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
     {
         value = std::stod(v);
@@ -409,6 +415,68 @@ void netlist::component_read_in(const std::string& line)
     }
     components.push_back(create_component(type,nodes,value));
 }
+// Subcircuit-Functs
+void netlist::subckt_call(const std::string& line)
+{
+    std::vector<std::string> terminal_names;
+    std::string subckt_value;
+    std::stringstream stream(line);
+    char dot;
+    stream >> dot;
+    std::string v;
+    stream >> v;
+    //              Check the possibly multiple subckts for the specific one
+    unsigned int id;
+    for (unsigned int i = 0; i<subckt_vector.size();i++)
+    {
+        std::string name = subckt_vector.at(i).get_name();
+        if ( name == v)
+        {
+            id = i;
+        }
+    }
+    std::vector<std::string> sub_terminal_names = subckt_vector.at(id).get_terminals();
+    std::vector<std::string> slines =  subckt_vector.at(id).get_sublines();
+    std::string terminal_name;
+    for (unsigned int i = 0; i<sub_terminal_names.size();i++)
+    {
+        stream >> terminal_name;
+        terminal_names.push_back(terminal_name);
+    }
+    stream >> subckt_value;
+    for (unsigned int i = 0; i < slines.size(); i++)
+    {
+        std::string sline = slines.at(i);
+        std::string ch_sline= change_subline_nodes(sline, sub_terminal_names, subckt_value);
+        ch_sline = change_subline_terminals(sline,sub_terminal_names,terminal_names);
+        slines[i] = ch_sline;
+    }
+    for(unsigned int i=0; i<slines.size();i++)
+    {
+        component_read_in(slines[i]);
+    }
+}
+void netlist::read_subckt_line(const std::string& line, unsigned int number_subckt)
+{
+    std::string sub_line = line;
+    subckt_vector.at(number_subckt).add_line(sub_line); //save it in vector in object                
+
+}
+void netlist::read_subckt_title(std::string& title)
+{
+    std::stringstream stream(title);
+    std::vector<std::string> sub_terminal_names;
+    std::string subcktname;
+    std::string tname;
+    stream >> subcktname;
+    while(stream >> tname)
+    {
+        sub_terminal_names.push_back(std::move (tname));
+    }
+    subcircuit subckt(subcktname,sub_terminal_names);
+    subckt_vector.push_back(subckt);
+}
+
 std::string netlist::change_subline_nodes(std::string line, std::vector<std::string> terminals,std::string subckt_value)
 {
         std::stringstream stream (line);
@@ -494,25 +562,51 @@ void netlist::set_matlab_values(std::string v)
 {
     values.push_back(v);
 }
-void netlist::set_simplification(const std::string& line)
+// simplification
+void netlist::save_simpl_line(const std::string& line)
 {
-    std::stringstream stream (line);
-    std::string s;
-    stream >> s;//s = simplify
-    stream >> s;// s = R1,C1
-    stream >> s;// s = >>
-    stream >> s;// s = R2,C2
-    vals_simplify.push_back(s);
+    simplify_lines.push_back(line);
 }
-std::vector<std::string> netlist::get_simplifications()
+void netlist::set_simplification()
 {
-    return vals_simplify;
+    for (unsigned int i = 0; i < simplify_lines.size(); i++)
+    {
+        std::string line = simplify_lines[i];
+        std::stringstream stream (line);
+        std::string first;
+        std::string second;
+        stream >> first;//s = simplify
+        stream >> first;// s = R1
+        stream >> second;// s = >>
+        stream >> second;// s = R2
+        change_simpl_map(first, second);
+    }
+}
+std::map<std::string, unsigned int > netlist::get_simplifications()
+{
+    return simpl_map;
 }
 bool netlist::is_simplification()
 {
     return simplification;
 }
-
-
-
+void netlist::change_simpl_map(std::string greater, std::string smaller)
+{
+    auto it_first = simpl_map.find(greater);
+    auto it_second= simpl_map.find(smaller);
+    unsigned int val_second= it_second -> second;
+    unsigned int val_first = val_second + 1;
+    it_first -> second = val_first;
+}
+void netlist::set_simpl_level(const std::string& line)
+{
+    std::stringstream stream(line);
+    std::string s;
+    stream >> s ;// command "Simplify Level"
+    stream >> simpl_level;
+}
+std::string netlist::get_simpl_level()
+{
+    return simpl_level;
+}
 
