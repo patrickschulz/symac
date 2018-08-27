@@ -1,5 +1,5 @@
 TARGET   := ./test
-CXXFLAGS := -g -Wextra -Wall -Wno-long-long -pedantic-errors -std=c++17
+CXXFLAGS := -g -Wextra -Wall -Wno-long-long -pedantic-errors -std=c++17 -O0
 CXX      := g++
 INCLUDES := 
 LIBS     := -lginac -lcln

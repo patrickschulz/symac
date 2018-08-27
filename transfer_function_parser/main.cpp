@@ -8,14 +8,12 @@ GiNaC::symbol s = GiNaC::symbol("s");
 
 int main()
 {
-    GiNaC::symbol R1 = GiNaC::symbol("R1");
-    GiNaC::symbol R2 = GiNaC::symbol("R2");
-    GiNaC::symbol C1 = GiNaC::symbol("C1");
-    GiNaC::symbol C2 = GiNaC::symbol("C2");
+    GiNaC::symbol R = GiNaC::symbol("R");
+    GiNaC::symbol C = GiNaC::symbol("C");
 
-    GiNaC::ex tfex = (1 + s)/(1 + s * s);
+    GiNaC::ex tfex = (1 + s * R * C)/(1 + s * R * C + s * s * R * R * C * C);
 
     transfer_function tf(tfex);
 
-    std::cout << tf << '\n';
+    //std::cout << tf << '\n';
 }
