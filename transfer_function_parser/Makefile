@@ -35,3 +35,6 @@ $(DEPS): $(BUILDDIR)/%.dep: %.$(EXT) $(BUILDDIR)/.tag
 .PHONY: clean
 clean:
 	$(RM) -r $(BUILDDIR)
+
+traverse: traversel.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o traverse traversel.cpp $(LIBS)

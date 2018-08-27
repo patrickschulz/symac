@@ -68,8 +68,8 @@ void current_controlled_voltage_source::set_stamp(netlist& nlist)
 
 void voltage_controlled_current_source::set_stamp(netlist& nlist)
 {
-    // +--+ (regular)
-    // +-+- (inverted, what i want!)
+    // ++-- (regular)
+    // -++- (inverted, what i want!)
     stmp.write(nodes[0], nodes[2], -value);
     stmp.write(nodes[0], nodes[3], +value);
     stmp.write(nodes[1], nodes[2], +value);
@@ -104,10 +104,10 @@ std::unique_ptr<component> create_component(char type, std::vector< unsigned int
             return std::make_unique<voltage_source>(nodes,value);
         case 'I':
             return std::make_unique<current_source>(nodes,value);
-        case 'E':
-            return std::make_unique<voltage_controlled_voltage_source>(nodes,value);
         case 'O':
             return std::make_unique<opamp>(nodes,value);
+        case 'E':
+            return std::make_unique<voltage_controlled_voltage_source>(nodes,value);
         case 'F':
             return std::make_unique<current_controlled_voltage_source>(nodes,value);
         case 'G':

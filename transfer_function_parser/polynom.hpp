@@ -4,21 +4,21 @@
 #include <ginac/ginac.h>
 
 #include "sspace_symbols.hpp"
-#include "product.hpp"
+#include "sum.hpp"
 
 struct polelement
 {
-    product p;
+    std::vector<sum> sums;
     bool valid;
 };
 
 class polynom
 {
     public:
-        void add_product(const product& p, unsigned int degree)
+        void add_sum(const sum& p, unsigned int degree)
         {
             vec.resize(degree + 1);
-            vec[degree].p = vec[degree].p * p;
+            vec[degree].sums.push_back(p);
             vec[degree].valid = true;
         }
 
@@ -39,8 +39,23 @@ std::ostream& operator<<(std::ostream& stream, const polynom& p)
     {
         if(p.vec[i].valid)
         {
-            stream << p.vec[i].p;
-            stream << " * s^" << i;
+            stream << "s^" << i << " * ";
+            if(p.vec[i].sums.size() > 1)
+            {
+                stream << '(';
+            }
+            for(unsigned int j = 0; j < p.vec[i].sums.size(); ++j)
+            {
+                stream << p.vec[i].sums[j];
+                if(j != p.vec[i].sums.size() - 1)
+                {
+                    stream << " + ";
+                }
+            }
+            if(p.vec[i].sums.size() > 1)
+            {
+                stream << ')';
+            }
             if(i != p.vec.size() - 1)
             {
                 stream << " + ";

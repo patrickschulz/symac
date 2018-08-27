@@ -64,7 +64,6 @@ namespace mna {
 
             for(unsigned int i = 0; i < nlist.number_of_devices(ct); ++i)
             {
-                //for(const auto& current : currents)
                 for(unsigned int cur = 0; cur < currents.size(); ++cur)
                 {
                     std::string current = currents[cur];

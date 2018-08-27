@@ -54,7 +54,6 @@ class component
         {   }
         
         virtual component_types type() const = 0;
-        virtual char short_type() const = 0;
 
         const std::vector<unsigned int>& get_nodes() const
         {
@@ -105,11 +104,6 @@ class resistor : public impedance
         {
             return component_types::ct_resistor;
         }
-
-        virtual char short_type() const override
-        {
-            return 'R';
-        }
 };
 
 class capacitor : public impedance
@@ -125,11 +119,6 @@ class capacitor : public impedance
         virtual component_types type() const override
         {
             return component_types::ct_capacitor;
-        }
-
-        virtual char short_type() const override
-        {
-            return 'C';
         }
 };
 
@@ -147,11 +136,6 @@ class inductor : public impedance
         {
             return component_types::ct_inductor;
         }
-
-        virtual char short_type() const override
-        {
-            return 'L';
-        }
 };
 
 class voltage_source : public component
@@ -164,11 +148,6 @@ class voltage_source : public component
         virtual component_types type() const override
         {
             return component_types::ct_voltage_source;
-        }
-
-        virtual char short_type() const override
-        {
-            return 'V';
         }
 };
 
@@ -183,11 +162,6 @@ class current_source : public component
         {
             return component_types::ct_current_source;
         }
-
-        virtual char short_type() const override
-        {
-            return 'I';
-        }
 };
 
 class opamp : public component
@@ -200,11 +174,6 @@ class opamp : public component
         virtual component_types type() const override
         {
             return component_types::ct_opamp;
-        }
-
-        virtual char short_type() const override
-        {
-            return 'O';
         }
 };
 
@@ -219,11 +188,6 @@ class voltage_controlled_voltage_source : public component
         {
             return component_types::ct_voltage_controlled_voltage_source;
         }
-
-        virtual char short_type() const override
-        {
-            return 'E';
-        }
 };
 
 class current_controlled_voltage_source : public component
@@ -236,11 +200,6 @@ class current_controlled_voltage_source : public component
         virtual component_types type() const override
         {
             return component_types::ct_current_controlled_voltage_source;
-        }
-
-        virtual char short_type() const override
-        {
-            return 'F';
         }
 };
 
@@ -255,11 +214,6 @@ class voltage_controlled_current_source : public component
         {
             return component_types::ct_voltage_controlled_current_source;
         }
-
-        virtual char short_type() const override
-        {
-            return 'G';
-        }
 };
 
 class current_controlled_current_source : public component
@@ -272,11 +226,6 @@ class current_controlled_current_source : public component
         virtual component_types type() const override
         {
             return component_types::ct_current_controlled_current_source;
-        }
-
-        virtual char short_type() const override
-        {
-            return 'H';
         }
 };
 

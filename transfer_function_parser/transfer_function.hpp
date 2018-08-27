@@ -16,6 +16,7 @@ class transfer_function
             GiNaC::ex numex = e.numer();
             GiNaC::ex denex = e.denom();
 
+            /*
             for(int i = numex.ldegree(s); i <= numex.degree(s); ++i)
             {
                 GiNaC::ex expr = numex.coeff(s, i);
@@ -33,9 +34,11 @@ class transfer_function
                 }
                 numerator.add_product(p, i);
             }
+            */
             for(int i = denex.ldegree(s); i <= denex.degree(s); ++i)
             {
                 GiNaC::ex expr = denex.coeff(s, i);
+                /*
                 product p;
                 if(expr.nops() == 0)
                 {
@@ -49,6 +52,7 @@ class transfer_function
                     }
                 }
                 denominator.add_product(p, i);
+                */
             }
         }
 

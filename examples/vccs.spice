@@ -1,0 +1,3 @@
+G 0 vout vin 0 gm
+R vout 0 Ro
+V vin 0 vin
