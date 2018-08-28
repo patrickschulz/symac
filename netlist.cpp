@@ -13,6 +13,7 @@ static bool is_comment(const std::string& line)
 {
     return line[0] == '*';
 }
+
 static bool is_two_terminal_device(const std::string& line)
 {
     std::regex rx(R"(^\s*[VIRCL]\s+\w+\s+\w+\s+\w+\s*$)");
@@ -35,61 +36,25 @@ static bool is_component(const std::string& line)
 {
     return is_two_terminal_device(line) || is_three_terminal_device(line) || is_four_terminal_device(line);
 }
-//subckt_title bool
+
 static bool is_subckt_title(const std::string& line)
 {
-    std::istringstream stream(line);
-    char dot;
-    std::string v;
-
-    stream >> dot;
-    stream >> v;
-    if(v == "subckt")
-    { 
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-    
+    std::regex rx(R"(^\.subckt)");
+    return std::regex_search(line, rx);
 }
+
 static bool is_subckt_end(const std::string& line)
 {
-    std::istringstream stream(line);
-    char dot;
-    std::string v;
-
-    stream >> dot;
-    stream >> v;
-    if(v == "end")
-    { 
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    std::regex rx(R"(^\.end)");
+    return std::regex_search(line, rx);
 }
+
 bool netlist::is_subckt_call(const std::string& line)
 {
-    std::istringstream stream(line);
-    char dot;
-    std::string v;
-    bool call = false;
-
-    stream >> dot;
-    stream >> v;
-    for (unsigned int i = 0; i<subckt_vector.size();i++)
-    {
-        std::string name = subckt_vector[i].get_name();
-        if ( name == v)
-        {
-            call = true;
-        }
-    }
-    return call;
+    std::regex rx(R"(^X\w+)");
+    return std::regex_search(line, rx);
 }
+
 static bool is_command_simplify(const std::string& line)
 {
     if(line.find("simplify") != std::string::npos)
@@ -105,7 +70,7 @@ static bool is_command_simplify(const std::string& line)
 unsigned int netlist::numbr_terminals(char type)
 {
     unsigned int number_terminals;
-   switch(type)
+    switch(type)
     {
         case 'R': // resistor
             return number_terminals = 2;
@@ -117,11 +82,11 @@ unsigned int netlist::numbr_terminals(char type)
             return number_terminals = 2;
         case 'I': // current_source
             return number_terminals = 2;
-        case 'O':
+        case 'O': // opamp
             return number_terminals = 3;
-        case 'E':
+        case 'E': // voltage controlled voltage source
             return number_terminals = 4;
-        case 'F':
+        case 'F': // current controlled voltage source
             return number_terminals = 4;
         case 'G': // voltage_controlled_current_source
             return number_terminals = 4;
@@ -131,8 +96,8 @@ unsigned int netlist::numbr_terminals(char type)
             std::cerr << "Unknown component: '" << type << "'\n";
             return 0   ;
     }
-    
 }
+
 netlist::netlist() :
     valid(false)
 {
@@ -184,7 +149,7 @@ void netlist::read(std::string filename)
         if(is_comment(line))
         {
             continue;
-        }// ignore
+        } // ignore
         else if(is_subckt_end(line))
         {
             subckt = false;
@@ -346,6 +311,7 @@ void netlist::component_read_in(const std::string& line)
     char type = name[0];
     unsigned int number_terminals = numbr_terminals(type);
     std::vector<unsigned int> nodes;
+    std::string snode;
     for (unsigned int i = 0; i < number_terminals; i++)
     {
         stream >> snode;
@@ -358,6 +324,7 @@ void netlist::component_read_in(const std::string& line)
     set_matlab_values(v);
     simpl_map.insert(std::make_pair(v, 0)).first ->second;
     
+    GiNaC::ex value;
     if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
     {
         value = std::stod(v);
