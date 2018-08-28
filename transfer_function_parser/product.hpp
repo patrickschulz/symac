@@ -2,6 +2,7 @@
 #define PRODUCT_HPP
 
 #include <ginac/ginac.h>
+#include <ginac/numeric.h>
 #include <iostream>
 #include <vector>
 
