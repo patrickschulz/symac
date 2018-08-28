@@ -17,24 +17,29 @@ int main(int argc, char** argv)
 {
     options opt(argc, argv);
     auto commandline_options = opt.get_options();
-
-    /*
-    for(auto e : commandline_options["node"].as<std::vector<std::string>>())
-    {
-        std::cout << e << ' ';
-    }
-    std::cout << '\n';
-    */
-
     if(commandline_options.count("netlist"))
     {
+        
+        
         std::string filename = commandline_options["netlist"].as<std::string>();
         netlist nlist(filename);
-
         if(nlist)
         {
-            const std::string mode = commandline_options["mode"].as<std::string>();
-            solver S(mode, nlist);
+            bool to_matlab = false;
+            const std::string mode  = commandline_options["mode"].as<std::string>();
+            std::vector<std::string> nodes;
+            if(commandline_options.count("node1") && commandline_options.count("node2"))
+            {
+                std::string node1= commandline_options["node1"].as<std::string>();
+                std::string node2= commandline_options["node2"].as<std::string>();
+                nodes.push_back(node1);
+                nodes.push_back(node2);
+            }
+            if(commandline_options.count("matlab_export"))
+            {
+                to_matlab = true;
+            }
+            solver S(filename, mode, nodes, nlist, to_matlab);
             S.mna();
             if(commandline_options.count("print"))
             {

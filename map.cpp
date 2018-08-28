@@ -1,13 +1,18 @@
 #include "map.hpp"
 
 #include <algorithm>
+#include <vector>
+#include <sstream>
+#include <ostream>
+
+#include "netlist.hpp"
 
 map::map()
 { 
     mappy["0"] = 0;
 }
 
-unsigned int map::get_mapped_node(const std::string& snode)
+unsigned int map::get_map_node(const std::string& snode)
 { 
     std::map<std::string, unsigned int>::iterator it = mappy.find(snode);
     if(it != mappy.end())
@@ -38,4 +43,20 @@ unsigned int map::get_number_nodes() const
          }
     );
     return it->second;
+}
+
+unsigned int map::find_node(std::string snode) const
+{
+     unsigned int unode;
+
+     auto it = mappy.find(snode);
+     if (it != mappy.end())
+     {
+         unode = it-> second;
+     }
+     else
+     {
+         std::cerr<< "Node not existent!" << std::endl;
+     }
+     return unode;
 }
