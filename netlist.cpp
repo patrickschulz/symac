@@ -113,10 +113,9 @@ void netlist::add_component(std::unique_ptr<component>&& comp)
 {
     components.push_back(std::move(comp));
     reset();
-    update();
-    for(const auto& c : components)
+    for(unsigned int i = 0; i < components.size(); ++i)
     {
-        c->set_stamp(*this);
+        components[i]->set_stamp(i + number_of_nodes());
     }
 }
 
@@ -195,10 +194,9 @@ void netlist::read(std::string filename)
         }
     }
     // set number of nodes, number of sources etc.
-    update();
-    for(const auto& c : components)
+    for(unsigned int i = 0; i < components.size(); ++i)
     {
-        c->set_stamp(*this);
+        components[i]->set_stamp(i + number_of_nodes());
     }
     valid = true;
 }
@@ -249,7 +247,9 @@ int netlist::number_of_voltage_sources() const
 
 unsigned int netlist::full_network_size() const
 {
-    return state.full_size();
+    return number_of_nodes() 
+         + number_of_devices(ct_resistor | ct_capacitor | ct_inductor | ct_voltage_source | ct_voltage_controlled_voltage_source | ct_current_controlled_current_source) 
+         + 2 * number_of_devices(ct_current_controlled_current_source);
 }
 
 netlist::operator bool()
@@ -263,18 +263,6 @@ void netlist::reset()
     {
         c->reset_stamp();
     }
-    state.reset();
-}
-
-void netlist::update()
-{
-    state.numnodes       = number_of_nodes();
-    state.numsources     = number_of_devices(ct_voltage_source);
-    state.numimpedances  = number_of_devices(ct_resistor) + number_of_devices(ct_capacitor) + number_of_devices(ct_inductor);
-    state.numopamps      = number_of_devices(ct_opamp);
-    state.numvcvs        = number_of_devices(ct_voltage_controlled_voltage_source);
-    state.numccvs        = number_of_devices(ct_current_controlled_voltage_source);
-    state.numcccs        = number_of_devices(ct_current_controlled_current_source);
 }
 
 void netlist::add_to_output_map(unsigned int unode, std::string snode)

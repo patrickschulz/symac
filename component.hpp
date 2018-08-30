@@ -12,8 +12,6 @@
 #include "stamp.hpp"
 
 
-class netlist;
-
 enum component_types
 {
     ct_none                              = 0,
@@ -65,7 +63,7 @@ class component
             stmp.clear();
         }
 
-        virtual void set_stamp(netlist&) = 0;
+        virtual void set_stamp(unsigned int offset) = 0;
 
         const stamp& get_stamp() const
         {
@@ -88,7 +86,7 @@ class impedance : public component
     public:
         using component::component;
 
-        virtual void set_stamp(netlist& nlist) override;
+        virtual void set_stamp(unsigned int offset) override;
 };
 
 class resistor : public impedance
@@ -143,7 +141,7 @@ class voltage_source : public component
     public:
         using component::component;
 
-        virtual void set_stamp(netlist&) override;
+        virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
         {
@@ -156,7 +154,7 @@ class current_source : public component
     public:
         using component::component;
 
-        virtual void set_stamp(netlist&) override;
+        virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
         {
@@ -169,7 +167,7 @@ class opamp : public component
     public:
         using component::component;
 
-        virtual void set_stamp(netlist&) override;
+        virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
         {
@@ -182,7 +180,7 @@ class voltage_controlled_voltage_source : public component
     public:
         using component::component;
 
-        virtual void set_stamp(netlist&) override;
+        virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
         {
@@ -195,7 +193,7 @@ class current_controlled_voltage_source : public component
     public:
         using component::component;
 
-        virtual void set_stamp(netlist&) override;
+        virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
         {
@@ -208,7 +206,7 @@ class voltage_controlled_current_source : public component
     public:
         using component::component;
 
-        virtual void set_stamp(netlist&) override;
+        virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
         {
@@ -221,7 +219,7 @@ class current_controlled_current_source : public component
     public:
         using component::component;
 
-        virtual void set_stamp(netlist&) override;
+        virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
         {

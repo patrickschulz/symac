@@ -10,62 +10,6 @@
 #include "map.hpp"
 #include "subckt.hpp"
 
-struct network_state
-{
-    network_state() :
-        numnodes(0),
-        numsources(0),
-        numimpedances(0),
-        numopamps(0),
-        numvcvs(0),
-        numccvs(0),
-        numcccs(0),
-        current_impedance(1),
-        current_source(1),
-        current_opamp(1),
-        current_vcvs(1),
-        current_ccvs(1),
-        current_cccs(1)
-    { }
-
-    unsigned int full_size() const
-    {
-        return numnodes       + 
-               numsources     + 
-               numimpedances  + 
-               numopamps      + 
-               numvcvs        +
-               numccvs * 2    +
-               numcccs;
-    }
-
-    void reset()
-    {
-        current_impedance = 1;
-        current_source = 1;
-        current_opamp = 1;
-        current_vcvs = 1;
-        current_ccvs = 1;
-        current_cccs = 1;
-    }
-
-    // network state
-    unsigned int numnodes;
-    unsigned int numsources;
-    unsigned int numimpedances;
-    unsigned int numopamps;
-    unsigned int numvcvs;
-    unsigned int numccvs;
-    unsigned int numcccs;
-
-    unsigned int current_impedance;
-    unsigned int current_source;
-    unsigned int current_opamp;
-    unsigned int current_vcvs;
-    unsigned int current_ccvs;
-    unsigned int current_cccs;   
-};
-
 class netlist
 {
     public:
@@ -85,20 +29,6 @@ class netlist
         int number_of_voltage_sources() const;
         
         unsigned int full_network_size() const;
-
-        unsigned int get_current_impedance() { return state.current_impedance; }
-        unsigned int get_current_voltage_source() { return state.current_source; }
-        unsigned int get_current_opamp() { return state.current_opamp; }
-        unsigned int get_current_vcvs() { return state.current_vcvs; }
-        unsigned int get_current_ccvs() { return state.current_ccvs; }
-        unsigned int get_current_cccs() { return state.current_cccs; }
-
-        void increment_current_impedance() { ++state.current_impedance; }
-        void increment_current_voltage_source() { ++state.current_source; }
-        void increment_current_opamp() { ++state.current_opamp; }
-        void increment_current_vcvs() { ++state.current_vcvs; }
-        void increment_current_ccvs() { ++state.current_ccvs; }
-        void increment_current_cccs() { ++state.current_cccs; }
 
         const std::vector<std::unique_ptr<component>>& get_components() const
         {
@@ -142,8 +72,6 @@ class netlist
         //subcircuit
         std::vector<subcircuit> subckt_vector;
         unsigned int number_subckt;
-
-        network_state state;
 
         //matlab output
         std::vector<std::string> values;

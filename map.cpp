@@ -4,8 +4,7 @@
 #include <vector>
 #include <sstream>
 #include <ostream>
-
-#include "netlist.hpp"
+#include <iostream>
 
 map::map()
 { 
