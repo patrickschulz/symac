@@ -41,7 +41,7 @@ function read_subcircuit_header(line)
     for node in string.gmatch(rest, "(%w+)") do
         table.insert(subcircuit.nodes, node)
     end
-    return subcircuit
+    return subcircuit, name
 end
 
 function read_subcircuit_body(line, netlist)
@@ -86,7 +86,7 @@ local netlist = {
 for _, line in ipairs(netlistlines) do
     if netlist.state == "idle" then
         if string.match(line, "%.SUBCKT") then
-            local subcircuit = read_subcircuit_header(line)
+            local subcircuit, name = read_subcircuit_header(line)
             -- store subcircuit
             netlist.subcircuits[name] = subcircuit
             -- now the netlist parser is in read mode (subcircuits)
