@@ -196,7 +196,7 @@ void netlist::read(std::string filename)
     // set number of nodes, number of sources etc.
     for(unsigned int i = 0; i < components.size(); ++i)
     {
-        components[i]->set_stamp(i + number_of_nodes());
+        components[i]->set_stamp(1 + i + number_of_nodes());
     }
     valid = true;
 }
