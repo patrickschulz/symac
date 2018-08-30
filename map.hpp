@@ -8,8 +8,9 @@ class map
 {   
     public:
         map();
-        unsigned int get_mapped_node(const std::string&);
+        unsigned int get_map_node(const std::string& snode);
         unsigned int get_number_nodes() const;
+        unsigned int find_node(std::string snode) const;
         
     private:
         std::map<std::string, unsigned int> mappy;

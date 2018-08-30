@@ -1,0 +1,4 @@
+V vin 0 Vin
+O vin vref vout
+R vout vref R1
+R vref 0 R2

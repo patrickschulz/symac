@@ -1,0 +1,7 @@
+.subckt sub p n
+R p n Rsub
+.end
+
+V vin 0 vin
+Xsub vin vout foo
+C vout 0 C0

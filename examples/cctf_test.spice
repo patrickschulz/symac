@@ -1,0 +1,6 @@
+*Stromteiler
+V A 0 Vin
+R A B R1
+C B 0 C1
+R B C R2
+C C 0 C2

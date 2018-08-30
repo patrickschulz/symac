@@ -2,8 +2,7 @@
 #define OPTIONS_HPP
 
 #include <cstdlib>
-//#include "program_options/program_options.hpp"
-#include <boost/program_options.hpp>
+#include "program_options/program_options.hpp"
 
 void print_usage(const boost::program_options::options_description& opt)
 {
@@ -48,7 +47,7 @@ void print_devices()
               << "  Operational amplifiers: O IN1 IN2 OUT VALUE\n"
               << "Four-terminal devices (Cx are the controlling terminals (plus and minus)):\n"
               << "  Voltage-controlled voltage sources: E N1 N2 C1 C2 VALUE\n"
-              << "  Current-controlled voltage sources: F N1 N2 C1 C2 VALUE\n"
+              << "  Current-controlled voltage sources: F N1 N2 C1 C2 VALUE\n"  
               << "  Voltage-controlled current sources: G N1 N2 C1 C2 VALUE\n"
               << "  Current-controlled current sources: H N1 N2 C1 C2 VALUE\n"
               ;
@@ -75,8 +74,10 @@ class options
                 ("nosolve,s" , "don't solve the network")
                 ("report,r"  , "create a report")
                 ("mode,m", value<std::string>()->default_value("ac"), "simulation mode (possible values: ac (default), sp (S-Parameters), tf (transfer function)")
-                ("node,n", value<std::vector<std::string>>(), "nodes for transfer function (pass two times)")
+                ("node1", value<std::string>(),"node One for transfer function")
+                ("node2", value<std::string>(),"node Two for transfer function")
                 ("result"    , "which results should be shown? (show all if none are given)")
+                ("matlab_export"," export results to MatLab-Script, Name must be given")
                 ;
 
             options_description hidden("Hidden options");
