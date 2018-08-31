@@ -7,39 +7,37 @@
 #include <map>
 
 #include "component.hpp"
-#include "map.hpp"
-#include "subckt.hpp"
+#include "nodemap.hpp"
+#include "subcircuit.hpp"
 
 class netlist
 {
     public:
         netlist();
         netlist(const std::string& filename);
+
+        void read(std::string filename);
         
         void component_read_in(const std::string& line);
-        
-        void add_component(std::unique_ptr<component>&&);
-        void read(std::string filename);
-        void print_all_components() const;
-        unsigned int numbr_terminals(char type);
+        void add_component(const component& c);
+
+        unsigned int number_terminals(char type);
         unsigned int number_of_nodes() const;
-        const std::vector<const component*> get_devices(component_types type) const;
+        const std::vector<component> get_devices(component_types type) const;
         unsigned int number_of_devices(component_types type) const;
-        unsigned int number_of_impedances() const;
-        int number_of_voltage_sources() const;
         
         unsigned int full_network_size() const;
 
-        const std::vector<std::unique_ptr<component>>& get_components() const
+        const std::vector<component>& get_components() const
         {
             return components;
         }
 
         operator bool();
-        // OUTPUT MAP
-        void add_to_output_map(unsigned int node, std::string snode);
+
         std::string get_output_node(unsigned int node) const;
-        unsigned int get_unode(std::string snode) const;
+        unsigned int get_unode(const std::string& snode) const;
+
         // subcircuit
         bool is_subckt_call(const std::string& line);
         void subckt_call(const std::string& line);
@@ -61,12 +59,10 @@ class netlist
         std::string get_simpl_level();
         
     private:
-        void reset();
-        void update();
+        std::vector<component> components;
 
         bool valid;
-        std::vector<std::unique_ptr<component>> components;
-        map nmap;
+        nodemap nmap;
         std::map<unsigned int, std::string> output_map;
         
         //subcircuit

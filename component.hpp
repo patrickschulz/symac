@@ -4,7 +4,7 @@
 #include <vector>
 #include <ginac/ginac.h>
 
-#include "stamp.hpp"
+#include "symbol.hpp"
 
 enum component_types
 {
@@ -20,6 +20,7 @@ enum component_types
     ct_voltage_controlled_current_source = 1 << 8,
     ct_current_controlled_current_source = 1 << 9
 };
+
 inline component_types operator|(component_types a, component_types b)
 {
     return static_cast<component_types>(static_cast<int>(a) | static_cast<int>(b));
@@ -41,196 +42,119 @@ const char component_names[] = {
 class component
 {
     public:
-        component(const std::vector<unsigned int>& nodes, const GiNaC::ex& value) :
-            nodes(nodes), value(value)
+        component(component_types type, const std::vector<unsigned int>& nodes, const GiNaC::ex& value) :
+            type(type), nodes(nodes), value(value)
         {   }
-        
-        virtual component_types type() const = 0;
 
-        virtual unsigned int element_size() const = 0;
+        component(char type, const std::vector<unsigned int>& nodes, const GiNaC::ex& value) :
+            nodes(nodes), value(value)
+        {   
+            switch(type)
+            {
+                case 'R':
+                    this->type = ct_resistor;
+                    break;
+                case 'C':
+                    this->type = ct_capacitor;
+                    break;
+                case 'L':
+                    this->type = ct_inductor;
+                    break;
+                case 'V':
+                    this->type = ct_voltage_source;
+                    break;
+                case 'I':
+                    this->type = ct_current_source;
+                    break;
+                case 'O':
+                    this->type = ct_opamp;
+                    break;
+                case 'E':
+                    this->type = ct_voltage_controlled_voltage_source;
+                    break;
+                case 'F':
+                    this->type = ct_current_controlled_voltage_source;
+                    break;
+                case 'G':
+                    this->type = ct_voltage_controlled_current_source;
+                    break;
+                case 'H':
+                    this->type = ct_current_controlled_current_source;
+                    break;
+            }
+        }
+        
+        component_types get_type() const
+        {
+            return type;
+        }
+
+        unsigned int element_size() const
+        {
+            switch(type)
+            {
+                case ct_resistor:
+                case ct_capacitor:
+                case ct_inductor:
+                case ct_voltage_source:
+                case ct_opamp:
+                case ct_voltage_controlled_voltage_source:
+                case ct_current_controlled_current_source:
+                    return 1;
+                    break;
+                case ct_current_controlled_voltage_source:
+                    return 2;
+                    break;
+                case ct_current_source:
+                case ct_voltage_controlled_current_source:
+                    return 0;
+                    break;
+                case ct_none: // suppress warning
+                    break;
+            }
+            // suppress warning
+            return 0;
+        }
 
         const std::vector<unsigned int>& get_nodes() const
         {
             return nodes;
         }
 
-        void reset_stamp()
+        GiNaC::ex get_value() const
         {
-            stmp.clear();
-        }
-
-        virtual void set_stamp(unsigned int offset) = 0;
-
-        const stamp& get_stamp() const
-        {
-            return stmp;
-        }
-
-        const GiNaC::ex& get_value() const
-        {
-            return value;
+            GiNaC::ex s = get_symbol("s");
+            switch(type)
+            {
+                case ct_resistor:
+                    return 1 / value;
+                    break;
+                case ct_capacitor:
+                    return s * value;
+                    break;
+                case ct_inductor:
+                    return 1 / (s * value);
+                    break;
+                case ct_voltage_source:
+                case ct_current_source:
+                case ct_opamp:
+                case ct_voltage_controlled_voltage_source:
+                case ct_current_controlled_voltage_source:
+                case ct_voltage_controlled_current_source:
+                case ct_current_controlled_current_source:
+                    return value;
+                    break;
+                case ct_none: // suppress warning
+                    break;
+            }
+            // suppress warning
+            return GiNaC::ex();
         }
 
     protected:
+        component_types type;
         std::vector<unsigned int> nodes;
         GiNaC::ex value;
-        stamp stmp;
 };
-
-class impedance : public component
-{
-    public:
-        using component::component;
-
-        unsigned int element_size() const;
-        virtual void set_stamp(unsigned int offset) override;
-};
-
-class resistor : public impedance
-{
-    public:
-        resistor(const std::vector<unsigned int>& nodes, const GiNaC::ex& value) :
-            impedance(nodes, value)
-        {   
-            this->value = 1 / value;
-        }
-
-        virtual component_types type() const override
-        {
-            return component_types::ct_resistor;
-        }
-};
-
-class capacitor : public impedance
-{
-    public:
-        capacitor(const std::vector<unsigned int>& nodes, const GiNaC::ex& value) :
-            impedance(nodes, value)
-        {   
-            GiNaC::ex s = get_symbol("s");
-            this->value = s * value;
-        }
-
-        virtual component_types type() const override
-        {
-            return component_types::ct_capacitor;
-        }
-};
-
-class inductor : public impedance
-{
-    public:
-        inductor(const std::vector<unsigned int>& nodes, const GiNaC::ex& value) :
-            impedance(nodes, value)
-        {   
-            GiNaC::ex s = get_symbol("s");
-            this->value = 1 / (s * value);
-        }
-
-        virtual component_types type() const override
-        {
-            return component_types::ct_inductor;
-        }
-};
-
-class voltage_source : public component
-{
-    public:
-        using component::component;
-
-        unsigned int element_size() const;
-        virtual void set_stamp(unsigned int offset) override;
-
-        virtual component_types type() const override
-        {
-            return component_types::ct_voltage_source;
-        }
-};
-
-class current_source : public component
-{
-    public:
-        using component::component;
-
-        unsigned int element_size() const;
-        virtual void set_stamp(unsigned int offset) override;
-
-        virtual component_types type() const override
-        {
-            return component_types::ct_current_source;
-        }
-};
-
-class opamp : public component
-{
-    public:
-        using component::component;
-
-        unsigned int element_size() const;
-        virtual void set_stamp(unsigned int offset) override;
-
-        virtual component_types type() const override
-        {
-            return component_types::ct_opamp;
-        }
-};
-
-class voltage_controlled_voltage_source : public component
-{
-    public:
-        using component::component;
-
-        unsigned int element_size() const;
-        virtual void set_stamp(unsigned int offset) override;
-
-        virtual component_types type() const override
-        {
-            return component_types::ct_voltage_controlled_voltage_source;
-        }
-};
-
-class current_controlled_voltage_source : public component
-{
-    public:
-        using component::component;
-
-        unsigned int element_size() const;
-        virtual void set_stamp(unsigned int offset) override;
-
-        virtual component_types type() const override
-        {
-            return component_types::ct_current_controlled_voltage_source;
-        }
-};
-
-class voltage_controlled_current_source : public component
-{
-    public:
-        using component::component;
-
-        unsigned int element_size() const;
-        virtual void set_stamp(unsigned int offset) override;
-
-        virtual component_types type() const override
-        {
-            return component_types::ct_voltage_controlled_current_source;
-        }
-};
-
-class current_controlled_current_source : public component
-{
-    public:
-        using component::component;
-
-        unsigned int element_size() const;
-        virtual void set_stamp(unsigned int offset) override;
-
-        virtual component_types type() const override
-        {
-            return component_types::ct_current_controlled_current_source;
-        }
-};
-
-std::unique_ptr<component> create_component(char type, std::vector<unsigned int> nodes, GiNaC::ex& value );
 
 #endif //COMPONENT_HPP

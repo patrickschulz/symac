@@ -19,7 +19,7 @@ void solver::mna()
     const auto& components = nlist.get_components();
     unsigned int networksize = nlist.full_network_size();
     unsigned int number_of_nodes = nlist.number_of_nodes();
-    A = mna::create_A_matrix(networksize, components);
+    A = mna::create_A_matrix(networksize, number_of_nodes, components);
     x = mna::create_x_vector(networksize, number_of_nodes, components);
     z = mna::create_z_vector(networksize, number_of_nodes, components);
 }
@@ -50,7 +50,7 @@ void solver::print()
         for(; row < nlist.number_of_nodes(); ++row)
         {
             std::string usernode = nlist.get_output_node(row + 1);
-            boost::format fmter = boost::format("        Node %s:\t\t") % (usernode);
+            boost::format fmter = boost::format("%sNode %s:\t\t") % ("        ") % (usernode);
             std::string str = fmter.str();
             std::cout << str << results(row, 0) << '\n';
         }
