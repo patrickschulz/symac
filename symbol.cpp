@@ -13,7 +13,8 @@ const GiNaC::symbol& get_symbol(const std::string& str)
     }
     else
     {
-        return directory.insert(std::make_pair(str, GiNaC::symbol(str))).first->second;
+        auto ret = directory.insert(std::make_pair(str, GiNaC::symbol(str)));
+        return ret.first->second;
     }
 }
 

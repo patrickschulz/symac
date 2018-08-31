@@ -142,14 +142,10 @@ void netlist::read(std::string filename)
             break;
         }
         trim(line); // remove whitespace
-        if(line.empty())
+        if(line.empty() || is_comment(line))
         {
             continue;
         }
-        if(is_comment(line))
-        {
-            continue;
-        } // ignore
         else if(is_subckt_end(line))
         {
             subckt = false;
@@ -377,12 +373,14 @@ void netlist::subckt_call(const std::string& line)
         component_read_in(slines[i]);
     }
 }
+
 void netlist::read_subckt_line(const std::string& line, unsigned int number_subckt)
 {
     std::string sub_line = line;
     subckt_vector.at(number_subckt).add_line(sub_line); //save it in vector in object                
 
 }
+
 void netlist::read_subckt_title(std::string& title)
 {
     std::stringstream stream(title);
@@ -440,6 +438,7 @@ std::string netlist::change_subline_nodes(std::string line, std::vector<std::str
         oline += buf;
         return oline;
 }
+
 std::string netlist::change_subline_terminals(std::string sline, std::vector<std::string> sub_t_names, std::vector<std::string> t_names)
 {
     //create map of sub_t_names & t_names 
@@ -479,15 +478,18 @@ std::vector<std::string> netlist::get_values()
 {
     return values;
 }
+
 void netlist::set_matlab_values(std::string v)
 {
     values.push_back(v);
 }
+
 // simplification
 void netlist::save_simpl_line(const std::string& line)
 {
     simplify_lines.push_back(line);
 }
+
 void netlist::set_simplification()
 {
     for (unsigned int i = 0; i < simplify_lines.size(); i++)
@@ -503,14 +505,17 @@ void netlist::set_simplification()
         change_simpl_map(first, second);
     }
 }
+
 std::map<std::string, unsigned int > netlist::get_simplifications()
 {
     return simpl_map;
 }
+
 bool netlist::is_simplification()
 {
     return simplification;
 }
+
 void netlist::change_simpl_map(std::string greater, std::string smaller)
 {
     auto it_first = simpl_map.find(greater);
@@ -519,6 +524,7 @@ void netlist::change_simpl_map(std::string greater, std::string smaller)
     unsigned int val_first = val_second + 1;
     it_first -> second = val_first;
 }
+
 void netlist::set_simpl_level(const std::string& line)
 {
     std::stringstream stream(line);
@@ -526,6 +532,7 @@ void netlist::set_simpl_level(const std::string& line)
     stream >> s ;// command "Simplify Level"
     stream >> simpl_level;
 }
+
 std::string netlist::get_simpl_level()
 {
     return simpl_level;
