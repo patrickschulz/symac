@@ -1,16 +1,10 @@
 #ifndef COMPONENT_HPP
 #define COMPONENT_HPP
 
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <algorithm>
 #include <vector>
-#include <memory>
 #include <ginac/ginac.h>
 
 #include "stamp.hpp"
-
 
 enum component_types
 {

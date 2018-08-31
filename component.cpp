@@ -1,4 +1,5 @@
 #include "component.hpp"
+
 #include <utility>
 
 unsigned int impedance::element_size() const
