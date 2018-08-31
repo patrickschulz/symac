@@ -18,6 +18,7 @@ void solver::mna()
 {
     const auto& components = nlist.get_components();
     unsigned int networksize = nlist.full_network_size();
+    networksize = 5;
     unsigned int number_of_nodes = nlist.number_of_nodes();
     A = mna::create_A_matrix(networksize, components);
     x = mna::create_x_vector(networksize, number_of_nodes, components);

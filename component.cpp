@@ -36,6 +36,8 @@ unsigned int current_source::element_size() const
 void current_source::set_stamp(unsigned int offset)
 {
     // a current source has no stamp (no changes in the network matrix)
+    // suppress warning about unused parameters
+    (void) offset;
 }
 
 unsigned int opamp::element_size() const
@@ -96,6 +98,8 @@ void voltage_controlled_current_source::set_stamp(unsigned int offset)
     stmp.write(nodes[0], nodes[3], +value);
     stmp.write(nodes[1], nodes[2], +value);
     stmp.write(nodes[1], nodes[3], -value);
+    // suppress warning about unused parameters
+    (void) offset;
 }
 
 unsigned int current_controlled_current_source::element_size() const
