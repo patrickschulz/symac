@@ -67,34 +67,33 @@ static bool is_command_simplify(const std::string& line)
     }
 }
 
-unsigned int netlist::numbr_terminals(char type)
+unsigned int netlist::number_terminals(char type)
 {
-    unsigned int number_terminals;
     switch(type)
     {
         case 'R': // resistor
-            return number_terminals = 2;
+            return 2;
         case 'C': // capacitor
-            return number_terminals = 2;
+            return 2;
         case 'L': // inductor
-            return number_terminals = 2;
+            return 2;
         case 'V': // voltage_source
-            return number_terminals = 2;
+            return 2;
         case 'I': // current_source
-            return number_terminals = 2;
+            return 2;
         case 'O': // opamp
-            return number_terminals = 3;
+            return 3;
         case 'E': // voltage controlled voltage source
-            return number_terminals = 4;
+            return 4;
         case 'F': // current controlled voltage source
-            return number_terminals = 4;
+            return 4;
         case 'G': // voltage_controlled_current_source
-            return number_terminals = 4;
+            return 4;
         case 'H': // current_controlled_current_source
-            return number_terminals = 4;
+            return 4;
         default:
             std::cerr << "Unknown component: '" << type << "'\n";
-            return 0   ;
+            return 0;
     }
 }
 
@@ -109,21 +108,14 @@ netlist::netlist(const std::string& filename) :
     read(filename);
 }
 
-void netlist::add_component(std::unique_ptr<component>&& comp)
+void netlist::add_component(const component& c)
 {
-    components.push_back(std::move(comp));
-    reset();
-    update();
-    for(const auto& c : components)
-    {
-        c->set_stamp(*this);
-    }
+    components.push_back(c);
 }
 
 void netlist::read(std::string filename)
 {
     std::ifstream file(filename);
-    output_map.insert(std::make_pair(0 , "GND"));
     if(!file.is_open())
     {
         valid = false;
@@ -190,23 +182,17 @@ void netlist::read(std::string filename)
             
         }
     }
-    // set number of nodes, number of sources etc.
-    update();
-    for(const auto& c : components)
-    {
-        c->set_stamp(*this);
-    }
     valid = true;
 }
 
-const std::vector<const component*> netlist::get_devices(component_types type) const
+const std::vector<component> netlist::get_devices(component_types type) const
 {
-    std::vector<const component*> devices;
+    std::vector<component> devices;
     for(const auto& c : components)
     {
-        if(c->type() & type)
+        if(c.get_type() & type)
         {
-            devices.emplace_back(c.get());
+            devices.emplace_back(c);
         }
     }
     return devices;
@@ -214,38 +200,26 @@ const std::vector<const component*> netlist::get_devices(component_types type) c
 
 unsigned int netlist::number_of_devices(component_types type) const
 {
-    const std::vector<const component*> devices = get_devices(type);
+    const std::vector<component> devices = get_devices(type);
     return devices.size();
-}
-
-unsigned int netlist::number_of_impedances() const
-{
-    return number_of_devices(ct_resistor) + number_of_devices(ct_capacitor) + number_of_devices(ct_inductor);
 }
 
 unsigned int netlist::number_of_nodes() const
 {
-    unsigned int nodes = 0;
-    nodes = nmap.get_number_nodes();
-    return nodes;
-}
-
-int netlist::number_of_voltage_sources() const
-{
-    int sources = 0;
-    for(const auto& com: components)
-    {
-        if(com->type() == component_types::ct_voltage_source)
-        {
-            ++sources;
-        }
-    }
-    return sources;
+    return nmap.get_number_nodes();
 }
 
 unsigned int netlist::full_network_size() const
 {
-    return state.full_size();
+    return number_of_nodes() +
+           number_of_devices(ct_resistor 
+                           | ct_capacitor 
+                           | ct_inductor 
+                           | ct_voltage_source 
+                           | ct_voltage_controlled_voltage_source 
+                           | ct_current_controlled_current_source
+           ) +
+           2 * number_of_devices(ct_current_controlled_voltage_source);
 }
 
 netlist::operator bool()
@@ -253,50 +227,21 @@ netlist::operator bool()
     return valid;
 }
 
-void netlist::reset()
-{
-    for(const auto& c : components)
-    {
-        c->reset_stamp();
-    }
-    state.reset();
-}
-
-void netlist::update()
-{
-    state.numnodes       = number_of_nodes();
-    state.numsources     = number_of_devices(ct_voltage_source);
-    state.numimpedances  = number_of_devices(ct_resistor) + number_of_devices(ct_capacitor) + number_of_devices(ct_inductor);
-    state.numopamps      = number_of_devices(ct_opamp);
-    state.numvcvs        = number_of_devices(ct_voltage_controlled_voltage_source);
-    state.numccvs        = number_of_devices(ct_current_controlled_voltage_source);
-    state.numcccs        = number_of_devices(ct_current_controlled_current_source);
-}
-
-void netlist::add_to_output_map(unsigned int unode, std::string snode)
-{
-    auto it = output_map.find(unode);
-    if ( it == output_map.end())
-    {
-        output_map.insert(std::make_pair(unode, snode)).first ->second;
-    }
-}
-
 std::string netlist::get_output_node(unsigned int unode) const
 {
-    std::string snode = "Not found";
-    auto it = output_map.find(unode);
-    if (it != output_map.end())
-    {
-        snode = it -> second;
-    }    
-    return snode;
+    return nmap[unode];
 }
 
-unsigned int netlist::get_unode( std::string snode) const
+unsigned int netlist::get_unode(const std::string& snode) const
 {
-    unsigned int unode = nmap.find_node(snode);
-    return unode;
+    if(nmap.check_node(snode))
+    {
+        return nmap[snode];
+    }
+    else
+    {
+        return 0;
+    }
 }
     
 void netlist::component_read_in(const std::string& line)
@@ -305,20 +250,18 @@ void netlist::component_read_in(const std::string& line)
     std::string name;
     stream >> name;
     char type = name[0];
-    unsigned int number_terminals = numbr_terminals(type);
+    unsigned int nterminals = number_terminals(type);
     std::vector<unsigned int> nodes;
     std::string snode;
-    for (unsigned int i = 0; i < number_terminals; i++)
+    for (unsigned int i = 0; i < nterminals; i++)
     {
         stream >> snode;
-        unsigned int n = nmap.get_map_node(snode);
+        unsigned int n = nmap[snode];
         nodes.push_back(std::move(n));
-        add_to_output_map(n,snode);                
     }
     std::string v;
     stream >> v;
-    set_matlab_values(v);
-    simpl_map.insert(std::make_pair(v, 0)).first ->second;
+    simpl_map.insert(std::make_pair(v, 0));
     
     GiNaC::ex value;
     if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
@@ -329,7 +272,7 @@ void netlist::component_read_in(const std::string& line)
     {
         value = get_symbol(v);
     }
-    components.push_back(create_component(type,nodes,value));
+    components.push_back(component(type, nodes, value));
 }
 
 // Subcircuit-Functs
@@ -406,7 +349,7 @@ std::string netlist::change_subline_nodes(std::string line, std::vector<std::str
         stream >> type;
         oline= type;
         oline.append(" ");
-        unsigned int nterminals = numbr_terminals(type);
+        unsigned int nterminals = number_terminals(type);
         
         for (unsigned int i = 0 ; i< nterminals; i++)
         {   
@@ -445,7 +388,7 @@ std::string netlist::change_subline_terminals(std::string sline, std::vector<std
     std::map<std::string,std::string> name_map;
     for (unsigned int i = 0 ; i< sub_t_names.size();i++)
     {
-        name_map[sub_t_names[i]]=t_names[i];
+        name_map[sub_t_names[i]] = t_names[i];
     }
     
     std::stringstream stream(sline);
@@ -455,7 +398,7 @@ std::string netlist::change_subline_terminals(std::string sline, std::vector<std
     char type=buf[0];
     oline = buf;
     oline.append(" ");
-    unsigned int nterminals = numbr_terminals(type);
+    unsigned int nterminals = number_terminals(type);
     std::map<std::string,std::string>::iterator it;
     for(unsigned int j = 0; j< nterminals; j++)
     {
@@ -463,7 +406,7 @@ std::string netlist::change_subline_terminals(std::string sline, std::vector<std
         it = name_map.find(buf);
         if(it != name_map.end())
         {
-            buf = it -> second;
+            buf = it->second;
         }
         oline.append(buf);
         oline.append(" ");
@@ -473,15 +416,16 @@ std::string netlist::change_subline_terminals(std::string sline, std::vector<std
     return oline;
 }
 
-//Matlab Values for default settings
 std::vector<std::string> netlist::get_values()
 {
+    std::vector<std::string> values;
+    for(const component& c : components)
+    {
+        std::ostringstream stream;
+        stream << c.get_value();
+        values.push_back(stream.str());
+    }
     return values;
-}
-
-void netlist::set_matlab_values(std::string v)
-{
-    values.push_back(v);
 }
 
 // simplification
@@ -520,9 +464,9 @@ void netlist::change_simpl_map(std::string greater, std::string smaller)
 {
     auto it_first = simpl_map.find(greater);
     auto it_second= simpl_map.find(smaller);
-    unsigned int val_second= it_second -> second;
+    unsigned int val_second= it_second->second;
     unsigned int val_first = val_second + 1;
-    it_first -> second = val_first;
+    it_first->second = val_first;
 }
 
 void netlist::set_simpl_level(const std::string& line)
