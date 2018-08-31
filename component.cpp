@@ -109,8 +109,10 @@ unsigned int current_controlled_current_source::element_size() const
 
 void current_controlled_current_source::set_stamp(unsigned int offset)
 {
-    stmp.write(nodes[0], offset, value);
-    stmp.write(nodes[1], offset, -value);
+    // TODO: i'm not sure about the stamping of the cccs, since i changed the signs to match the behaviour of the vccs at the output.
+    // This needs some more testing
+    stmp.write(nodes[0], offset, -value);
+    stmp.write(nodes[1], offset,  value);
     stmp.write(offset, nodes[2], 1);
     stmp.write(nodes[2], offset, 1);
     stmp.write(offset, nodes[3], -1);
