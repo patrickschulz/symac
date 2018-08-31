@@ -41,7 +41,8 @@ namespace mna {
         {
             boost::format fmter = boost::format("I%d") % (i + 1);
             std::string str = fmter.str();
-            x(offset + i, 0) = get_symbol(str);
+            x(offset, 0) = get_symbol(str);
+            offset += components[i]->element_size();
         }
 
         return x;

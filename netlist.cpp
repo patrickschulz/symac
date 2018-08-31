@@ -194,9 +194,11 @@ void netlist::read(std::string filename)
         }
     }
     // set number of nodes, number of sources etc.
-    for(unsigned int i = 0; i < components.size(); ++i)
+    unsigned int offset = number_of_nodes() + 1;
+    for(const auto& c : components)
     {
-        components[i]->set_stamp(1 + i + number_of_nodes());
+        c->set_stamp(offset);
+        offset += c->element_size();
     }
     valid = true;
 }

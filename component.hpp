@@ -53,6 +53,8 @@ class component
         
         virtual component_types type() const = 0;
 
+        virtual unsigned int element_size() const = 0;
+
         const std::vector<unsigned int>& get_nodes() const
         {
             return nodes;
@@ -86,6 +88,7 @@ class impedance : public component
     public:
         using component::component;
 
+        unsigned int element_size() const;
         virtual void set_stamp(unsigned int offset) override;
 };
 
@@ -141,6 +144,7 @@ class voltage_source : public component
     public:
         using component::component;
 
+        unsigned int element_size() const;
         virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
@@ -154,6 +158,7 @@ class current_source : public component
     public:
         using component::component;
 
+        unsigned int element_size() const;
         virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
@@ -167,6 +172,7 @@ class opamp : public component
     public:
         using component::component;
 
+        unsigned int element_size() const;
         virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
@@ -180,6 +186,7 @@ class voltage_controlled_voltage_source : public component
     public:
         using component::component;
 
+        unsigned int element_size() const;
         virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
@@ -193,6 +200,7 @@ class current_controlled_voltage_source : public component
     public:
         using component::component;
 
+        unsigned int element_size() const;
         virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
@@ -206,6 +214,7 @@ class voltage_controlled_current_source : public component
     public:
         using component::component;
 
+        unsigned int element_size() const;
         virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override
@@ -219,6 +228,7 @@ class current_controlled_current_source : public component
     public:
         using component::component;
 
+        unsigned int element_size() const;
         virtual void set_stamp(unsigned int offset) override;
 
         virtual component_types type() const override

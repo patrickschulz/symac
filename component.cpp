@@ -1,6 +1,11 @@
 #include "component.hpp"
 #include <utility>
 
+unsigned int impedance::element_size() const
+{
+    return 1;
+}
+
 void impedance::set_stamp(unsigned int offset)
 {
     stmp.write(offset, nodes[0], value);
@@ -8,6 +13,11 @@ void impedance::set_stamp(unsigned int offset)
     stmp.write(offset, nodes[1], -value);
     stmp.write(nodes[1], offset, -1);
     stmp.write(offset, offset, -1);
+}
+
+unsigned int voltage_source::element_size() const
+{
+    return 1;
 }
 
 void voltage_source::set_stamp(unsigned int offset)
@@ -18,9 +28,19 @@ void voltage_source::set_stamp(unsigned int offset)
     stmp.write(nodes[1], offset, -1);
 }
 
+unsigned int current_source::element_size() const
+{
+    return 0;
+}
+
 void current_source::set_stamp(unsigned int offset)
 {
     // a current source has no stamp (no changes in the network matrix)
+}
+
+unsigned int opamp::element_size() const
+{
+    return 1;
 }
 
 void opamp::set_stamp(unsigned int offset)
@@ -28,6 +48,11 @@ void opamp::set_stamp(unsigned int offset)
     stmp.write(offset, nodes[0], 1);
     stmp.write(offset, nodes[1], -1);
     stmp.write(nodes[2], offset, 1);
+}
+
+unsigned int voltage_controlled_voltage_source::element_size() const
+{
+    return 1;
 }
 
 void voltage_controlled_voltage_source::set_stamp(unsigned int offset)
@@ -38,6 +63,11 @@ void voltage_controlled_voltage_source::set_stamp(unsigned int offset)
     stmp.write(nodes[1], offset, -1);
     stmp.write(offset, nodes[2], -value);
     stmp.write(offset, nodes[3], value);
+}
+
+unsigned int current_controlled_voltage_source::element_size() const
+{
+    return 2;
 }
 
 void current_controlled_voltage_source::set_stamp(unsigned int offset)
@@ -53,6 +83,11 @@ void current_controlled_voltage_source::set_stamp(unsigned int offset)
     stmp.write(offset, offset, -value);
 }
 
+unsigned int voltage_controlled_current_source::element_size() const
+{
+    return 1;
+}
+
 void voltage_controlled_current_source::set_stamp(unsigned int offset)
 {
     // ++-- (regular)
@@ -61,6 +96,11 @@ void voltage_controlled_current_source::set_stamp(unsigned int offset)
     stmp.write(nodes[0], nodes[3], +value);
     stmp.write(nodes[1], nodes[2], +value);
     stmp.write(nodes[1], nodes[3], -value);
+}
+
+unsigned int current_controlled_current_source::element_size() const
+{
+    return 1;
 }
 
 void current_controlled_current_source::set_stamp(unsigned int offset)
