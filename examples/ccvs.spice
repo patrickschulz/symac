@@ -1,5 +1,5 @@
 - CCVS test
-V 1 0 Vin
 R 1 2 Rin
-F 3 0 2 0 Rin
-R 3 0 Rin
+R 3 0 Rout
+V 1 0 Vin
+F 3 0 2 0 Rtrans

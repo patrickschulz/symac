@@ -36,10 +36,14 @@ namespace mna {
         unsigned int offset = number_of_nodes;
         for(unsigned int i = 0; i < components.size(); ++i)
         {
-            boost::format fmter = boost::format("I%d") % (i + 1);
-            std::string str = fmter.str();
-            x(offset, 0) = get_symbol(str);
-            offset += components[i]->element_size();
+            const auto& c = components[i];
+            for(unsigned int j = 0; j < c->element_size(); ++j)
+            {
+                boost::format fmter = boost::format("I%d") % (i + j + 1);
+                std::string str = fmter.str();
+                x(offset, 0) = get_symbol(str);
+                ++offset;
+            }
         }
 
         return x;
