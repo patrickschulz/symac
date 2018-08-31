@@ -16,9 +16,12 @@ solver::solver(const std::string& filename, const std::string& mode,std::vector<
 
 void solver::mna()
 {
-    A = mna::create_A_matrix(nlist);
-    x = mna::create_x_vector(nlist);
-    z = mna::create_z_vector(nlist);
+    const auto& components = nlist.get_components();
+    unsigned int networksize = nlist.full_network_size();
+    unsigned int number_of_nodes = nlist.number_of_nodes();
+    A = mna::create_A_matrix(networksize, components);
+    x = mna::create_x_vector(networksize, number_of_nodes, components);
+    z = mna::create_z_vector(networksize, number_of_nodes, components);
 }
 
 void solver::solve()

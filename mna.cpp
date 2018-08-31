@@ -1,4 +1,4 @@
-#include "netlist.hpp"
+#include "component.hpp"
 #include "mna.hpp"
 #include "stamp.hpp"
 
@@ -7,11 +7,10 @@
 
 namespace mna {
 
-    GiNaC::matrix create_A_matrix(const netlist& nlist)
+    GiNaC::matrix create_A_matrix(unsigned int networksize, const std::vector<std::unique_ptr<component>>& components)
     {
-        unsigned int networksize = nlist.full_network_size();
         GiNaC::matrix A(networksize, networksize);
-        for(const auto& c : nlist.get_components())
+        for(const auto& c : components)
         {
             for(const element& elem : c->get_stamp())
             {
@@ -22,21 +21,19 @@ namespace mna {
         return A;
     }
 
-    GiNaC::matrix create_x_vector(const netlist& nlist)
+    GiNaC::matrix create_x_vector(unsigned int networksize, unsigned int number_of_nodes, const std::vector<std::unique_ptr<component>>& components)
     {
-        unsigned int networksize = nlist.full_network_size();
         GiNaC::matrix x(networksize, 1);
 
         unsigned int row = 0;
-        for(; row < nlist.number_of_nodes(); ++row)
+        for(; row < number_of_nodes; ++row)
         {
             boost::format fmter = boost::format("v%d") % (row + 1);
             std::string str = fmter.str();
             x(row, 0) = get_symbol(str);
         }        
 
-        const auto& components = nlist.get_components();
-        unsigned int offset = nlist.number_of_nodes();
+        unsigned int offset = number_of_nodes;
         for(unsigned int i = 0; i < components.size(); ++i)
         {
             boost::format fmter = boost::format("I%d") % (i + 1);
@@ -48,13 +45,11 @@ namespace mna {
         return x;
     }
 
-    GiNaC::matrix create_z_vector(const netlist& nlist)
+    GiNaC::matrix create_z_vector(unsigned int networksize, unsigned int number_of_nodes, const std::vector<std::unique_ptr<component>>& components)
     {
-        unsigned int networksize = nlist.full_network_size();
         GiNaC::matrix z(networksize, 1);
 
-        const auto& components = nlist.get_components();
-        unsigned int offset = nlist.number_of_nodes();
+        unsigned int offset = number_of_nodes;
         for(unsigned int i = 0; i < components.size(); ++i)
         {
             const auto& c = components[i];
