@@ -45,17 +45,16 @@ class netlist
         void read_subckt_title(std::string& title);
         std::string change_subline_nodes(std::string line, std::vector<std::string> terminals, std::string subckt_name);
         std::string change_subline_terminals(std::string sline, std::vector<std::string> sub_t_names, std::vector<std::string> t_names);
-        //matlab export
-        void set_matlab_values(std::string v);
+
         std::vector<std::string> get_values();
+
         //command - simplification
         bool is_simplification();
         void set_simplification();
         std::map<std::string, unsigned int> get_simplifications();
         void save_simpl_line(const std::string& line);
         void change_simpl_map(std::string, std::string);
-        //simplification level
-        void set_simpl_level(const std::string&);
+        void set_simpl_level(const std::string&); //simplification level
         std::string get_simpl_level();
         
     private:
@@ -63,21 +62,16 @@ class netlist
 
         bool valid;
         nodemap nmap;
-        std::map<unsigned int, std::string> output_map;
         
         //subcircuit
         std::vector<subcircuit> subckt_vector;
         unsigned int number_subckt;
 
-        //matlab output
-        std::vector<std::string> values;
-        
         //command-simplification
         bool simplification ;
         std::vector<std::string> simplify_lines; 
         std::map<std::string, unsigned int> simpl_map;
-        //simplification level (english, medium, well-done)
-        std::string simpl_level;
+        std::string simpl_level; //simplification level (english, medium, well-done)
 };
 
 #endif //NETLIST_HPP

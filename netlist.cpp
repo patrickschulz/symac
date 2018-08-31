@@ -265,7 +265,6 @@ void netlist::component_read_in(const std::string& line)
     }
     std::string v;
     stream >> v;
-    set_matlab_values(v);
     simpl_map.insert(std::make_pair(v, 0));
     
     GiNaC::ex value;
@@ -419,15 +418,16 @@ std::string netlist::change_subline_terminals(std::string sline, std::vector<std
     return oline;
 }
 
-//Matlab Values for default settings
 std::vector<std::string> netlist::get_values()
 {
+    std::vector<std::string> values;
+    for(const component& c : components)
+    {
+        std::ostringstream stream;
+        stream << c.get_value();
+        values.push_back(stream.str());
+    }
     return values;
-}
-
-void netlist::set_matlab_values(std::string v)
-{
-    values.push_back(v);
 }
 
 // simplification
