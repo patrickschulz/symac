@@ -250,7 +250,7 @@ int netlist::number_of_voltage_sources() const
 unsigned int netlist::full_network_size() const
 {
     return number_of_nodes() 
-         + number_of_devices(ct_resistor | ct_capacitor | ct_inductor | ct_voltage_source | ct_voltage_controlled_voltage_source | ct_current_controlled_current_source | ct_voltage_controlled_current_source)
+         + number_of_devices(ct_resistor | ct_capacitor | ct_inductor | ct_voltage_source | ct_voltage_controlled_voltage_source | ct_current_controlled_current_source) 
          + 2 * number_of_devices(ct_current_controlled_current_source);
 }
 

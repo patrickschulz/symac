@@ -87,7 +87,7 @@ void current_controlled_voltage_source::set_stamp(unsigned int offset)
 
 unsigned int voltage_controlled_current_source::element_size() const
 {
-    return 1;
+    return 0;
 }
 
 void voltage_controlled_current_source::set_stamp(unsigned int offset)

@@ -50,12 +50,11 @@ namespace mna {
         GiNaC::matrix z(networksize, 1);
 
         unsigned int offset = number_of_nodes;
-        for(unsigned int i = 0; i < components.size(); ++i)
+        for(const auto& c : components)
         {
-            const auto& c = components[i];
             if(c->type() == ct_voltage_source)
             {
-                z(offset + i, 0) += c->get_value();
+                z(offset, 0) += c->get_value();
             }
             if(c->type() == ct_current_source)
             {
@@ -69,6 +68,7 @@ namespace mna {
                     z(nodes[1] - 1, 0) -= c->get_value();
                 }
             }
+            offset += c->element_size();
         }
 
         return z;
