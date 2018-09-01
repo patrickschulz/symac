@@ -3,7 +3,7 @@
 #include <sstream>
 
 subcircuit::subcircuit(const std::string& name, const std::vector<std::string>& terminals) :
-    name(name), terminals(terminals)
+    name(name), terminals(terminals), instance_number(1)
 {
 
 }
@@ -42,9 +42,7 @@ std::vector<component> subcircuit::get_mapped_components(const std::vector<std::
                 }
                 else // local net
                 {
-                    // TODO
-                    //mapped_node = node + ":" + std::to_string(nlist.subinstances[subname]);
-                    mapped_node = node + ":" + std::to_string(1);
+                    mapped_node = node + ":" + name + ":" + std::to_string(instance_number);
                 }
             }
             mapped_nodes.push_back(mapped_node);
@@ -52,6 +50,7 @@ std::vector<component> subcircuit::get_mapped_components(const std::vector<std::
         c.set_nodes(mapped_nodes);
         mapped_components.push_back(c);
     }
+    ++instance_number;
     return mapped_components;
 }
 

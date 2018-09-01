@@ -1,3 +1,4 @@
 Transfer function
 V vin 0 Vin
-R vin 0 R0
+R vin vout R1
+R vout 0 R2

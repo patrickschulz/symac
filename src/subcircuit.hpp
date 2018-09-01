@@ -21,6 +21,7 @@ class subcircuit
         std::string name;
         std::vector<std::string> terminals;
         std::vector<component> components;
+        unsigned int instance_number;
 };
 
 subcircuit read_subcircuit_header(const std::string& line);

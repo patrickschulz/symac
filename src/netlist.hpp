@@ -39,14 +39,6 @@ class netlist
         std::vector<std::string> get_values();
 
         /*
-        // subcircuit
-        bool is_subckt_call(const std::string& line);
-        void subckt_call(const std::string& line);
-        void read_subckt_line(const std::string& line, unsigned int number_subckt);
-        void read_subckt_title(std::string& title);
-        std::string change_subline_nodes(std::string line, std::vector<std::string> terminals, std::string subckt_name);
-        std::string change_subline_terminals(std::string sline, std::vector<std::string> sub_t_names, std::vector<std::string> t_names);
-
         //command - simplification
         bool is_simplification();
         void set_simplification();
@@ -64,14 +56,9 @@ class netlist
 
         // subcircuits
         std::map<std::string, subcircuit> subcircuits;
-        std::map<std::string, unsigned int> subinstances;
         subcircuit* current_subcircuit;
         
         /*
-        //subcircuit
-        std::vector<subcircuit> subckt_vector;
-        unsigned int number_subckt;
-
         //command-simplification
         bool simplification ;
         std::vector<std::string> simplify_lines; 

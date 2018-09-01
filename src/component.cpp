@@ -112,7 +112,7 @@ GiNaC::ex component::get_value() const
         case ct_none: // suppress warning
             break;
     }
-    // suppress warning
+    // suppress warning, this line should never be reached
     return GiNaC::ex();
 }
 
