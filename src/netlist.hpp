@@ -7,7 +7,6 @@
 #include <map>
 
 #include "componentlist.hpp"
-#include "nodemap.hpp"
 #include "subcircuit.hpp"
 
 class netlist
@@ -66,7 +65,6 @@ class netlist
         componentlist components;
 
         bool valid;
-        nodemap nmap;
         
         /*
         //subcircuit

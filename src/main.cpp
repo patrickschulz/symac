@@ -16,14 +16,16 @@ int main(int argc, char** argv)
         netlist nlist(filename);
         if(nlist)
         {
-            bool to_matlab = false;
+            //bool to_matlab = false;
             const std::string mode  = commandline_options["mode"].as<std::string>();
 
             std::vector<std::string> nodes = commandline_options["nodes"].as<std::vector<std::string>>();
+            /*
             if(commandline_options.count("matlab_export"))
             {
                 to_matlab = true;
             }
+            */
             solver S(mode, nlist.get_components());
             S.mna();
             if(commandline_options.count("print"))

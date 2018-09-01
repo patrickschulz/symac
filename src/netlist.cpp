@@ -226,23 +226,6 @@ netlist::operator bool()
     return valid;
 }
 
-std::string netlist::get_output_node(unsigned int unode) const
-{
-    return nmap[unode];
-}
-
-unsigned int netlist::get_unode(const std::string& snode) const
-{
-    if(nmap.check_node(snode))
-    {
-        return nmap[snode];
-    }
-    else
-    {
-        return 0;
-    }
-}
-    
 component netlist::component_read_in(const std::string& line)
 {
     std::istringstream stream(line);
