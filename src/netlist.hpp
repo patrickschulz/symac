@@ -6,7 +6,7 @@
 #include <memory>
 #include <map>
 
-#include "component.hpp"
+#include "componentlist.hpp"
 #include "nodemap.hpp"
 #include "subcircuit.hpp"
 
@@ -27,7 +27,7 @@ class netlist
         
         unsigned int full_network_size() const;
 
-        const std::vector<component>& get_components() const
+        const componentlist& get_components() const
         {
             return components;
         }
@@ -63,7 +63,7 @@ class netlist
         */
         
     private:
-        std::vector<component> components;
+        componentlist components;
 
         bool valid;
         nodemap nmap;

@@ -114,7 +114,7 @@ netlist::netlist(const std::string& filename) :
 
 void netlist::add_component(const component& c)
 {
-    components.push_back(c);
+    components.add_component(c);
 }
 
 void netlist::read(std::string filename)
@@ -190,7 +190,7 @@ void netlist::read(std::string filename)
             //}
             else if(is_component(line))
             {
-                components.push_back(component_read_in(line));
+                components.add_component(component_read_in(line));
             }
             else
             {
@@ -223,7 +223,7 @@ void netlist::read(std::string filename)
 
 unsigned int netlist::number_of_devices(component_types type) const
 {
-    return std::count_if(components.begin(), components.end(), [type] (const component& c) { return c.get_type() & type; });
+    return components.number_of_devices(type);
 }
 
 unsigned int netlist::number_of_nodes() const
@@ -273,13 +273,13 @@ component netlist::component_read_in(const std::string& line)
     stream >> name;
     char type = name[0];
     unsigned int nterminals = number_terminals(type);
-    std::vector<unsigned int> nodes;
+    std::vector<std::string> nodes;
     std::string snode;
     for (unsigned int i = 0; i < nterminals; i++)
     {
         stream >> snode;
-        unsigned int inode = nmap[snode];
-        nodes.push_back(inode);
+        //unsigned int inode = nmap[snode];
+        nodes.push_back(snode);
     }
     std::string v;
     stream >> v;
@@ -440,6 +440,7 @@ std::string netlist::change_subline_terminals(std::string sline, std::vector<std
 }
 */
 
+/*
 std::vector<std::string> netlist::get_values()
 {
     std::vector<std::string> values;
@@ -451,6 +452,7 @@ std::vector<std::string> netlist::get_values()
     }
     return values;
 }
+*/
 
 /*
 // simplification

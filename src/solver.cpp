@@ -16,12 +16,10 @@ solver::solver(const std::string& filename, const std::string& mode,std::vector<
 
 void solver::mna()
 {
-    const auto& components = nlist.get_components();
-    unsigned int networksize = nlist.full_network_size();
-    unsigned int number_of_nodes = nlist.number_of_nodes();
-    A = mna::create_A_matrix(networksize, number_of_nodes, components);
-    x = mna::create_x_vector(networksize, number_of_nodes, components);
-    z = mna::create_z_vector(networksize, number_of_nodes, components);
+    const componentlist& components = nlist.get_components();
+    A = mna::create_A_matrix(components);
+    x = mna::create_x_vector(components);
+    z = mna::create_z_vector(components);
 }
 
 void solver::solve()
@@ -246,7 +244,8 @@ void solver::vvtf_matlab_export(std::string& filename, unsigned int first, unsig
     filename.erase(dot, std::string::npos);
     std::string name = path + filename + ".m";
     std::ofstream ofile(name, std::ofstream::out);
-    std::vector<std::string> values= nlist.get_values();
+    //std::vector<std::string> values= nlist.get_values();
+    std::vector<std::string> values;
     
     ofile << "% Matlab-Export: " << std::endl;
     ofile << "% Voltage-Voltage Transfer Function"<< std::endl;

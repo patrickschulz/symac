@@ -3,12 +3,14 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 class nodemap
 {   
     public:
         nodemap();
         unsigned int operator[](const std::string& snode);
+        std::vector<unsigned int> operator[](const std::vector<std::string>& snodes);
         unsigned int operator[](const std::string& snode) const;
         std::string operator[](unsigned int inode) const;
         unsigned int get_number_nodes() const;

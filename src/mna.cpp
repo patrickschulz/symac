@@ -1,13 +1,15 @@
 #include "component.hpp"
 #include "mna.hpp"
 #include "stamp.hpp"
+#include "nodemap.hpp"
 
 #include <string>
 #include <boost/format.hpp>
 
 stamp get_stamp(const component& c, unsigned int offset)
 {
-    std::vector<unsigned int> nodes = c.get_nodes();
+    nodemap nmap;
+    std::vector<unsigned int> nodes = nmap[c.get_nodes()];
     GiNaC::ex value = c.get_value();
     stamp stmp;
     switch(c.get_type())
@@ -75,10 +77,11 @@ stamp get_stamp(const component& c, unsigned int offset)
 
 namespace mna {
 
-    GiNaC::matrix create_A_matrix(unsigned int networksize, unsigned int number_of_nodes, const std::vector<component>& components)
+    GiNaC::matrix create_A_matrix(const componentlist& components)
     {
+        unsigned int networksize = components.network_size();
         GiNaC::matrix A(networksize, networksize);
-        unsigned int offset = number_of_nodes + 1;
+        unsigned int offset = components.number_of_nodes() + 1;
         for(const auto& c : components)
         {
             stamp stmp = get_stamp(c, offset);
@@ -92,10 +95,12 @@ namespace mna {
         return A;
     }
 
-    GiNaC::matrix create_x_vector(unsigned int networksize, unsigned int number_of_nodes, const std::vector<component>& components)
+    GiNaC::matrix create_x_vector(const componentlist& components)
     {
+        unsigned int networksize = components.network_size();
         GiNaC::matrix x(networksize, 1);
 
+        /*
         unsigned int row = 0;
         for(; row < number_of_nodes; ++row)
         {
@@ -116,14 +121,17 @@ namespace mna {
                 ++offset;
             }
         }
+        */
 
         return x;
     }
 
-    GiNaC::matrix create_z_vector(unsigned int networksize, unsigned int number_of_nodes, const std::vector<component>& components)
+    GiNaC::matrix create_z_vector(const componentlist& components)
     {
+        unsigned int networksize = components.network_size();
         GiNaC::matrix z(networksize, 1);
 
+        /*
         unsigned int offset = number_of_nodes;
         for(const auto& c : components)
         {
@@ -133,7 +141,7 @@ namespace mna {
             }
             if(c.get_type() == ct_current_source)
             {
-                std::vector<unsigned int> nodes = c.get_nodes();
+                std::vector<std::string> nodes = c.get_nodes();
                 if(nodes[0] > 0)
                 {
                     z(nodes[0] - 1, 0) += c.get_value();
@@ -145,6 +153,7 @@ namespace mna {
             }
             offset += c.element_size();
         }
+        */
 
         return z;
     }

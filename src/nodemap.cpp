@@ -25,6 +25,16 @@ unsigned int nodemap::operator[](const std::string& snode)
     } 
 }
 
+std::vector<unsigned int> nodemap::operator[](const std::vector<std::string>& snodes)
+{ 
+    std::vector<unsigned int> mapped_nodes;
+    for(const std::string& snode : snodes)
+    {
+        mapped_nodes.push_back(operator[](snode));
+    }
+    return mapped_nodes;
+}
+
 unsigned int nodemap::operator[](const std::string& snode) const
 { 
     std::map<std::string, unsigned int>::const_iterator it = internal_map.find(snode);

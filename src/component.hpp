@@ -42,11 +42,11 @@ const char component_names[] = {
 class component
 {
     public:
-        component(component_types type, const std::vector<unsigned int>& nodes, const GiNaC::ex& value) :
+        component(component_types type, const std::vector<std::string>& nodes, const GiNaC::ex& value) :
             type(type), nodes(nodes), value(value)
         {   }
 
-        component(char type, const std::vector<unsigned int>& nodes, const GiNaC::ex& value) :
+        component(char type, const std::vector<std::string>& nodes, const GiNaC::ex& value) :
             nodes(nodes), value(value)
         {   
             switch(type)
@@ -116,7 +116,7 @@ class component
             return 0;
         }
 
-        const std::vector<unsigned int>& get_nodes() const
+        const std::vector<std::string>& get_nodes() const
         {
             return nodes;
         }
@@ -153,7 +153,7 @@ class component
 
     protected:
         component_types type;
-        std::vector<unsigned int> nodes;
+        std::vector<std::string> nodes;
         GiNaC::ex value;
 };
 
