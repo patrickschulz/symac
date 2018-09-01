@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <boost/format.hpp>
 
+/*
 void create_report(const netlist& nlist, const GiNaC::matrix& m)
 {
     std::ofstream file("report.tex");
@@ -66,6 +67,7 @@ void create_report(const netlist& nlist, const GiNaC::matrix& m)
     //}
     file << R"(\end{document})";
 }
+*/
 
 // trim from start (in place)
 void ltrim(std::string &s) 

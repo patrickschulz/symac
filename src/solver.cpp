@@ -45,7 +45,7 @@ void solver::print()
         };
 
         std::cout << "    Node voltages:\n";
-        for(; row < nlist.number_of_nodes(); ++row)
+        for(; row < nlist.get_components().number_of_nodes(); ++row)
         {
             std::string usernode = nlist.get_output_node(row + 1);
             boost::format fmter = boost::format("%sNode %s:\t\t") % ("        ") % (usernode);
@@ -59,7 +59,7 @@ void solver::print()
             component_types ct;
             std::vector<std::string> currents;
             std::tie(header, ct, currents) = dev;
-            unsigned int size = nlist.number_of_devices(ct);
+            unsigned int size = nlist.get_components().number_of_devices(ct);
             if(size > 0)
             {
                 std::cout << "    " << header << ":\n";
