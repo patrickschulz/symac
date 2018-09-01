@@ -4,22 +4,18 @@
 #include <numeric>
 #include <fstream>
 
-
 #include "mna.hpp"
-#include "netlist.hpp"
 
-
-solver::solver(const std::string& filename, const std::string& mode,std::vector<std::string> nodes, netlist& nlist, bool matlab_export) :
-    filename(filename),mode (mode),nodes(nodes), nlist(nlist), matlab_export(matlab_export)
+solver::solver(const std::string& mode, const componentlist& components) :
+    mode(mode), components(components)
 {
 }
 
 void solver::mna()
 {
-    const componentlist& components = nlist.get_components();
-    A = mna::create_A_matrix(components);
-    x = mna::create_x_vector(components);
-    z = mna::create_z_vector(components);
+    A = mna::create_A_matrix(nmap, components);
+    x = mna::create_x_vector(nmap, components);
+    z = mna::create_z_vector(nmap, components);
 }
 
 void solver::solve()
@@ -45,9 +41,10 @@ void solver::print()
         };
 
         std::cout << "    Node voltages:\n";
-        for(; row < nlist.get_components().number_of_nodes(); ++row)
+        for(; row < components.number_of_nodes(); ++row)
         {
-            std::string usernode = nlist.get_output_node(row + 1);
+            //std::string usernode = nlist.get_output_node(row + 1);
+            std::string usernode = "";
             boost::format fmter = boost::format("%sNode %s:\t\t") % ("        ") % (usernode);
             std::string str = fmter.str();
             std::cout << str << results(row, 0) << '\n';
@@ -59,7 +56,7 @@ void solver::print()
             component_types ct;
             std::vector<std::string> currents;
             std::tie(header, ct, currents) = dev;
-            unsigned int size = nlist.get_components().number_of_devices(ct);
+            unsigned int size = components.number_of_devices(ct);
             if(size > 0)
             {
                 std::cout << "    " << header << ":\n";
@@ -77,6 +74,7 @@ void solver::print()
             }
         }
     }
+    /*
     else if(mode == "tf")
     {
         if(nodes.size() != 2){
@@ -98,15 +96,14 @@ void solver::print()
         {
             vvtf_matlab_export(filename,first,second);
         }
-        /*
         if(nlist.is_simplification())
         { 
-//             std::string H_simple = vvtf_simplification(H);
+            std::string H_simple = vvtf_simplification(H);
             std::cout << " Simplified (in Latex) "<< '\n';
-//             std::cout << "H(s) = " << H_simple << '\n';
+            std::cout << "H(s) = " << H_simple << '\n';
         }
-        */
     }
+    */
     else
     {
         std::cerr << "unknown mode '" << mode << "' given\n";
@@ -201,6 +198,7 @@ void solver::print_matrices()
     print_network_matrices(A, x, z);
 }
 
+/*
 void solver::matrices_to_matlab(const std::string& filename)
 {
     std::string a = filename;
@@ -293,3 +291,4 @@ std::string solver::vvtf_funct_to_latex_string(GiNaC::ex H)
     std::string string_funct = s.str();
     return string_funct;
 }
+*/

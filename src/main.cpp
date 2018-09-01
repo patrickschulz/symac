@@ -24,7 +24,7 @@ int main(int argc, char** argv)
             {
                 to_matlab = true;
             }
-            solver S(filename, mode, nodes, nlist, to_matlab);
+            solver S(mode, nlist.get_components());
             S.mna();
             if(commandline_options.count("print"))
             {

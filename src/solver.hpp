@@ -6,16 +6,18 @@
 
 #include <ginac/ginac.h>
 
-#include "netlist.hpp"
+#include "componentlist.hpp"
+#include "nodemap.hpp"
 
 class solver
 {
     public:
-        solver(const std::string& filename, const std::string& mode,std::vector<std::string> nodes, netlist& nlist, bool matlab_export);
+        solver(const std::string& mode, const componentlist& components);
         void mna();
         void solve();
         void print();
         void print_matrices();
+
         void matrices_to_matlab(const std::string& filename);
         void vvtf_matlab_export(std::string& filename, unsigned int first, unsigned int second);
         std::string vvtf_funct_to_latex_string(GiNaC::ex H);
@@ -23,12 +25,13 @@ class solver
         //std::string vvtf_simplification(GiNaC::ex H);
         //std::string simplify_line(std::string s);
         //std::string sim_replace(std::string v);
+        //
     private:
-        std::string filename;
         std::string mode;
-        std::vector<std::string> nodes;
-        netlist& nlist;
-        bool matlab_export;
+
+        const componentlist& components;
+        nodemap nmap;
+
         GiNaC::matrix A;
         GiNaC::matrix x;
         GiNaC::matrix z;

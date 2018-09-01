@@ -2,13 +2,12 @@
 #include "mna.hpp"
 #include "stamp.hpp"
 #include "nodemap.hpp"
+#include "componentlist.hpp"
 
 #include <string>
 #include <boost/format.hpp>
 
-nodemap nmap;
-
-stamp get_stamp(const component& c, unsigned int offset)
+stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
 {
     std::vector<unsigned int> nodes = nmap[c.get_nodes()];
     GiNaC::ex value = c.get_value();
@@ -78,14 +77,14 @@ stamp get_stamp(const component& c, unsigned int offset)
 
 namespace mna {
 
-    GiNaC::matrix create_A_matrix(const componentlist& components)
+    GiNaC::matrix create_A_matrix(nodemap& nmap, const componentlist& components)
     {
         unsigned int networksize = components.network_size();
         GiNaC::matrix A(networksize, networksize);
         unsigned int offset = components.number_of_nodes() + 1;
         for(const auto& c : components)
         {
-            stamp stmp = get_stamp(c, offset);
+            stamp stmp = get_stamp(c, offset, nmap);
             offset += c.element_size();
             for(const element& elem : stmp)
             {
@@ -96,7 +95,7 @@ namespace mna {
         return A;
     }
 
-    GiNaC::matrix create_x_vector(const componentlist& components)
+    GiNaC::matrix create_x_vector(nodemap& nmap, const componentlist& components)
     {
         unsigned int networksize = components.network_size();
         GiNaC::matrix x(networksize, 1);
@@ -126,7 +125,7 @@ namespace mna {
         return x;
     }
 
-    GiNaC::matrix create_z_vector(const componentlist& components)
+    GiNaC::matrix create_z_vector(nodemap& nmap, const componentlist& components)
     {
         unsigned int networksize = components.network_size();
         GiNaC::matrix z(networksize, 1);
