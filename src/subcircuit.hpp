@@ -15,6 +15,8 @@ class subcircuit
 
         void add_component(const component& c);
 
+        std::vector<component> get_mapped_components(const std::vector<std::string>& nodes);
+
     private:
         std::string name;
         std::vector<std::string> terminals;

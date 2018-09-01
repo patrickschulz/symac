@@ -4,5 +4,9 @@ G s d g s gm
 R d s ro
 .end
 
+.subckt sub p n
+R p n R0
+.end
+
 V vin 0 vin
-Xmosfet vin 0 vout
+Xsub vin 0

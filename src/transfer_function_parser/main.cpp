@@ -21,8 +21,10 @@ GiNaC::symbol s = GiNaC::symbol("s");
 
 int main()
 {
-    GiNaC::symbol R = GiNaC::symbol("R");
-    GiNaC::symbol C = GiNaC::symbol("C");
+    GiNaC::symbol R1 = GiNaC::symbol("R1");
+    GiNaC::symbol R2 = GiNaC::symbol("R2");
+    GiNaC::symbol C1 = GiNaC::symbol("C1");
+    GiNaC::symbol C2 = GiNaC::symbol("C2");
 
     GiNaC::ex den1 = s * R1;
     GiNaC::ex den2 = s * R1 * C1;

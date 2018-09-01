@@ -2,8 +2,6 @@
 #define NETLIST_HPP
 
 #include <vector>
-#include <iterator>
-#include <memory>
 #include <map>
 
 #include "componentlist.hpp"
@@ -36,9 +34,7 @@ class netlist
         std::string get_output_node(unsigned int node) const;
         unsigned int get_unode(const std::string& snode) const;
 
-        std::map<std::string, subcircuit> subcircuits;
-        std::map<std::string, unsigned int> subinstances;
-        subcircuit* current_subcircuit;
+        void translate_subcircuit(const std::string& line);
 
         std::vector<std::string> get_values();
 
@@ -65,6 +61,11 @@ class netlist
         componentlist components;
 
         bool valid;
+
+        // subcircuits
+        std::map<std::string, subcircuit> subcircuits;
+        std::map<std::string, unsigned int> subinstances;
+        subcircuit* current_subcircuit;
         
         /*
         //subcircuit

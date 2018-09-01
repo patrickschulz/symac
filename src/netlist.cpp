@@ -8,6 +8,7 @@
 #include <ginac/ginac.h>
 
 #include "util.hpp"
+#include "symbol.hpp"
 
 static bool is_comment(const std::string& line)
 {
@@ -117,6 +118,28 @@ void netlist::add_component(const component& c)
     components.add_component(c);
 }
 
+void netlist::translate_subcircuit(const std::string& line)
+{
+    std::istringstream stream(line);
+    std::string subname;
+    char X;
+    stream >> X >> subname;
+    ++subinstances[subname];
+
+    std::vector<std::string> nodes;
+    std::copy(std::istream_iterator<std::string>(stream), 
+              std::istream_iterator<std::string>(),
+              std::back_inserter(nodes)
+             );
+
+    subcircuit sub = subcircuits[subname];
+    std::vector<component> subcomponents = sub.get_mapped_components(nodes);
+    for(const component& c : subcomponents)
+    {
+        components.add_component(c);
+    }
+}
+
 void netlist::read(std::string filename)
 {
     std::ifstream file(filename);
@@ -128,7 +151,7 @@ void netlist::read(std::string filename)
 
     bool title_found = false;
     bool idle = true;
-    unsigned int number_subckt=0;
+    //unsigned int number_subckt = 0;
     while(true)
     {
         std::string line;
@@ -153,13 +176,12 @@ void netlist::read(std::string filename)
             }
             else if(line.find("X") != std::string::npos)
             {
-                /*
-                vector<component> cs = translate_subcircuit(line, nlist);
-                for(auto c : cs)
-                {
-                    nlist.components.push_back(c);
-                }
-                */
+                translate_subcircuit(line);
+                //std::vector<component> cs = translate_subcircuit(line);
+                //for(auto c : cs)
+                //{
+                //    add_component(c);
+                //}
             }
             //else if(is_subckt_end(line))
             //{
