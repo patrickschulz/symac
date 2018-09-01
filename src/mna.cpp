@@ -6,9 +6,10 @@
 #include <string>
 #include <boost/format.hpp>
 
+nodemap nmap;
+
 stamp get_stamp(const component& c, unsigned int offset)
 {
-    nodemap nmap;
     std::vector<unsigned int> nodes = nmap[c.get_nodes()];
     GiNaC::ex value = c.get_value();
     stamp stmp;
@@ -100,28 +101,27 @@ namespace mna {
         unsigned int networksize = components.network_size();
         GiNaC::matrix x(networksize, 1);
 
-        /*
         unsigned int row = 0;
-        for(; row < number_of_nodes; ++row)
+        for(; row < components.number_of_nodes(); ++row)
         {
             boost::format fmter = boost::format("v%d") % (row + 1);
             std::string str = fmter.str();
             x(row, 0) = get_symbol(str);
         }        
 
-        unsigned int offset = number_of_nodes;
-        for(unsigned int i = 0; i < components.size(); ++i)
+        unsigned int offset = components.number_of_nodes();
+        unsigned int i = 0;
+        for(const auto& c : components)
         {
-            const auto& c = components[i];
             for(unsigned int j = 0; j < c.element_size(); ++j)
             {
                 boost::format fmter = boost::format("I%d") % (i + j + 1);
+                ++i;
                 std::string str = fmter.str();
                 x(offset, 0) = get_symbol(str);
                 ++offset;
             }
         }
-        */
 
         return x;
     }
@@ -131,8 +131,7 @@ namespace mna {
         unsigned int networksize = components.network_size();
         GiNaC::matrix z(networksize, 1);
 
-        /*
-        unsigned int offset = number_of_nodes;
+        unsigned int offset = components.number_of_nodes();
         for(const auto& c : components)
         {
             if(c.get_type() == ct_voltage_source)
@@ -141,7 +140,7 @@ namespace mna {
             }
             if(c.get_type() == ct_current_source)
             {
-                std::vector<std::string> nodes = c.get_nodes();
+                std::vector<unsigned int> nodes = nmap[c.get_nodes()];
                 if(nodes[0] > 0)
                 {
                     z(nodes[0] - 1, 0) += c.get_value();
@@ -153,7 +152,6 @@ namespace mna {
             }
             offset += c.element_size();
         }
-        */
 
         return z;
     }
