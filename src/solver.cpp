@@ -100,12 +100,14 @@ void solver::print()
         {
             vvtf_matlab_export(filename,first,second);
         }
+        /*
         if(nlist.is_simplification())
         { 
 //             std::string H_simple = vvtf_simplification(H);
             std::cout << " Simplified (in Latex) "<< '\n';
 //             std::cout << "H(s) = " << H_simple << '\n';
         }
+        */
     }
     else
     {

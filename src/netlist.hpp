@@ -18,12 +18,11 @@ class netlist
 
         void read(std::string filename);
         
-        void component_read_in(const std::string& line);
+        component component_read_in(const std::string& line);
         void add_component(const component& c);
 
         unsigned int number_terminals(char type);
         unsigned int number_of_nodes() const;
-        const std::vector<component> get_devices(component_types type) const;
         unsigned int number_of_devices(component_types type) const;
         
         unsigned int full_network_size() const;
@@ -38,6 +37,13 @@ class netlist
         std::string get_output_node(unsigned int node) const;
         unsigned int get_unode(const std::string& snode) const;
 
+        std::map<std::string, subcircuit> subcircuits;
+        std::map<std::string, unsigned int> subinstances;
+        subcircuit* current_subcircuit;
+
+        std::vector<std::string> get_values();
+
+        /*
         // subcircuit
         bool is_subckt_call(const std::string& line);
         void subckt_call(const std::string& line);
@@ -45,8 +51,6 @@ class netlist
         void read_subckt_title(std::string& title);
         std::string change_subline_nodes(std::string line, std::vector<std::string> terminals, std::string subckt_name);
         std::string change_subline_terminals(std::string sline, std::vector<std::string> sub_t_names, std::vector<std::string> t_names);
-
-        std::vector<std::string> get_values();
 
         //command - simplification
         bool is_simplification();
@@ -56,6 +60,7 @@ class netlist
         void change_simpl_map(std::string, std::string);
         void set_simpl_level(const std::string&); //simplification level
         std::string get_simpl_level();
+        */
         
     private:
         std::vector<component> components;
@@ -63,6 +68,7 @@ class netlist
         bool valid;
         nodemap nmap;
         
+        /*
         //subcircuit
         std::vector<subcircuit> subckt_vector;
         unsigned int number_subckt;
@@ -72,6 +78,7 @@ class netlist
         std::vector<std::string> simplify_lines; 
         std::map<std::string, unsigned int> simpl_map;
         std::string simpl_level; //simplification level (english, medium, well-done)
+        */
 };
 
 #endif //NETLIST_HPP

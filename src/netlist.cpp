@@ -37,6 +37,7 @@ static bool is_component(const std::string& line)
     return is_two_terminal_device(line) || is_three_terminal_device(line) || is_four_terminal_device(line);
 }
 
+/*
 static bool is_subckt_title(const std::string& line)
 {
     std::regex rx(R"(^\.subckt)");
@@ -54,7 +55,9 @@ bool netlist::is_subckt_call(const std::string& line)
     std::regex rx(R"(^X\w+)");
     return std::regex_search(line, rx);
 }
+*/
 
+/*
 static bool is_command_simplify(const std::string& line)
 {
     if(line.find("simplify") != std::string::npos)
@@ -66,6 +69,7 @@ static bool is_command_simplify(const std::string& line)
         return false;
     }
 }
+*/
 
 unsigned int netlist::number_terminals(char type)
 {
@@ -123,7 +127,7 @@ void netlist::read(std::string filename)
     }
 
     bool title_found = false;
-    bool subckt = false;
+    bool idle = true;
     unsigned int number_subckt=0;
     while(true)
     {
@@ -138,70 +142,88 @@ void netlist::read(std::string filename)
         {
             continue;
         }
-        else if(is_subckt_end(line))
+        if(idle)
         {
-            subckt = false;
-            number_subckt++;
-            continue;
-        }
-        if(subckt)
-        {
-            read_subckt_line(line, number_subckt);
-        }
-        else if(is_subckt_title(line))
-        {
-            subckt = true;
-            std::string init (".subckt");
-            std::string title = line;
-            title.erase(0,init.length());
-            read_subckt_title(title);
-        }
-        else if(is_subckt_call(line))
-        {
-            subckt_call(line);
-        }
-        else if (is_command_simplify(line))
-        {
-            save_simpl_line(line);
-            simplification = true;
-        }
-        else if(is_component(line))
-        {
-            component_read_in(line);
-        }
-        else
-        {
-            if(title_found)
+            if(line.find(".subckt") != std::string::npos)
             {
-                std::cerr << "unknown line: '" << line << "'\n";
+                subcircuit s = read_subcircuit_header(line);
+                subcircuits[s.get_name()] = s;
+                current_subcircuit = &subcircuits[s.get_name()];
+                idle = false;
+            }
+            else if(line.find("X") != std::string::npos)
+            {
+                /*
+                vector<component> cs = translate_subcircuit(line, nlist);
+                for(auto c : cs)
+                {
+                    nlist.components.push_back(c);
+                }
+                */
+            }
+            //else if(is_subckt_end(line))
+            //{
+            //    subckt = false;
+            //    number_subckt++;
+            //    continue;
+            //}
+            //if(subckt)
+            //{
+            //    read_subckt_line(line, number_subckt);
+            //}
+            //else if(is_subckt_title(line))
+            //{
+            //    subckt = true;
+            //    std::string init (".subckt");
+            //    std::string title = line;
+            //    title.erase(0,init.length());
+            //    read_subckt_title(title);
+            //}
+            //else if(is_subckt_call(line))
+            //{
+            //    subckt_call(line);
+            //}
+            //else if (is_command_simplify(line))
+            //{
+            //    save_simpl_line(line);
+            //    simplification = true;
+            //}
+            else if(is_component(line))
+            {
+                components.push_back(component_read_in(line));
             }
             else
             {
-                title_found = true;
+                if(title_found)
+                {
+                    std::cerr << "unknown line: '" << line << "'\n";
+                }
+                else
+                {
+                    title_found = true;
+                }
+                
             }
-            
+        }
+        else // !idle (reading-in subcircuit definitions
+        {
+            if(line.find(".end") != std::string::npos)
+            {
+                idle = true;
+            }
+            else
+            {
+                component c = component_read_in(line);
+                current_subcircuit->add_component(c);
+            }
         }
     }
     valid = true;
 }
 
-const std::vector<component> netlist::get_devices(component_types type) const
-{
-    std::vector<component> devices;
-    for(const auto& c : components)
-    {
-        if(c.get_type() & type)
-        {
-            devices.emplace_back(c);
-        }
-    }
-    return devices;
-}
-
 unsigned int netlist::number_of_devices(component_types type) const
 {
-    const std::vector<component> devices = get_devices(type);
-    return devices.size();
+    return std::count_if(components.begin(), components.end(), [type] (const component& c) { return c.get_type() & type; });
 }
 
 unsigned int netlist::number_of_nodes() const
@@ -244,7 +266,7 @@ unsigned int netlist::get_unode(const std::string& snode) const
     }
 }
     
-void netlist::component_read_in(const std::string& line)
+component netlist::component_read_in(const std::string& line)
 {
     std::istringstream stream(line);
     std::string name;
@@ -256,12 +278,12 @@ void netlist::component_read_in(const std::string& line)
     for (unsigned int i = 0; i < nterminals; i++)
     {
         stream >> snode;
-        unsigned int n = nmap[snode];
-        nodes.push_back(std::move(n));
+        unsigned int inode = nmap[snode];
+        nodes.push_back(inode);
     }
     std::string v;
     stream >> v;
-    simpl_map.insert(std::make_pair(v, 0));
+    //simpl_map.insert(std::make_pair(v, 0));
     
     GiNaC::ex value;
     if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
@@ -272,9 +294,10 @@ void netlist::component_read_in(const std::string& line)
     {
         value = get_symbol(v);
     }
-    components.push_back(component(type, nodes, value));
+    return component(type, nodes, value);
 }
 
+/*
 // Subcircuit-Functs
 void netlist::subckt_call(const std::string& line)
 {
@@ -415,6 +438,7 @@ std::string netlist::change_subline_terminals(std::string sline, std::vector<std
     oline.append(buf);
     return oline;
 }
+*/
 
 std::vector<std::string> netlist::get_values()
 {
@@ -428,6 +452,7 @@ std::vector<std::string> netlist::get_values()
     return values;
 }
 
+/*
 // simplification
 void netlist::save_simpl_line(const std::string& line)
 {
@@ -481,4 +506,4 @@ std::string netlist::get_simpl_level()
 {
     return simpl_level;
 }
-
+*/
