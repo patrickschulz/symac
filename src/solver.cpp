@@ -6,8 +6,8 @@
 
 #include "mna.hpp"
 
-solver::solver(const std::string& mode, const componentlist& components) :
-    mode(mode), components(components)
+solver::solver(const componentlist& components) :
+    components(components)
 {
 }
 
@@ -18,96 +18,10 @@ void solver::mna()
     z = mna::create_z_vector(nmap, components);
 }
 
-void solver::solve()
+result solver::solve()
 {
-    results = A.solve(x, z, GiNaC::solve_algo::gauss);
-}
-
-void solver::print()
-{
-    if(mode == "ac")
-    {
-        std::cout << "Results:\n";
-        std::cout << GiNaC::csrc;
-        unsigned int row = 0;
-        
-        std::vector<std::tuple<std::string, component_types, std::vector<std::string>>> dev_formats = {
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through impedances", ct_resistor | ct_capacitor | ct_inductor,{"Iz"}),
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through voltage sources", ct_voltage_source, {"Iv"}),
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents into opamps (output)", ct_opamp, {"Iop"}),
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through vcvs", ct_voltage_controlled_voltage_source, {"I_vcvs"}),
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through cccs", ct_current_controlled_current_source, {"I_cccs"}),
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through ccvs", ct_current_controlled_voltage_source, {"Ifin", "Ifout"})
-        };
-
-        std::cout << "    Node voltages:\n";
-        for(; row < components.number_of_nodes(); ++row)
-        {
-            std::string usernode = nmap[row + 1];
-            boost::format fmter = boost::format("%sNode %s:\t\t") % ("        ") % (usernode);
-            std::string str = fmter.str();
-            std::cout << str << results(row, 0) << '\n';
-        }
-        std::cout << '\n';
-        for(const auto& dev : dev_formats)
-        {
-            std::string header;
-            component_types ct;
-            std::vector<std::string> currents;
-            std::tie(header, ct, currents) = dev;
-            unsigned int size = components.number_of_devices(ct);
-            if(size > 0)
-            {
-                std::cout << "    " << header << ":\n";
-                for(unsigned int i = 0; i < size; ++i)
-                {
-                    for(const auto& current : currents)
-                    {
-                        boost::format fmter = boost::format("        %s%d:\t\t") % current % (i + 1);
-                        std::string str = fmter.str();
-                        std::cout << str << results(row, 0) << '\n';
-                        ++row;
-                    }
-                }
-                std::cout << '\n';
-            }
-        }
-    }
-    /*
-    else if(mode == "tf")
-    {
-        if(nodes.size() != 2){
-            std::cerr << "You have to specify two nodes (by using the -n argument two times)"<< '\n';
-            exit(1);
-        }
-        if(nodes[0] == "0" || nodes[1]== "0" || nodes[0] == "GND" || nodes[1] == "GND" )
-        {
-            std::cerr << " You can't use the GND node (node 0)" << '\n';
-            exit(1);
-        }
-        unsigned int first = nlist.get_unode(nodes[0]) - 1;
-        unsigned int second= nlist.get_unode(nodes[1]) - 1;
-        GiNaC::ex H = results(second, 0) / results(first, 0);
-        std::cout << "H(s) = " << H << '\n';
-        std::cout << "H(s) to Latex" << '\n';
-        std::cout << "H(s) = " <<GiNaC::latex << H << '\n';
-        if(matlab_export)
-        {
-            vvtf_matlab_export(filename,first,second);
-        }
-        if(nlist.is_simplification())
-        { 
-            std::string H_simple = vvtf_simplification(H);
-            std::cout << " Simplified (in Latex) "<< '\n';
-            std::cout << "H(s) = " << H_simple << '\n';
-        }
-    }
-    */
-    else
-    {
-        std::cerr << "unknown mode '" << mode << "' given\n";
-        exit(1);
-    }
+    GiNaC::matrix res = A.solve(x, z, GiNaC::solve_algo::gauss);
+    return result(components, res, nmap);
 }
 
 void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, const GiNaC::matrix& z)

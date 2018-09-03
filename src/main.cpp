@@ -5,6 +5,7 @@
 #include "netlist.hpp"
 #include "options.hpp"
 #include "solver.hpp"
+#include "result.hpp"
 
 int main(int argc, char** argv)
 {
@@ -16,24 +17,20 @@ int main(int argc, char** argv)
         netlist nlist(filename);
         if(nlist)
         {
-            //bool to_matlab = false;
-            const std::string mode  = commandline_options["mode"].as<std::string>();
-
             std::vector<std::string> nodes = commandline_options["nodes"].as<std::vector<std::string>>();
-            /*
-            if(commandline_options.count("matlab_export"))
-            {
-                to_matlab = true;
-            }
-            */
-            solver S(mode, nlist.get_components());
+            solver S(nlist.get_components());
             S.mna();
             if(commandline_options.count("print"))
             {
                 S.print_matrices();
             }
-            S.solve();
-            S.print();
+            const std::string mode  = commandline_options["mode"].as<std::string>();
+            result res = S.solve();
+            res.print(mode);
+            if(commandline_options.count("matlab_export"))
+            {
+                res.export_matlab();
+            }
         }
         else
         {

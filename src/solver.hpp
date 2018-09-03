@@ -8,14 +8,14 @@
 
 #include "componentlist.hpp"
 #include "nodemap.hpp"
+#include "result.hpp"
 
 class solver
 {
     public:
-        solver(const std::string& mode, const componentlist& components);
+        solver(const componentlist& components);
         void mna();
-        void solve();
-        void print();
+        result solve();
         void print_matrices();
 
         void matrices_to_matlab(const std::string& filename);
@@ -27,15 +27,12 @@ class solver
         //std::string sim_replace(std::string v);
         //
     private:
-        std::string mode;
-
         const componentlist& components;
         nodemap nmap;
 
         GiNaC::matrix A;
         GiNaC::matrix x;
         GiNaC::matrix z;
-        GiNaC::matrix results;
 };
 
 #endif // SOLVER_HPP
