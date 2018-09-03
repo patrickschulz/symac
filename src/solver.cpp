@@ -31,46 +31,23 @@ void solver::print()
         std::cout << GiNaC::csrc;
         unsigned int row = 0;
         
-        std::vector<std::tuple<std::string, component_types, std::vector<std::string>>> dev_formats = {
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through impedances", ct_resistor | ct_capacitor | ct_inductor,{"Iz"}),
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through voltage sources", ct_voltage_source, {"Iv"}),
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents into opamps (output)", ct_opamp, {"Iop"}),
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through vcvs", ct_voltage_controlled_voltage_source, {"I_vcvs"}),
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through cccs", ct_current_controlled_current_source, {"I_cccs"}),
-            std::make_tuple<std::string, component_types, std::vector<std::string>>("Currents through ccvs", ct_current_controlled_voltage_source, {"Ifin", "Ifout"})
-        };
+        std::map<component_types, std::pair<std::string, unsigned int>> result_display_map { { ct_resistor, { "Ir", 0 } }, { ct_voltage_source, { "Iv", 0 } } };
 
         std::cout << "    Node voltages:\n";
         for(; row < components.number_of_nodes(); ++row)
         {
             std::string usernode = nmap[row + 1];
             boost::format fmter = boost::format("%sNode %s:\t\t") % ("        ") % (usernode);
-            std::string str = fmter.str();
-            std::cout << str << results(row, 0) << '\n';
+            std::cout << fmter.str() << results(row, 0) << '\n';
         }
-        std::cout << '\n';
-        for(const auto& dev : dev_formats)
+        std::cout << "\n   Currents:\n";
+        for(const component& c : components)
         {
-            std::string header;
-            component_types ct;
-            std::vector<std::string> currents;
-            std::tie(header, ct, currents) = dev;
-            unsigned int size = components.number_of_devices(ct);
-            if(size > 0)
-            {
-                std::cout << "    " << header << ":\n";
-                for(unsigned int i = 0; i < size; ++i)
-                {
-                    for(const auto& current : currents)
-                    {
-                        boost::format fmter = boost::format("        %s%d:\t\t") % current % (i + 1);
-                        std::string str = fmter.str();
-                        std::cout << str << results(row, 0) << '\n';
-                        ++row;
-                    }
-                }
-                std::cout << '\n';
-            }
+            std::pair<std::string, unsigned int>& display = result_display_map[c.get_type()];
+            ++display.second;
+            boost::format fmter = boost::format("%sCurrent %s%d:\t\t") % ("        ") % (display.first) % (display.second);
+            std::cout << fmter.str() << results(row, 0) << '\n';
+            ++row;
         }
     }
     /*
