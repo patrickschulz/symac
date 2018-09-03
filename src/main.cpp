@@ -16,16 +16,9 @@ int main(int argc, char** argv)
         netlist nlist(filename);
         if(nlist)
         {
-            //bool to_matlab = false;
             const std::string mode  = commandline_options["mode"].as<std::string>();
 
             std::vector<std::string> nodes = commandline_options["nodes"].as<std::vector<std::string>>();
-            /*
-            if(commandline_options.count("matlab_export"))
-            {
-                to_matlab = true;
-            }
-            */
             solver S(mode, nlist.get_components());
             S.mna();
             if(commandline_options.count("print"))
@@ -34,6 +27,11 @@ int main(int argc, char** argv)
             }
             S.solve();
             S.print();
+            if(commandline_options.count("matlab_export"))
+            {
+                //std::string matlab_export_mode = commandline_options["matlab_export"].as<std::string>();
+                //S.export_to_matlab(matlab_export_mode);
+            }
         }
         else
         {
