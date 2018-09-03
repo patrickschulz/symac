@@ -1,5 +1,6 @@
 #include "result.hpp"
 
+#include <iostream>
 #include <map>
 #include <boost/format.hpp>
 
@@ -9,6 +10,19 @@ result::result(const componentlist& components,  const GiNaC::matrix& results, c
     components(components), results(results), nmap(nmap)
 {
 
+}
+
+void result::print_voltage(const std::string& voltage) const
+{
+    unsigned int inode = nmap[voltage];
+    std::cout << results(inode - 1, 0) << '\n';
+}
+
+void result::print_voltage(const std::string& voltage1, const std::string& voltage2) const
+{
+    unsigned int inode1 = nmap[voltage1];
+    unsigned int inode2 = nmap[voltage2];
+    std::cout << results(inode1 - 1, 0) - results(inode2 - 1, 0) << '\n';
 }
 
 void result::print(const std::string& mode) const
@@ -37,7 +51,8 @@ void result::print(const std::string& mode) const
             { ct_voltage_controlled_voltage_source, { { "I_vcvs"        }, 0 } },
             { ct_current_controlled_current_source, { { "I_cccs"        }, 0 } },
             { ct_current_controlled_voltage_source, { { "Ifin", "Ifout" }, 0 } },
-            { ct_voltage_controlled_current_source, { {                 }, 0 } }
+            { ct_voltage_controlled_current_source, { {                 }, 0 } }, // dummy entry
+            { ct_current_source                   , { {                 }, 0 } }  // dummy entry
         };
         for(const component& c : components)
         {
@@ -52,31 +67,6 @@ void result::print(const std::string& mode) const
                 ++row;
             }
         }
-        /*
-        for(const auto& dev : dev_formats)
-        {
-            std::string header;
-            component_types ct;
-            std::vector<std::string> currents;
-            std::tie(header, ct, currents) = dev;
-            unsigned int size = components.number_of_devices(ct);
-            if(size > 0)
-            {
-                std::cout << "    " << header << ":\n";
-                for(unsigned int i = 0; i < size; ++i)
-                {
-                    for(const auto& current : currents)
-                    {
-                        boost::format fmter = boost::format("        %s%d:\t\t") % current % (i + 1);
-                        std::string str = fmter.str();
-                        std::cout << str << results(row, 0) << '\n';
-                        ++row;
-                    }
-                }
-                std::cout << '\n';
-            }
-        }
-        */
     }
     /*
     else if(mode == "tf")

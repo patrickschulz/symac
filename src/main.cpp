@@ -29,7 +29,7 @@ int main(int argc, char** argv)
             res.print(mode);
             if(commandline_options.count("matlab_export"))
             {
-                res.export_matlab();
+                //res.export_matlab();
             }
         }
         else

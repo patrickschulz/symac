@@ -13,6 +13,9 @@ class result
         result(const componentlist& components,  const GiNaC::matrix& results, const nodemap& nmap);
         void print(const std::string& mode) const;
 
+        void print_voltage(const std::string& voltage) const;
+        void print_voltage(const std::string& voltage1, const std::string& voltage2) const;
+
     private:
         const componentlist& components;
 
