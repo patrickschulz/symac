@@ -9,6 +9,7 @@
 map::map()
 { 
     mappy["0"]=0;
+    rev_mappy[0] = "GND";
 }
 unsigned int map::get_map_node(std::string snode)
 {
@@ -30,11 +31,12 @@ unsigned int map::get_map_node(std::string snode)
         else
         {
             inode = mappy.size();
-            mappy.insert(std::make_pair(snode,inode)).first->second;
+            mappy.insert(std::make_pair(snode,inode));
+            rev_mappy.insert(std::make_pair(inode, snode));
         } 
         return inode;
 }    
-unsigned int map::get_number_nodes() const
+unsigned int map::get_number_nodes() const  
 {
     unsigned int i = mappy.size();
     i--;
@@ -55,19 +57,25 @@ unsigned int map::find_node(std::string snode) const
      }
      return unode;
 }
-            
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
+std::string  map::get_output_node(unsigned int unode)
+{
+    std::string snode = "Not found";
+    auto it = rev_mappy.find(unode);
+    if (it != rev_mappy.end())
+    {
+        snode = it -> second;
+    }    
+    return snode;
+}
+void map::add_to_output_map(unsigned int inode, std::string unode)
+{
+    auto it = rev_mappy.find(inode);
+    if(it == rev_mappy.end())
+    {
+        rev_mappy.insert(std::make_pair(inode,unode));
+    }
+}
+       
 // TODO : put funct in netlist
 // unsigned int map::get_max_node()
 // {

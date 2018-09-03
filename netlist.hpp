@@ -53,8 +53,7 @@ class netlist
 
         operator bool();
         // OUTPUT MAP
-        void add_to_output_map(unsigned int node, std::string snode);
-        std::string get_output_node(unsigned int node) const;
+        std::string get_output_node(unsigned int node);
         unsigned int get_unode(std::string snode) const;
         // subcircuit
         bool is_subckt_call(const std::string& line);
@@ -75,6 +74,7 @@ class netlist
         //simplification level
         void set_simpl_level(const std::string&);
         std::string get_simpl_level();
+        std::vector<unsigned int> get_simpl_vector();
         
     private:
         void reset();
@@ -82,9 +82,9 @@ class netlist
 
         bool valid;
         std::vector<std::unique_ptr<component>> components;
+        // Mapping and reverse_mapping(for output) of nodes
         map nmap;
-        std::map<unsigned int, std::string> output_map;
-        
+        map rev_nmap;
         //subcircuit
         std::vector<subcircuit> subckt_vector;
         unsigned int number_subckt;
@@ -112,6 +112,7 @@ class netlist
         bool simplification ;
         std::vector<std::string> simplify_lines; 
         std::map<std::string, unsigned int> simpl_map;
+        std::map<std::string, std::string> simpl_commands;
         //simplification level (english, medium, well-done)
         std::string simpl_level;
 };

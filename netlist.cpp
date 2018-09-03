@@ -54,7 +54,8 @@ static bool is_subckt_title(const std::string& line)
     }
     
 }
-static bool is_subckt_end(const std::string& line)
+
+static bool is_end(const std::string& line)
 {
     std::istringstream stream(line);
     char dot;
@@ -71,6 +72,7 @@ static bool is_subckt_end(const std::string& line)
         return false;
     }
 }
+
 bool netlist::is_subckt_call(const std::string& line)
 {
     std::istringstream stream(line);
@@ -90,10 +92,35 @@ bool netlist::is_subckt_call(const std::string& line)
     }
     return call;
 }
-static bool is_command_simplify(const std::string& line)
+
+static bool is_simplify_line(const std::string& line)
 {
-    if(line.find("simplify") != std::string::npos)
+    if(line.find(">>") != std::string::npos)
     {   
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+static bool is_command(const std::string& line)
+{
+    if(line.find(".command") != std::string::npos)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+static bool is_level(const std::string& line)
+{
+    if(line.find("level") != std::string::npos)
+    {
         return true;
     }
     else
@@ -170,21 +197,11 @@ void netlist::add_component(std::unique_ptr<component>&& comp)
         c->set_stamp(*this);
     }
 }
-
-// std::string netlist::to_string(std::vector<unsigned int> n)
-// {
-//     std::stringstream v ;
-//     std::string s;
-//     copy(n.begin(),n.end(), ostream_iterator<unsigned int> (v," ");    
-//     s = v.str();
-//     return s;
-// }
 void netlist::read(std::string filename)
 {
 
  
     std::ifstream file(filename);
-    output_map.insert(std::make_pair(0 , "GND"));
     if(!file.is_open())
     {
         valid = false;
@@ -193,7 +210,8 @@ void netlist::read(std::string filename)
 
     bool title_found = false;
     bool subckt = false;
-    unsigned int number_subckt=0;
+    bool simplify_temp = false;
+    unsigned int number_subckt=-1;
     while(true)
     {
         std::string line;
@@ -211,10 +229,19 @@ void netlist::read(std::string filename)
         {
             continue;
         }// ignore
-        else if(is_subckt_end(line))
+        else if(is_end(line))
         {
             subckt = false;
-            number_subckt++;
+            simplify_temp = false;
+            continue;
+        }
+        else if(is_command(line))
+        {
+            if (line.find("simplify"))
+            {
+                simplification = true;
+                simplify_temp = true;
+            }
             continue;
         }
         if(subckt)
@@ -223,6 +250,7 @@ void netlist::read(std::string filename)
         }
         else if(is_subckt_title(line))
         {
+            number_subckt++;
             subckt = true;
             std::string init (".subckt");
             std::string title = line;
@@ -233,10 +261,16 @@ void netlist::read(std::string filename)
         {
             subckt_call(line);
         }
-        else if (is_command_simplify(line))
+        else if(simplify_temp)
         {
-            save_simpl_line(line);
-            simplification = true;
+            if(is_level(line))
+            {
+                set_simpl_level(line);
+            }
+            else if(is_simplify_line(line))
+            {
+                save_simpl_line(line);
+            }
         }
         else if(is_component(line))
         {
@@ -257,6 +291,13 @@ void netlist::read(std::string filename)
     }
     // set number of nodes, number of sources etc.
     update();
+    set_simplification();
+    for(auto& it: simpl_commands)
+    {
+        std::string first  = it.first;
+        std::string second = it.second;
+        change_simpl_map(first,second);
+    }
     for(const auto& c : components)
     {
         c->set_stamp(*this);
@@ -356,24 +397,9 @@ void netlist::update()
     numccvs        = number_of_devices(ct_current_controlled_voltage_source);
     numcccs        = number_of_devices(ct_current_controlled_current_source);
 }
-
-void netlist::add_to_output_map(unsigned int unode, std::string snode)
+std::string netlist::get_output_node(unsigned int unode)
 {
-    auto it = output_map.find(unode);
-    if ( it == output_map.end())
-    {
-        output_map.insert(std::make_pair(unode, snode)).first ->second;
-    }
-}
-std::string netlist::get_output_node(unsigned int unode) const
-{
-    std::string snode = "Not found";
-    auto it = output_map.find(unode);
-    if (it != output_map.end())
-    {
-        snode = it -> second;
-    }    
-    return snode;
+   return rev_nmap.get_output_node(unode);
 }
 unsigned int netlist::get_unode( std::string snode) const
 {
@@ -395,14 +421,14 @@ void netlist::component_read_in(const std::string& line)
     for (unsigned int i = 0; i < number_terminals; i++)
     {
         stream >> snode;
-        unsigned int n = nmap.get_map_node(snode);
-        nodes.push_back(std::move(n));
-        add_to_output_map(n,snode);                
+        unsigned int inode = nmap.get_map_node(snode);
+        nodes.push_back(inode);     
+        rev_nmap.add_to_output_map(inode,snode);
     }
     std::string v;
     stream >> v;
     set_matlab_values(v);
-    simpl_map.insert(std::make_pair(v, 0)).first ->second;
+    simpl_map.insert(std::make_pair(v, 0));
     
     if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
     {
@@ -460,7 +486,6 @@ void netlist::read_subckt_line(const std::string& line, unsigned int number_subc
 {
     std::string sub_line = line;
     subckt_vector.at(number_subckt).add_line(sub_line); //save it in vector in object                
-
 }
 void netlist::read_subckt_title(std::string& title)
 {
@@ -562,7 +587,7 @@ void netlist::set_matlab_values(std::string v)
 {
     values.push_back(v);
 }
-// simplification
+//simplification
 void netlist::save_simpl_line(const std::string& line)
 {
     simplify_lines.push_back(line);
@@ -575,11 +600,10 @@ void netlist::set_simplification()
         std::stringstream stream (line);
         std::string first;
         std::string second;
-        stream >> first;//s = simplify
         stream >> first;// s = R1
         stream >> second;// s = >>
         stream >> second;// s = R2
-        change_simpl_map(first, second);
+        simpl_commands.insert(std::make_pair(first,second)); 
     }
 }
 std::map<std::string, unsigned int > netlist::get_simplifications()
@@ -602,11 +626,19 @@ void netlist::set_simpl_level(const std::string& line)
 {
     std::stringstream stream(line);
     std::string s;
-    stream >> s ;// command "Simplify Level"
+    stream >> s ;// command "Simplify-Level"
     stream >> simpl_level;
 }
 std::string netlist::get_simpl_level()
 {
     return simpl_level;
 }
-
+std::vector<unsigned int> netlist::get_simpl_vector()
+{
+    std::vector<unsigned int> ret;
+    for (auto it = simpl_map.begin(); it != simpl_map.end(); ++it)
+    {
+        ret.push_back(it -> second);
+    }
+    return ret;
+}
