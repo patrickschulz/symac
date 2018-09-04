@@ -32,12 +32,14 @@ void result::print(const std::string& mode) const
         std::cout << "Results:\n";
         std::cout << GiNaC::csrc;
         unsigned int row = 0;
+
+        std::string indentation = std::string(8, ' ');
         
         std::cout << "    Node voltages:\n";
         for(; row < components.number_of_nodes(); ++row)
         {
             std::string usernode = nmap[row + 1];
-            boost::format fmter = boost::format("%sNode %s:\t\t") % ("        ") % (usernode);
+            boost::format fmter = boost::format("%s%-20s") % (indentation) % ("Node " + usernode + ": ");
             std::string str = fmter.str();
             std::cout << str << results(row, 0) << '\n';
         }
@@ -61,7 +63,7 @@ void result::print(const std::string& mode) const
             ++display.second;
             for(const std::string& current : currents)
             {
-                boost::format fmter = boost::format("%sCurrent %s%d:\t") % ("        ") % (current) % (display.second);
+                boost::format fmter = boost::format("%s%-20s") % (indentation) % ("Current " + current + std::to_string(display.second) + ": ");
                 std::string str = fmter.str();
                 std::cout << str << results(row, 0) << '\n';
                 ++row;
