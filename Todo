@@ -1,4 +1,7 @@
 Here is a list of stuff i want to implement, in no particular order:
+    - implement a better lexer/parser
+        This is needed to implement more features into the netlist parser, for example to read result printing statements or also support spectre netlists
+
     - simplification of terms with approximate value, e.g.:
         set prop a > c
         set prop a > d
