@@ -231,12 +231,12 @@ void solver::matrices_to_matlab(const std::string& filename)
 }
 void solver::vvtf_matlab_export(std::string& filename, unsigned int first, unsigned int second)
 {
-    const char *path="/home/jan/Desktop";// make it relative ?
+    /*const char *path="/home/jan/Desktop";// make it relative ?
     std::size_t slash = filename.find("/");
     filename.erase(0,slash);
-    std::size_t dot = filename.find(".");
+    */std::size_t dot = filename.find(".");
     filename.erase(dot, std::string::npos);
-    std::string name = path + filename + ".m";
+    std::string name =filename + ".m";
     std::ofstream ofile(name, std::ofstream::out);
     std::vector<std::string> values= nlist.get_values();
     
@@ -401,7 +401,7 @@ std::string solver::sim_replace(std::string v)
     std::string buf;
     std::string sub;
     bool comps_to_delete = false;
-    unsigned int sum = 0;
+    float sum = 0.0;
     unsigned int numbr_elements = 0;
     while(stream>>buf)
     {
@@ -431,7 +431,7 @@ std::string solver::sim_replace(std::string v)
     return sub;
 }
 
-bool solver::simpl_delete(float average, std::string level)
+bool solver::simpl_delete( float average, std::string level)
 {
     bool check = false;
     if(level.empty())

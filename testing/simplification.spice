@@ -1,5 +1,5 @@
 .command simplify
-level well-done
+level english
 R1 >> R2 
 C1 >> C2
 .end
