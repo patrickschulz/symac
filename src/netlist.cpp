@@ -38,19 +38,10 @@ static bool is_component(const std::string& line)
     return is_two_terminal_device(line) || is_three_terminal_device(line) || is_four_terminal_device(line);
 }
 
-/*
 static bool is_command_simplify(const std::string& line)
 {
-    if(line.find("simplify") != std::string::npos)
-    {   
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return line.find("simplify") != std::string::npos;
 }
-*/
 
 unsigned int netlist::number_terminals(char type)
 {
@@ -105,12 +96,11 @@ void netlist::translate_subcircuit(const std::string& line)
     char X;
     stream >> X >> subname;
 
+    // save instance nodes
     std::vector<std::string> nodes;
-    std::copy(std::istream_iterator<std::string>(stream), 
-              std::istream_iterator<std::string>(),
-              std::back_inserter(nodes)
-             );
+    std::copy(std::istream_iterator<std::string>(stream), std::istream_iterator<std::string>(), std::back_inserter(nodes));
 
+    // get mapped components and store them
     subcircuit sub = subcircuits[subname];
     std::vector<component> subcomponents = sub.get_mapped_components(nodes);
     for(const component& c : subcomponents)
@@ -156,11 +146,11 @@ void netlist::read(std::string filename)
             {
                 translate_subcircuit(line);
             }
-            //else if (is_command_simplify(line))
-            //{
-            //    save_simpl_line(line);
-            //    simplification = true;
-            //}
+            else if (is_command_simplify(line))
+            {
+                //save_simpl_line(line);
+                //simplification = true;
+            }
             else if(is_component(line))
             {
                 components.add_component(component_read_in(line));
@@ -175,7 +165,6 @@ void netlist::read(std::string filename)
                 {
                     title_found = true;
                 }
-                
             }
         }
         else // !idle (reading-in subcircuit definitions
