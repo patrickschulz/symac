@@ -92,13 +92,16 @@ GiNaC::ex component::get_value() const
     switch(type)
     {
         case ct_resistor:
-            return 1 / value;
+            //return 1 / value;
+            return value;
             break;
         case ct_capacitor:
-            return s * value;
+            //return s * value;
+            return 1 / (s * value);
             break;
         case ct_inductor:
-            return 1 / (s * value);
+            //return 1 / (s * value);
+            return s * value;
             break;
         case ct_voltage_source:
         case ct_current_source:

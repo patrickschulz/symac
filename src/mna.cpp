@@ -7,7 +7,7 @@
 #include <string>
 #include <boost/format.hpp>
 
-stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
+static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
 {
     std::vector<unsigned int> nodes = nmap[c.get_nodes()];
     GiNaC::ex value = c.get_value();
@@ -17,12 +17,31 @@ stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
         case ct_resistor:
         case ct_capacitor:
         case ct_inductor:
+            stmp.write(offset, nodes[0], 1);
+            stmp.write(nodes[0], offset, 1);
+            stmp.write(offset, nodes[1], -1);
+            stmp.write(nodes[1], offset, -1);
+            stmp.write(offset, offset, -value);
+            break;
+            /*
+             * Currently an impedance-based approach for impedances is used. This allows the use of zero-ohm-resistors (shorts).
+             * In spectre, the choice depends on the value of the resistance (let's focus on resistances). 
+             * For big resistors, the resistance is used, for small resistors, the conductance is used.
+             * Since this is done because of numerical stability and accuracy, we don't care about this in symbolic spice.
+             * However, i think shorts are more often needed than opens, so i changed the implementation.
+             * The best would be to support both, ideally with a switch. Furthermore, the simulator should be able to choose the right method,
+             * based on the value of the device. (TODO)
+             * If you change this back, you need also to change the return value of component::get_value() (FIXME)
+        case ct_resistor:
+        case ct_capacitor:
+        case ct_inductor:
             stmp.write(offset, nodes[0], value);
             stmp.write(nodes[0], offset, 1);
             stmp.write(offset, nodes[1], -value);
             stmp.write(nodes[1], offset, -1);
             stmp.write(offset, offset, -1);
             break;
+            */
         case ct_voltage_source:
             stmp.write(offset, nodes[0], 1);
             stmp.write(nodes[0], offset, 1);
@@ -108,7 +127,6 @@ namespace mna {
             x(row, 0) = get_symbol(str);
         }        
 
-        unsigned int offset = components.number_of_nodes();
         unsigned int i = 0;
         for(const auto& c : components)
         {
@@ -117,8 +135,8 @@ namespace mna {
                 boost::format fmter = boost::format("I%d") % (i + j + 1);
                 ++i;
                 std::string str = fmter.str();
-                x(offset, 0) = get_symbol(str);
-                ++offset;
+                x(row, 0) = get_symbol(str);
+                ++row;
             }
         }
 
