@@ -14,7 +14,7 @@ solver::solver(const componentlist& components) :
 void solver::mna()
 {
     A = mna::create_A_matrix(nmap, components);
-    x = mna::create_x_vector(nmap, components);
+    x = mna::create_x_vector(components);
     z = mna::create_z_vector(nmap, components);
 }
 

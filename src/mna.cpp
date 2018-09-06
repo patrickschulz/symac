@@ -114,7 +114,7 @@ namespace mna {
         return A;
     }
 
-    GiNaC::matrix create_x_vector(nodemap& nmap, const componentlist& components)
+    GiNaC::matrix create_x_vector(const componentlist& components)
     {
         unsigned int networksize = components.network_size();
         GiNaC::matrix x(networksize, 1);
