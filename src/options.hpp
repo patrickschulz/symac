@@ -2,8 +2,7 @@
 #define OPTIONS_HPP
 
 #include <cstdlib>
-#include "program_options/program_options.hpp"
-//#include <boost/program_options.hpp>
+#include <program_options.hpp>
 
 void print_usage(const boost::program_options::options_description& opt)
 {
@@ -71,6 +70,7 @@ class options
                 ("version,v" , "show version")
                 ("print,p"   , "print network matrices")
                 ("info,i"    , "print information about the network matrices")
+                ("language,l", value<std::string>()->default_value("spice"), "select netlist language. Possible values: spice (default), spectre (not implemented)")
                 ("devices,D" , "print information about the usage of all components")
                 ("nosolve,s" , "don't solve the network")
                 ("report,r"  , "create a report")
