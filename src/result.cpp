@@ -70,9 +70,9 @@ void result::print(const std::string& mode) const
             }
         }
     }
-    /*
     else if(mode == "tf")
     {
+        std::vector<std::string> nodes { "1", "4" };
         if(nodes.size() != 2){
             std::cerr << "You have to specify two nodes (by using the -n argument two times)"<< '\n';
             exit(1);
@@ -82,12 +82,13 @@ void result::print(const std::string& mode) const
             std::cerr << " You can't use the GND node (node 0)" << '\n';
             exit(1);
         }
-        unsigned int first = nlist.get_unode(nodes[0]) - 1;
-        unsigned int second= nlist.get_unode(nodes[1]) - 1;
-        GiNaC::ex H = results(second, 0) / results(first, 0);
-        std::cout << "H(s) = " << H << '\n';
-        std::cout << "H(s) to Latex" << '\n';
-        std::cout << "H(s) = " <<GiNaC::latex << H << '\n';
+        unsigned int first = nmap[nodes[0]];
+        unsigned int second= nmap[nodes[1]];
+        GiNaC::ex H = results(second - 1, 0) / results(first - 1, 0);
+        std::cout << "H(s) = " << H.normal() << '\n';
+        //std::cout << "H(s) to Latex" << '\n';
+        //std::cout << "H(s) = " <<GiNaC::latex << H << '\n';
+        /*
         if(matlab_export)
         {
             vvtf_matlab_export(filename,first,second);
@@ -98,8 +99,8 @@ void result::print(const std::string& mode) const
             std::cout << " Simplified (in Latex) "<< '\n';
             std::cout << "H(s) = " << H_simple << '\n';
         }
+        */
     }
-    */
     else
     {
         std::cerr << "unknown mode '" << mode << "' given\n";
