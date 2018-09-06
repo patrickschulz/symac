@@ -61,32 +61,13 @@ GiNaC::symbol s = GiNaC::symbol("s");
 
 int main()
 {
-    GiNaC::symbol x("x");
-    GiNaC::symbol y("y");
-    GiNaC::ex e = x * y + x + y;
-
-    my_visitor v;
-
-    for(GiNaC::const_preorder_iterator i = e.preorder_begin(); i != e.preorder_end(); ++i)
-    {
-        i->accept(v);
-    }
-    /*
-    GiNaC::symbol R1 = GiNaC::symbol("R1");
-    GiNaC::symbol R2 = GiNaC::symbol("R2");
-    GiNaC::symbol C1 = GiNaC::symbol("C1");
-    GiNaC::symbol C2 = GiNaC::symbol("C2");
-
-    GiNaC::ex den1 = s * R1;
-    GiNaC::ex den2 = s * R1 * C1;
-    GiNaC::ex den3 = s * (R1 + R2);
-    GiNaC::ex den4 = s * (R1 * C1 + R2 * C2);
-    GiNaC::ex den5 = s * ((R1 + R2) * C1);
-
-    debug_print(den1.coeff(s, 1));
-    debug_print(den2.coeff(s, 1));
-    debug_print(den3.coeff(s, 1));
-    debug_print(den4.coeff(s, 1));
-    debug_print(den5.coeff(s, 1));
-    */
+    GiNaC::symbol R1("R1");
+    GiNaC::symbol R2("R2");
+    GiNaC::symbol C1("C1");
+    GiNaC::symbol C2("C2");
+    GiNaC::ex e = (R1 + R2) * (C1 + C2 * (R1 * C1));
+    
+    debug_print(e);
+    debug_print(e.expand());
+    std::cout << e << '\n' << e.expand() << '\n';
 }
