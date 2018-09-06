@@ -1,8 +1,8 @@
 TARGET   := ./symac
 CXXFLAGS := -g -Wextra -Wall -Wno-long-long -pedantic-errors -std=c++17
 CXX      := g++
-INCLUDES := 
-LIBS     := -L/home/pschulz/program_options -lginac -lboost_program_options
+INCLUDES := -I/home/pschulz/Workspace/program_options
+LIBS     := -L/home/pschulz/Workspace/program_options -lginac -lboost_program_options
 EXT      := cpp
 BUILDDIR := .build
 
