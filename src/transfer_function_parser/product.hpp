@@ -40,7 +40,7 @@ class product
         }
 
         friend std::ostream& operator<<(std::ostream& stream, const product& p);
-        friend product operator*(product left, product right);
+        friend product operator*(const product& left, const product& right);
 
     private:
         GiNaC::numeric prefix;
@@ -68,7 +68,7 @@ std::ostream& operator<<(std::ostream& stream, const product& p)
     return stream;
 }
 
-product operator*(product left, product right)
+product operator*(const product& left, const product& right)
 {
     product res;
     res.prefix = left.prefix * right.prefix;
