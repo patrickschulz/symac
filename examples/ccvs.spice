@@ -1,5 +1,8 @@
 - CCVS test
-R 1 2 Rin
-R 3 0 Rout
-V 1 0 Vin
-F 3 0 2 0 Rtrans
+V vin 0 Vin
+R vin vx Rin
+R vout 0 Rout
+F vout 0 vx 0 Rtrans
+
+.print V(vx)
+.print V(vout)

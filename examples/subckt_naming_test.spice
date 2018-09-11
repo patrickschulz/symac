@@ -1,9 +1,0 @@
-* Loop test Subcircuit*
-.subckt name i o 
-.V i o V1
-.end  
-
-.name Vin 0 Voltsrc
-R Vin Vout R1
-C Vout 0 C1
-

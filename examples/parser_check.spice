@@ -1,8 +1,8 @@
 Title
-R 1 0 R1
+R0 1 0 R1
 * empty line
 
 * second title
 Second Title
 * wrong component
-R 1 2 3 R0
+R0 1 2 3 R0

@@ -1,3 +1,0 @@
-*Einfacher Mosfet ( ohne Kapazitäten)
-.subckt mosfet g s d
-.

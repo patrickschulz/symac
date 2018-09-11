@@ -1,9 +1,0 @@
-Transfer function
-V0 vin 0 Vin
-R1 vin vout R1
-R2 vout 0 R2
-
-.print V(vout)
-.print I(R1)
-.print I(R2)
-.print I(V0)

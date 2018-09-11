@@ -1,4 +1,7 @@
 - Resistive divider
-V 1 0 V0
-R 1 2 R1
-R 2 0 R2
+V0 vin 0 V0
+R1 vin vout R1
+R2 vout 0 R2
+
+.print V(vout)
+.print I(R1)

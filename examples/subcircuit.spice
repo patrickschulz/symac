@@ -1,8 +1,0 @@
-.subckt mosfet g s d
-C g s cgs
-G s d g s gm
-R d s ro
-.end
-
-V vin 0 vin
-Xmosfet vin 0 vout

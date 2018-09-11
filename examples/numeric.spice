@@ -1,3 +1,5 @@
 - Numeric Test
-I 1 0 1
-R 1 0 50
+I0 vout 0 1
+R0 vout 0 50
+
+.print V(vout)

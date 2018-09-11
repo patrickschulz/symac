@@ -1,4 +1,0 @@
-V A 0 Vin
-R A B R1
-R B C R2
-O 0 B C 

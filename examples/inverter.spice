@@ -1,5 +1,0 @@
-- Opamp inverter
-V 1 0 Vin
-R 1 2 R1
-R 2 3 R2
-O 0 2 3
