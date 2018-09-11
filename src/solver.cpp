@@ -3,6 +3,7 @@
 #include <boost/format.hpp>
 #include <numeric>
 #include <fstream>
+#include <sstream>
 
 #include "mna.hpp"
 

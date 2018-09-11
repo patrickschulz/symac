@@ -88,35 +88,7 @@ void component::set_nodes(const std::vector<std::string>& nodes)
 
 GiNaC::ex component::get_value() const
 {
-    GiNaC::ex s = get_symbol("s");
-    switch(type)
-    {
-        case ct_resistor:
-            //return 1 / value;
-            return value;
-            break;
-        case ct_capacitor:
-            //return s * value;
-            return 1 / (s * value);
-            break;
-        case ct_inductor:
-            //return 1 / (s * value);
-            return s * value;
-            break;
-        case ct_voltage_source:
-        case ct_current_source:
-        case ct_opamp:
-        case ct_voltage_controlled_voltage_source:
-        case ct_current_controlled_voltage_source:
-        case ct_voltage_controlled_current_source:
-        case ct_current_controlled_current_source:
-            return value;
-            break;
-        case ct_none: // suppress warning
-            break;
-    }
-    // suppress warning, this line should never be reached
-    return GiNaC::ex();
+    return value;
 }
 
 // vim: nowrap
