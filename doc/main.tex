@@ -7,4 +7,32 @@
 
 \begin{document}
     \maketitle
+    \section{Introduction}
+    In electronics, linear circuits play a big role. Even if the circuit is inherently linear in its function, like a mixer or an oscillator, it still can often be characterized (at least in some
+    points) in a linear manner. Other circuits as amplifiers are designed to be linear. In order to analyze these circuits, small-signal version of the circuit are created and the node voltages and 
+    currents are derived to get one or more transfer functions (among other useful stuff). For networks containing more than only some resistors and controlled-sources, especially for non-standard
+    topologies, this analysis tends to be very error-prone and tedious. There are a lot of techniques helping the designer on making good approximations like estimating the bandwidth of the circuit.
+    However, this still relies on the designer not making any mathematical errors. On the other hand, electronics are not doable without circuit simulators, such as spice and spectre. Why don't 
+    designers use a good tool for \emph{symbolic} circuit analysis? Good question!
+
+    This documents present \emph{SymAC}, a symbolic AC-domain linear circuit simulator, which gives the designer \emph{symbolic} results, such as $v_\mathrm{out} = -g_m r_o$ instead of $12.5$.
+    \section{Usage}
+        \subsection{Supported Devices}
+        SymAC supports almost\footnote{Currently missing: Transformers} all linear devices. If you are missing one, it is propably implementable with the available components. Technically, not all
+        devices are needed to build all linear networks, since elements as controlled sources, gyrators or transformers can easily be built from other components. Still, for convenience it would
+        be nice to have these components. Since it is easy to add them to the simulator, I will probably do this some time, but this has a very low priority right now. If you're doing ,,regular'',
+        low-voltage electronics (like integrated electronics), you will almost certainly be satisfied with the available devices. Here are the supported devices:
+        \begin{itemize}
+            \item Voltage and current sources
+            \item Impedances: resistors, capacitors and inductors
+            \item Controlled sources: voltage and current in- and output
+            \item Ideal operational amplifier (single ended)
+        \end{itemize}
+        \subsection{Results browser}
+        \subsection{Post-simplification of results}
+    \section{Mathematical Background -- Modified Nodal Analysis (MNA)}
+    \section{Implementation}
+        \subsection{Implementation of the main engine}
+        \subsection{Structure of the processing of results}
+        \subsection{Simplification}
 \end{document}
