@@ -1,9 +1,13 @@
 - MOSFET amplifier
-V 1 0 Vin
-R 1 2 Rs
-C 2 0 Cgs
-G 0 3 2 0 gm
-R 3 0 Rout
-C 3 0 Cout
-C 2 4 Cff
-R 4 3 Rff
+.subckt mosfet g s d
+Cgs g s cgs
+G s d g s gm
+Ro d s ro
+.end
+
+V0 vin 0 vin
+X1 mosfet vin 0 vout
+Rl vout 0 ro
+
+.print V(vout)
+.print all

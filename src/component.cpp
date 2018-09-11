@@ -44,14 +44,19 @@ component::component(const std::string& name, char type, const std::vector<std::
     }
 }
 
+component_types component::get_type() const
+{
+    return type;
+}
+
 std::string component::get_name() const
 {
     return name;
 }
 
-component_types component::get_type() const
+void component::name_prepend(const std::string& prefix)
 {
-    return type;
+    name = prefix + name;
 }
 
 unsigned int component::element_size() const

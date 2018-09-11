@@ -91,8 +91,8 @@ void netlist::translate_subcircuit(const std::string& line)
 {
     std::istringstream stream(line);
     std::string subname;
-    char X;
-    stream >> X >> subname;
+    std::string instname;
+    stream >> instname >> subname;
 
     // save instance nodes
     std::vector<std::string> nodes;
@@ -101,23 +101,25 @@ void netlist::translate_subcircuit(const std::string& line)
     // get mapped components and store them
     subcircuit sub = subcircuits[subname];
     std::vector<component> subcomponents = sub.get_mapped_components(nodes);
-    for(const component& c : subcomponents)
+    for(component& c : subcomponents)
     {
+        c.name_prepend(instname + "/");
         components.add_component(c);
     }
 }
 
-void netlist::read(std::string filename)
+std::vector<std::string> netlist::read(std::string filename)
 {
     std::ifstream file(filename);
     if(!file.is_open())
     {
         valid = false;
-        return;
+        //return;
     }
 
     bool title_found = false;
     bool idle = true;
+    std::vector<std::string> print_cmds;
     while(true)
     {
         std::string line;
@@ -135,7 +137,10 @@ void netlist::read(std::string filename)
         {
             if(line.find(".print") != std::string::npos)
             {
-
+                std::istringstream stream(line);
+                std::string cmd;
+                stream >> cmd >> cmd; // skip ".print"
+                print_cmds.push_back(cmd);
             }
             else if(line.find(".subckt") != std::string::npos)
             {
@@ -163,7 +168,7 @@ void netlist::read(std::string filename)
                 {
                     std::cerr << "unknown line: '" << line << "'\n";
                     valid = false;
-                    return;
+                    //return;
                 }
                 else
                 {
@@ -185,6 +190,7 @@ void netlist::read(std::string filename)
         }
     }
     valid = true;
+    return print_cmds;
 }
 
 netlist::operator bool()
