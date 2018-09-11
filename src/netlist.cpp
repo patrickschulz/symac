@@ -17,19 +17,19 @@ static bool is_comment(const std::string& line)
 
 static bool is_two_terminal_device(const std::string& line)
 {
-    std::regex rx(R"(^\s*[VIRCL]\s+\w+\s+\w+\s+\w+\s*$)");
+    std::regex rx(R"(^\s*[VIRCL]\w*\s+\w+\s+\w+\s+\w+\s*$)");
     return std::regex_search(line, rx);
 }
 
 static bool is_three_terminal_device(const std::string& line)
 {
-    std::regex rx(R"(^\s*[O]\s+\w+\s+\w+\s+\w+\s*$)");
+    std::regex rx(R"(^\s*[O]\w*\s+\w+\s+\w+\s+\w+\s*$)");
     return std::regex_match(line, rx);
 }
 
 static bool is_four_terminal_device(const std::string& line)
 {
-    std::regex rx(R"(^\s*[EFGH]\s+\w+\s+\w+\s+\w+\s+\w+\s+\w+\s*$)");
+    std::regex rx(R"(^\s*[EFGH]\w*\s+\w+\s+\w+\s+\w+\s+\w+\s+\w+\s*$)");
     return std::regex_match(line, rx);
 }
 
@@ -45,32 +45,30 @@ static bool is_command_simplify(const std::string& line)
 
 unsigned int netlist::number_terminals(char type)
 {
+    unsigned int num = 0;
     switch(type)
     {
         case 'R': // resistor
-            return 2;
         case 'C': // capacitor
-            return 2;
         case 'L': // inductor
-            return 2;
         case 'V': // voltage_source
-            return 2;
         case 'I': // current_source
-            return 2;
+            num = 2;
+            break;
         case 'O': // opamp
-            return 3;
+            num = 3;
+            break;
         case 'E': // voltage controlled voltage source
-            return 4;
         case 'F': // current controlled voltage source
-            return 4;
         case 'G': // voltage_controlled_current_source
-            return 4;
         case 'H': // current_controlled_current_source
-            return 4;
+            num = 4;
+            break;
         default:
             std::cerr << "Unknown component: '" << type << "'\n";
             return 0;
     }
+    return num;
 }
 
 netlist::netlist() :
@@ -135,7 +133,11 @@ void netlist::read(std::string filename)
         }
         if(idle)
         {
-            if(line.find(".subckt") != std::string::npos)
+            if(line.find(".print") != std::string::npos)
+            {
+
+            }
+            else if(line.find(".subckt") != std::string::npos)
             {
                 subcircuit s = read_subcircuit_header(line);
                 subcircuits[s.get_name()] = s;
@@ -160,6 +162,8 @@ void netlist::read(std::string filename)
                 if(title_found)
                 {
                     std::cerr << "unknown line: '" << line << "'\n";
+                    valid = false;
+                    return;
                 }
                 else
                 {
@@ -188,6 +192,20 @@ netlist::operator bool()
     return valid;
 }
 
+static GiNaC::ex check_and_convert_numeric_symbol(const std::string& v)
+{
+    GiNaC::ex value;
+    if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
+    {
+        value = std::stod(v);
+    }
+    else
+    {
+        value = get_symbol(v);
+    }
+    return value;
+}
+
 component netlist::component_read_in(const std::string& line)
 {
     std::istringstream stream(line);
@@ -206,15 +224,7 @@ component netlist::component_read_in(const std::string& line)
     stream >> v;
     //simpl_map.insert(std::make_pair(v, 0));
     
-    GiNaC::ex value;
-    if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
-    {
-        value = std::stod(v);
-    }
-    else
-    {
-        value = get_symbol(v);
-    }
+    GiNaC::ex value = check_and_convert_numeric_symbol(v);
     return component(type, nodes, value);
 }
 
