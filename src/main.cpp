@@ -27,7 +27,8 @@ int main(int argc, char** argv)
             //const std::string mode  = commandline_options["mode"].as<std::string>();
             std::vector<std::string> print_cmd { "V(vout)", "V(vin)", "I(Iv1)" };
             result res = S.solve();
-            res.print(print_cmd);
+            //res.print(print_cmd);
+            res.print_all();
             if(commandline_options.count("matlab_export"))
             {
                 //res.export_matlab();
