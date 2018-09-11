@@ -54,6 +54,37 @@ std::string component::get_name() const
     return name;
 }
 
+std::vector<std::string> component::get_terminal_names() const
+{
+    std::vector<std::string> terminals;
+    switch(type)
+    {
+        case ct_resistor:
+        case ct_capacitor:
+        case ct_inductor:
+        case ct_voltage_source:
+        case ct_voltage_controlled_voltage_source:
+            terminals.push_back(".p");
+            break;
+        case ct_current_controlled_current_source:
+            terminals.push_back(".p");
+            break;
+        case ct_opamp: 
+            terminals.push_back(".out");
+            break;
+        case ct_current_controlled_voltage_source:
+            terminals.push_back(".p");
+            terminals.push_back(".cp");
+            break;
+        // these have no currents in the results matrix, so the vector is empty
+        case ct_current_source:
+        case ct_voltage_controlled_current_source:
+        case ct_none:
+            break;
+    }
+    return terminals;
+}
+
 void component::name_prepend(const std::string& prefix)
 {
     name = prefix + name;

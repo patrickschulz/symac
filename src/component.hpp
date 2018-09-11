@@ -33,6 +33,9 @@ class component
         component_types get_type() const;
         std::string get_name() const;
 
+        // results
+        std::vector<std::string> get_terminal_names() const;
+
         void name_prepend(const std::string& prefix);
 
         unsigned int element_size() const;

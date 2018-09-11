@@ -4,4 +4,4 @@ R1 vin vx R1
 R2 vx vout R2
 Op 0 vx vout
 
-.print V(vout)
+.print all

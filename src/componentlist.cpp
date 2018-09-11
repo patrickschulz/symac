@@ -8,12 +8,6 @@ void componentlist::add_component(const component& c)
     components.push_back(c);
 }
 
-unsigned int componentlist::number_of_nodes() const
-{
-    const auto& nodes = get_nodes();
-    return nodes.size();
-}
-
 std::vector<std::string> componentlist::get_nodes() const
 {
     std::set<std::string> all_nodes;
@@ -29,6 +23,12 @@ std::vector<std::string> componentlist::get_nodes() const
         }
     }
     return std::vector<std::string>(all_nodes.begin(), all_nodes.end());
+}
+
+unsigned int componentlist::number_of_nodes() const
+{
+    const auto& nodes = get_nodes();
+    return nodes.size();
 }
 
 unsigned int componentlist::number_of_devices(component_types type) const

@@ -18,9 +18,14 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
     for(const component& c : components) // device currents
     {
         std::string current = c.get_name();
-        resultmap.insert(std::make_pair(current, results(row, 0)));
-        row += c.element_size();
+        auto terminals = c.get_terminal_names();
+        for(const auto& terminal : terminals)
+        {
+            resultmap.insert(std::make_pair(current + terminal, results(row, 0)));
+            ++row;
+        }
     }
+    // TODO: fill the result map with the remaining terminal currents
 }
 
 void result::print_all() const
