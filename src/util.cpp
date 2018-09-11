@@ -19,7 +19,8 @@ void rtrim(std::string &s)
 }
 
 // trim from both ends (in place)
-void trim(std::string &s) {
+void trim(std::string &s)
+{
     ltrim(s);
     rtrim(s);
 }
