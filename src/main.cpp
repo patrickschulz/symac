@@ -14,7 +14,8 @@ int main(int argc, char** argv)
     if(commandline_options.count("netlist"))
     {
         std::string filename = commandline_options["netlist"].as<std::string>();
-        netlist nlist(filename);
+        netlist nlist;
+        auto print_cmds = nlist.read(filename);
         if(nlist)
         {
             std::vector<std::string> nodes = commandline_options["nodes"].as<std::vector<std::string>>();
@@ -25,10 +26,8 @@ int main(int argc, char** argv)
                 S.print_matrices();
             }
             //const std::string mode  = commandline_options["mode"].as<std::string>();
-            std::vector<std::string> print_cmd { "V(vout)", "V(vin)", "I(IV0)" };
             result res = S.solve();
-            res.print(print_cmd);
-            //res.print_all();
+            res.print(print_cmds);
             if(commandline_options.count("matlab_export"))
             {
                 //res.export_matlab();

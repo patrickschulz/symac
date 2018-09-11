@@ -17,8 +17,9 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
     }
     for(const component& c : components) // device currents
     {
-        std::string current = std::string("I") + c.get_name();
+        std::string current = c.get_name();
         resultmap.insert(std::make_pair(current, results(row, 0)));
+        row += c.element_size();
     }
 }
 
@@ -33,7 +34,15 @@ void result::print_all() const
 void result::print_voltage(const std::string& voltage) const
 {
     auto it = resultmap.find(voltage);
-    std::cout << voltage << " = " << it->second << '\n';
+    std::cout << "V(" << voltage << ")";
+    if(it != resultmap.end())
+    {
+        std::cout << " = " << it->second << '\n';
+    }
+    else
+    {
+        std::cout << " not found\n";
+    }
 }
 
 void result::print_voltage(const std::string& voltage1, const std::string& voltage2) const
@@ -46,7 +55,15 @@ void result::print_voltage(const std::string& voltage1, const std::string& volta
 void result::print_current(const std::string& device) const
 {
     auto it = resultmap.find(device);
-    std::cout << device << " = " << it->second << '\n';
+    std::cout << "I(" << device << ")";
+    if(it != resultmap.end())
+    {
+        std::cout << " = " << it->second << '\n';
+    }
+    else
+    {
+        std::cout << " not found\n";
+    }
 }
 
 void result::print(const std::vector<std::string>& print_cmd) const
@@ -54,15 +71,22 @@ void result::print(const std::vector<std::string>& print_cmd) const
     std::cout << GiNaC::csrc;
     for(const auto& cmd : print_cmd)
     {
-        char domain = cmd[0];
-        std::string symbol = cmd.substr(2, cmd.size() - 3);
-        if(domain == 'V')
+        if(cmd == "all")
         {
-            print_voltage(symbol);
+            print_all();
         }
         else
         {
-            print_current(symbol);
+            char domain = cmd[0];
+            std::string symbol = cmd.substr(2, cmd.size() - 3);
+            if(domain == 'V')
+            {
+                print_voltage(symbol);
+            }
+            else
+            {
+                print_current(symbol);
+            }
         }
     }
     /*
