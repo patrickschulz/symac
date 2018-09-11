@@ -23,14 +23,7 @@ Here is a list of stuff i want to implement, in no particular order:
     
     - Implement transfer functions for all voltage nodes but also for all currents so that impedances are possible too
 
-    - Implement a result selection filter where the wanted values (can also include values which have to be calculated) are specified
-
     - Implement S-parameter simulation
-
-    - Implement naming of components:
-        R 1 0 R0   <-- before
-        R1 1 0 R0  <-- after
-        Not present names will be auto-assigned
 
     - Enhance readability of output, similar perhaps to sympy. Also improve (and implement correctly) the latex report, because this provides the best output.
 
