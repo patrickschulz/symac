@@ -2,12 +2,12 @@
 
 #include "symbol.hpp"
 
-component::component(component_types type, const std::vector<std::string>& nodes, const GiNaC::ex& value) :
-    type(type), nodes(nodes), value(value)
+component::component(const std::string& name, component_types type, const std::vector<std::string>& nodes, const GiNaC::ex& value) :
+    name(name), type(type), nodes(nodes), value(value)
 {   }
 
-component::component(char type, const std::vector<std::string>& nodes, const GiNaC::ex& value) :
-    nodes(nodes), value(value)
+component::component(const std::string& name, char type, const std::vector<std::string>& nodes, const GiNaC::ex& value) :
+    name(name), nodes(nodes), value(value)
 {   
     switch(type)
     {
@@ -42,6 +42,11 @@ component::component(char type, const std::vector<std::string>& nodes, const GiN
             this->type = ct_current_controlled_current_source;
             break;
     }
+}
+
+std::string component::get_name() const
+{
+    return name;
 }
 
 component_types component::get_type() const

@@ -212,6 +212,7 @@ component netlist::component_read_in(const std::string& line)
     std::string name;
     stream >> name;
     char type = name[0];
+    //name = name.substr(1); // without this statement, the device type is part of the device name
     unsigned int nterminals = number_terminals(type);
     std::vector<std::string> nodes;
     std::string snode;
@@ -225,7 +226,7 @@ component netlist::component_read_in(const std::string& line)
     //simpl_map.insert(std::make_pair(v, 0));
     
     GiNaC::ex value = check_and_convert_numeric_symbol(v);
-    return component(type, nodes, value);
+    return component(name, type, nodes, value);
 }
 
 /*

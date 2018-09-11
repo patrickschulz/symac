@@ -8,19 +8,6 @@
 
 result::result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap)
 {
-    std::map<component_types, std::pair<std::vector<std::string>, unsigned int>> results_display_map { 
-        { ct_resistor,                          { { "Ir"            }, 0 } }, 
-        { ct_capacitor,                         { { "Ic"            }, 0 } }, 
-        { ct_inductor,                          { { "Il"            }, 0 } }, 
-        { ct_voltage_source,                    { { "Iv"            }, 0 } },
-        { ct_opamp,                             { { "Iop"           }, 0 } },
-        { ct_voltage_controlled_voltage_source, { { "I_vcvs"        }, 0 } },
-        { ct_current_controlled_current_source, { { "I_cccs"        }, 0 } },
-        { ct_current_controlled_voltage_source, { { "Ifin", "Ifout" }, 0 } },
-        { ct_voltage_controlled_current_source, { {                 }, 0 } }, // dummy entry
-        { ct_current_source                   , { {                 }, 0 } }  // dummy entry
-    };
-
     // parse results and store all in the results map
     unsigned int row = 0;
     for(; row < components.number_of_nodes(); ++row) // node voltages
@@ -30,14 +17,16 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
     }
     for(const component& c : components) // device currents
     {
-        auto& display = results_display_map[c.get_type()];
-        ++display.second;
-        for(const std::string& current : display.first)
-        {
-            std::string key = current + std::to_string(display.second);
-            resultmap.insert(std::make_pair(key, results(row, 0)));
-            ++row;
-        }
+        std::string current = std::string("I") + c.get_name();
+        resultmap.insert(std::make_pair(current, results(row, 0)));
+    }
+}
+
+void result::print_all() const
+{
+    for(auto entry : resultmap)
+    {
+        std::cout << entry.first << " = " << entry.second << '\n';
     }
 }
 
