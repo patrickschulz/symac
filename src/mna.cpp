@@ -43,6 +43,7 @@ static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
             stmp.write(offset, nodes[0], 1);
             stmp.write(offset, nodes[1], -1);
             stmp.write(nodes[2], offset, 1);
+            //stmp.write(nodes[3], offset, -1); // TODO: use this line for four-terminal (differential) opamps?
             break;
         case ct_voltage_controlled_voltage_source:
             stmp.write(offset, nodes[0], 1);
