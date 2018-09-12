@@ -20,6 +20,7 @@ void subcircuit::add_component(const component& c)
 
 std::vector<component> subcircuit::get_mapped_components(const std::vector<std::string>& nodes)
 {
+    // map the subcircuit terminals to the instance terminals
     std::map<std::string, std::string> submap;
     for(unsigned int i = 0; i < terminals.size(); ++i)
     {
@@ -60,7 +61,7 @@ subcircuit read_subcircuit_header(const std::string& line)
     std::string name;
     std::string temp;
     std::vector<std::string> terminals;
-    stream >> temp >> name; // skip ".SUBCKT" 
+    stream >> temp >> name; // skip ".subckt" 
     while(stream >> temp)
     {
         terminals.push_back(temp);
