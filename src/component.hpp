@@ -27,7 +27,6 @@ inline component_types operator|(component_types a, component_types b)
 class component
 {
     public:
-        component(const std::string& name, component_types type, const std::vector<std::string>& nodes, const GiNaC::ex& value);
         component(const std::string& name, char type, const std::vector<std::string>& nodes, const GiNaC::ex& value);
         
         component_types get_type() const;
@@ -50,6 +49,10 @@ class component
         component_types type;
         std::vector<std::string> nodes;
         GiNaC::ex value;
+
+        // constant component attributes
+        unsigned int mna_size;
+        std::vector<std::string> terminals;
 };
 
 #endif //COMPONENT_HPP
