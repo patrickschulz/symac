@@ -1,92 +1,184 @@
 /*=============================================================================
-    Copyright (c) 2002-2010 Joel de Guzman
+    Copyright (c) 2001-2010 Joel de Guzman
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
 =============================================================================*/
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  This sample demontrates a parser for a comma separated list of numbers.
-//  No actions.
+//  A Roman Numerals Parser (demonstrating the symbol table). This is
+//  discussed in the "Symbols" chapter in the Spirit User's Guide.
 //
-//  [ JDG May 10, 2002 ]    spirit1
-//  [ JDG March 24, 2007 ]  spirit2
+//  [ JDG August 22, 2002 ] spirit1
+//  [ JDG March 13, 2007 ]  spirit2
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <iostream>
-#include <vector>
 #include <string>
-#include <complex>
 
 namespace client
 {
-    using boost::spirit::qi::double_;
-    using boost::spirit::qi::_1;
-    using boost::spirit::qi::phrase_parse;
-    using boost::spirit::ascii::space;
-    using boost::phoenix::ref;
+    namespace qi = boost::spirit::qi;
+    namespace ascii = boost::spirit::ascii;
 
-    template<typename Iterator>
-    bool parse_numbers(Iterator first, Iterator last, std::complex<double>& c)
+    ///////////////////////////////////////////////////////////////////////////////
+    //  Parse roman hundreds (100..900) numerals using the symbol table.
+    //  Notice that the data associated with each slot is the parser's attribute
+    //  (which is passed to attached semantic actions).
+    ///////////////////////////////////////////////////////////////////////////////
+    //[tutorial_roman_hundreds
+    struct hundreds_ : qi::symbols<char, unsigned>
     {
-        double rN = 0.0;
-        double iN = 0.0;
+        hundreds_()
+        {
+            add
+                ("C"    , 100)
+                ("CC"   , 200)
+                ("CCC"  , 300)
+                ("CD"   , 400)
+                ("D"    , 500)
+                ("DC"   , 600)
+                ("DCC"  , 700)
+                ("DCCC" , 800)
+                ("CM"   , 900)
+            ;
+        }
 
-        bool r = phrase_parse(first, last,
-                // begin grammar
+    } hundreds;
+    //]
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //  Parse roman tens (10..90) numerals using the symbol table.
+    ///////////////////////////////////////////////////////////////////////////////
+    //[tutorial_roman_tens
+    struct tens_ : qi::symbols<char, unsigned>
+    {
+        tens_()
+        {
+            add
+                ("X"    , 10)
+                ("XX"   , 20)
+                ("XXX"  , 30)
+                ("XL"   , 40)
+                ("L"    , 50)
+                ("LX"   , 60)
+                ("LXX"  , 70)
+                ("LXXX" , 80)
+                ("XC"   , 90)
+            ;
+        }
+
+    } tens;
+    //]
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //  Parse roman ones (1..9) numerals using the symbol table.
+    ///////////////////////////////////////////////////////////////////////////////
+    //[tutorial_roman_ones
+    struct ones_ : qi::symbols<char, unsigned>
+    {
+        ones_()
+        {
+            add
+                ("I"    , 1)
+                ("II"   , 2)
+                ("III"  , 3)
+                ("IV"   , 4)
+                ("V"    , 5)
+                ("VI"   , 6)
+                ("VII"  , 7)
+                ("VIII" , 8)
+                ("IX"   , 9)
+            ;
+        }
+
+    } ones;
+    //]
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //  roman (numerals) grammar
+    //
+    //      Note the use of the || operator. The expression
+    //      a || b reads match a or b and in sequence. Try
+    //      defining the roman numerals grammar in YACC or
+    //      PCCTS. Spirit rules! :-)
+    ///////////////////////////////////////////////////////////////////////////////
+    //[tutorial_roman_grammar
+    template <typename Iterator>
+    struct roman : qi::grammar<Iterator, unsigned()>
+    {
+        roman() : roman::base_type(start)
+        {
+            using qi::eps;
+            using qi::lit;
+            using qi::_val;
+            using qi::_1;
+            using ascii::char_;
+
+            start = eps             [_val = 0] >>
                 (
-                        '(' >> double_[ref(rN) = _1] >> -(',' >> double_[ref(iN) = _1]) >> ')'
-                    |    double_[ref(rN) = _1]
-                ),
-                // end grammar
-                space);
-        if (first != last) // fail if we did not get a full match
-            return false;
-        c = std::complex<double>(rN, iN);
-        return r;
-    }
+                    +lit('M')       [_val += 1000]
+                    ||  hundreds    [_val += _1]
+                    ||  tens        [_val += _1]
+                    ||  ones        [_val += _1]
+                )
+            ;
+        }
+
+        qi::rule<Iterator, unsigned()> start;
+    };
     //]
 }
 
-////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //  Main program
-////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 int
 main()
 {
     std::cout << "/////////////////////////////////////////////////////////\n\n";
-    std::cout << "\t\tA comma separated list parser for Spirit...\n\n";
+    std::cout << "\t\tRoman Numerals Parser\n\n";
     std::cout << "/////////////////////////////////////////////////////////\n\n";
+    std::cout << "Type a Roman Numeral ...or [q or Q] to quit\n\n";
 
-    std::cout << "Give me a complex number.\n";
-    std::cout << "Type [q or Q] to quit\n\n";
+    typedef std::string::const_iterator iterator_type;
+    typedef client::roman<iterator_type> roman;
+
+    roman roman_parser; // Our grammar
 
     std::string str;
-    while (getline(std::cin, str))
+    unsigned result;
+    while (std::getline(std::cin, str))
     {
         if (str.empty() || str[0] == 'q' || str[0] == 'Q')
             break;
 
-        std::complex<double> c;
-        if (client::parse_numbers(str.begin(), str.end(), c))
+        std::string::const_iterator iter = str.begin();
+        std::string::const_iterator end = str.end();
+        //[tutorial_roman_grammar_parse
+        bool r = parse(iter, end, roman_parser, result);
+
+        if (r && iter == end)
         {
             std::cout << "-------------------------\n";
             std::cout << "Parsing succeeded\n";
-            std::cout << "got: " << c << std::endl;
+            std::cout << "result = " << result << std::endl;
             std::cout << "-------------------------\n";
         }
         else
         {
+            std::string rest(iter, end);
             std::cout << "-------------------------\n";
             std::cout << "Parsing failed\n";
+            std::cout << "stopped at: \": " << rest << "\"\n";
             std::cout << "-------------------------\n";
         }
+        //]
     }
 
     std::cout << "Bye... :-) \n\n";
