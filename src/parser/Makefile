@@ -1,2 +1,2 @@
 parser: main.cpp
-	g++ main.cpp -o parser
+	g++ -std=c++14 main.cpp -o parser
