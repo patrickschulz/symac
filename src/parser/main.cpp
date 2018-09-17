@@ -2,6 +2,7 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/fusion/container/vector.hpp>
+#include <boost/phoenix/phoenix.hpp>
 
 #include <iostream>
 #include <string>
@@ -68,9 +69,23 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::vector<std::string>, nodes)
 )
 
-std::map<component_types, unsigned int> number_of_terminals {
-    { ct_resistor, 1 }
-};
+
+int number(component_types ct)
+{
+    std::map<component_types, unsigned int> number_of_terminals {
+        { ct_resistor,                          2 },
+        { ct_capacitor,                         2 },
+        { ct_inductor,                          2 },
+        { ct_voltage_source,                    2 },
+        { ct_current_source,                    2 },
+        { ct_opamp,                             3 },
+        { ct_voltage_controlled_voltage_source, 4 },
+        { ct_current_controlled_voltage_source, 4 },
+        { ct_voltage_controlled_current_source, 4 },
+        { ct_current_controlled_current_source, 4 }
+    };
+    return number_of_terminals[ct];
+}
 
 int
 main()
@@ -81,6 +96,13 @@ main()
     std::cout << "Type a Test String ...or [q or Q] to quit\n\n";
 
     typedef std::string::const_iterator iterator_type;
+    using qi::_a;
+    using qi::_1;
+    using boost::phoenix::bind;
+    using qi::repeat;
+    using qi::omit;
+    using qi::space;
+    using qi::alnum;
 
     std::string str;
     while (std::getline(std::cin, str))
@@ -88,15 +110,12 @@ main()
         if (str.empty() || str[0] == 'q' || str[0] == 'Q')
             break;
 
-        qi::rule<std::string::iterator, component(), qi::locals<int>> parser;
-        parser %= 
-               component_parser[qi::_a = number_of_terminals[qi::_1]] 
-            >> qi::repeat(qi::_a)[qi::omit[+qi::space] 
-            >> +qi::alnum];
+        qi::rule<std::string::iterator, component(), qi::locals<int>> component_line;
+        component_line %= component_parser[_a = bind(number, _1)] >> repeat(_a)[omit[+space] >> +alnum];
 
         component result;
         auto iter = str.begin();
-        bool r = qi::parse(iter, str.end(), parser, result);
+        bool r = qi::parse(iter, str.end(), component_line, result);
 
         if (r && iter == str.end())
         {
