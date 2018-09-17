@@ -6,17 +6,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 namespace qi = boost::spirit::qi;
-
-struct print_vec
-{
-    template<typename T>
-    void operator()(const T& x) const
-    {
-        std::cout << x << '\n';
-    }
-};
 
 enum component_types
 {
@@ -56,22 +48,29 @@ struct component
 {
     component_types type;
     std::vector<std::string> nodes;
-    void print()
-    {
-        std::cout << type << " { ";
-        for(auto n : nodes)
-        {
-            std::cout << n << ' ';
-        }
-        std::cout << "}\n";
-    }
+    friend std::ostream& operator<<(std::ostream& stream, const component& c);
 };
+
+std::ostream& operator<<(std::ostream& stream, const component& c)
+{
+    stream << c.type << " { ";
+    for(auto n : c.nodes)
+    {
+        stream << n << ' ';
+    }
+    stream << '}';
+    return stream;
+}
 
 BOOST_FUSION_ADAPT_STRUCT(
     component,
     (component_types, type)
     (std::vector<std::string>, nodes)
 )
+
+std::map<component_types, unsigned int> number_of_terminals {
+    { ct_resistor, 1 }
+};
 
 int
 main()
@@ -89,7 +88,11 @@ main()
         if (str.empty() || str[0] == 'q' || str[0] == 'Q')
             break;
 
-        qi::rule<std::string::iterator, component()> parser = component_parser >> qi::omit[+qi::space] >> +qi::alnum % qi::space;
+        qi::rule<std::string::iterator, component(), qi::locals<int>> parser;
+        parser %= 
+               component_parser[qi::_a = number_of_terminals[qi::_1]] 
+            >> qi::repeat(qi::_a)[qi::omit[+qi::space] 
+            >> +qi::alnum];
 
         component result;
         auto iter = str.begin();
@@ -99,7 +102,7 @@ main()
         {
             std::cout << "-------------------------\n";
             std::cout << "Parsing succeeded\n";
-            result.print();
+            std::cout << result << '\n';
             std::cout << "-------------------------\n";
         }
         else
