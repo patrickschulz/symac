@@ -49,12 +49,14 @@ struct component
 {
     component_types type;
     std::vector<std::string> nodes;
+    std::string value;
+
     friend std::ostream& operator<<(std::ostream& stream, const component& c);
 };
 
 std::ostream& operator<<(std::ostream& stream, const component& c)
 {
-    stream << c.type << " { ";
+    stream << c.type << " (" << c.value << ") { ";
     for(auto n : c.nodes)
     {
         stream << n << ' ';
@@ -67,6 +69,7 @@ BOOST_FUSION_ADAPT_STRUCT(
     component,
     (component_types, type)
     (std::vector<std::string>, nodes)
+    (std::string, value)
 )
 
 
@@ -103,6 +106,7 @@ main()
     using qi::omit;
     using qi::space;
     using qi::alnum;
+    using qi::char_;
 
     std::string str;
     while (std::getline(std::cin, str))
@@ -111,7 +115,7 @@ main()
             break;
 
         qi::rule<std::string::iterator, component(), qi::locals<int>> component_line;
-        component_line %= component_parser[_a = bind(number, _1)] >> repeat(_a)[omit[+space] >> +alnum];
+        component_line %= component_parser[_a = bind(number, _1)] >> repeat(_a)[omit[+space] >> +alnum] >> omit[+space] >> +char_;
 
         component result;
         auto iter = str.begin();
