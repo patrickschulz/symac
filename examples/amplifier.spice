@@ -1,12 +1,13 @@
 - MOSFET amplifier
 .subckt mosfet g s d
-Cgs g s cgs
+*Cgs g s cgs
 G s d g s gm
 Ro d s ro
 .end
 
 V0 vin 0 vin
 X1 mosfet vin 0 vout
-Rl vout 0 ro
+X2 mosfet vout 0 vout
 
-.print all
+*.print all
+.print V(vout)
