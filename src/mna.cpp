@@ -16,12 +16,7 @@ static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
     switch(c.get_type())
     {
         case ct_resistor:
-        case ct_capacitor:
         case ct_inductor:
-            if(c.get_type() == ct_capacitor)
-            {
-                value = 1 / (s * value);
-            }
             if(c.get_type() == ct_inductor)
             {
                 value = s * value;
@@ -42,6 +37,14 @@ static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
             stmp.write(nodes[1], offset, -1);
             stmp.write(offset, offset, -1);
             */
+            break;
+        case ct_capacitor: // use an admittance-based approach for capacitors, this allows the use of 0 for the capacitance
+            value = s * value;
+            stmp.write(offset, nodes[0], value);
+            stmp.write(nodes[0], offset, 1);
+            stmp.write(offset, nodes[1], -value);
+            stmp.write(nodes[1], offset, -1);
+            stmp.write(offset, offset, -1);
             break;
         case ct_voltage_source:
             stmp.write(offset, nodes[0], 1);
