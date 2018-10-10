@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <sstream>
+#include <fstream>
 
 #include "netlist_parser.hpp"
 
@@ -20,38 +22,21 @@ struct netlist_printer_type : public boost::static_visitor<>
 class netlist
 {
     public:
-        void parse()
+        void parse(const std::string& filename)
         {
+            std::ifstream file(filename);
+            std::stringstream buffer;
+            buffer << file.rdbuf();
 
-            std::cout << "/////////////////////////////////////////////////////////\n\n";
-            std::cout << "\t\tParser Test\n\n";
-            std::cout << "/////////////////////////////////////////////////////////\n\n";
-            std::cout << "Type a Test String ...or [q or Q] to quit\n\n";
+            std::string str = buffer.str();
+            auto iter = str.begin();
+            bool r = qi::phrase_parse(iter, str.end(), netlist_parser, qi::ascii::space, lines);
 
-            std::string str;
-            while (std::getline(std::cin, str))
+            if (r && iter == str.end())
             {
-                if (str.empty() || str[0] == 'q' || str[0] == 'Q')
-                    break;
-
-                auto iter = str.begin();
-                bool r = qi::phrase_parse(iter, str.end(), netlist_parser, qi::ascii::space, lines);
-
-                if (r && iter == str.end())
+                for(auto e : lines)
                 {
-                    std::cout << "-------------------------\n";
-                    std::cout << "Parsing succeeded\n";
-                    for(auto e : lines)
-                    {
-                        apply_visitor(netlist_printer, e);
-                    }
-                    std::cout << "-------------------------\n";
-                }
-                else
-                {
-                    std::cout << "-------------------------\n";
-                    std::cout << "Parsing failed at " << *iter << "\n";
-                    std::cout << "-------------------------\n";
+                    apply_visitor(netlist_printer, e);
                 }
             }
         }
@@ -63,5 +48,5 @@ class netlist
 int main()
 {
     netlist nlist;
-    nlist.parse();
+    nlist.parse("example.spice");
 }

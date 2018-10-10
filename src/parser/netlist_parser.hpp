@@ -1,9 +1,4 @@
-#include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/include/adapt_adt.hpp>
-#include <boost/phoenix/phoenix.hpp>
 #include <boost/variant.hpp>
 
 #include "component_parser.hpp"
