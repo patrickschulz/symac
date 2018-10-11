@@ -1,3 +1,6 @@
+#ifndef COMMAND_PARSER_HPP
+#define COMMAND_PARSER_HPP
+
 #include <boost/spirit/include/qi.hpp>
 
 namespace qi = boost::spirit::qi;
@@ -9,9 +12,10 @@ struct command_parser_type : public qi::grammar<std::string::iterator, qi::ascii
     command_parser_type() : command_parser_type::base_type(main)
     {
         using qi::char_;
+        using qi::ascii::space;
 
         command  = ".print";
-        body    %= +char_;
+        body    %= +(char_ - space);
         main    %= command >> body;
     }
 
@@ -19,3 +23,5 @@ struct command_parser_type : public qi::grammar<std::string::iterator, qi::ascii
     qi::rule<Iterator, std::string()> body;
     qi::rule<Iterator, qi::ascii::space_type, std::string()> main;
 } command_parser;
+
+#endif // COMMAND_PARSER_HPP

@@ -1,3 +1,6 @@
+#ifndef COMPONENT_PARSER_HPP
+#define COMPONENT_PARSER_HPP
+
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/fusion/container/vector.hpp>
@@ -144,3 +147,5 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::asc
     qi::rule<Iterator, qi::ascii::space_type, std::vector<std::string>(component_types)> terminals;
     qi::rule<Iterator, qi::ascii::space_type, component(), qi::locals<component_types>> main;
 } component_parser;
+
+#endif // COMPONENT_PARSER_HPP

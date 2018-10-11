@@ -12,10 +12,14 @@ namespace qi = boost::spirit::qi;
 struct netlist_printer_type : public boost::static_visitor<>
 {
     public:
-        template<typename T>
-        void operator() (const T& operand) const
+        void operator() (const component& c) const
         {
-            std::cout << operand << '\n';
+            std::cout << c << '\n';
+        }
+
+        void operator() (const std::string& str) const
+        {
+            std::cout << '"' << str << '"' << '\n';
         }
 } netlist_printer;
 
