@@ -71,6 +71,21 @@ void result::print_current(const std::string& device) const
     }
 }
 
+void result::print_helper(const std::string& p) const
+{
+    char domain = p[0];
+    std::string symbol = p.substr(2, p.size() - 3);
+    if(domain == 'V')
+    {
+        print_voltage(symbol);
+    }
+    else
+    {
+        print_current(symbol);
+    }
+}
+
+
 void result::print(const std::vector<std::string>& print_cmd) const
 {
     std::cout << GiNaC::csrc;
@@ -82,15 +97,27 @@ void result::print(const std::vector<std::string>& print_cmd) const
         }
         else
         {
-            char domain = cmd[0];
-            std::string symbol = cmd.substr(2, cmd.size() - 3);
-            if(domain == 'V')
+            std::istringstream stream(cmd);
+            std::vector<std::string> entries;
+            std::string tmp;
+            while(stream >> tmp)
             {
-                print_voltage(symbol);
+                entries.push_back(tmp);
+            }
+            if(entries.size() > 1)
+            {
+                std::string op1 = entries[0].substr(2, entries[0].size() - 3);
+                std::string op2 = entries[2].substr(2, entries[2].size() - 3);
+                auto it1 = resultmap.find(op1);
+                auto it2 = resultmap.find(op2);
+                GiNaC::ex res = it1->second / it2->second;
+                res = res.expand();
+                res = res.normal();
+                std::cout << res << '\n';
             }
             else
             {
-                print_current(symbol);
+                print_helper(cmd);
             }
         }
     }

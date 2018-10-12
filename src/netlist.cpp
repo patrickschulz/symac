@@ -139,7 +139,9 @@ std::vector<std::string> netlist::read(std::string filename)
             {
                 std::istringstream stream(line);
                 std::string cmd;
-                stream >> cmd >> cmd; // skip ".print"
+                stream >> cmd; // skip ".print"
+                stream.get(); // skip one whitespace
+                std::getline(stream, cmd);
                 print_cmds.push_back(cmd);
             }
             else if(line.find(".subckt") != std::string::npos)
