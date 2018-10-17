@@ -10,18 +10,19 @@
 
 namespace qi = boost::spirit::qi;
 
-struct netlist_parser_type : public qi::grammar<std::string::iterator, qi::ascii::space_type, std::vector<boost::variant<component, std::string>>()>
+struct netlist_parser_type : public qi::grammar<std::string::iterator, SKIPPER, std::vector<boost::variant<component, std::string>>()>
 {
     typedef std::string::iterator Iterator;
 
     netlist_parser_type() : netlist_parser_type::base_type(main)
     {
-        line %= component_parser | command_parser;
-        main %= +line;
+        line %= component_parser | command_parser | comment;
+        main %= +line >> qi::eol;
     }
 
-    qi::rule<Iterator, qi::ascii::space_type, boost::variant<component, std::string>()> line;
-    qi::rule<Iterator, qi::ascii::space_type, std::vector<boost::variant<component, std::string>>()> main;
+    qi::rule<Iterator> comment;
+    qi::rule<Iterator, SKIPPER, boost::variant<component, std::string>()> line;
+    qi::rule<Iterator, SKIPPER, std::vector<boost::variant<component, std::string>>()> main;
 } netlist_parser;
 
 #endif // NETLIST_PARSER_HPP

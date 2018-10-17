@@ -1,3 +1,5 @@
+#define SKIPPER qi::ascii::blank_type
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -34,7 +36,7 @@ class netlist
 
             std::string str = buffer.str();
             auto iter = str.begin();
-            bool r = qi::phrase_parse(iter, str.end(), netlist_parser, qi::ascii::space, lines);
+            bool r = qi::phrase_parse(iter, str.end(), netlist_parser, qi::ascii::blank, lines);
 
             if (r && iter == str.end())
             {
