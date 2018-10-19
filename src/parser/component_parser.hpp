@@ -123,7 +123,7 @@ struct component_parser_type : public qi::grammar<std::string::iterator, SKIPPER
 {
     typedef std::string::iterator Iterator;
 
-    component_parser_type() : component_parser_type::base_type(main)
+    component_parser_type() : component_parser_type::base_type(main, "component")
     {
         using qi::alnum;
         using qi::char_;

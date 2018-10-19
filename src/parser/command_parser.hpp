@@ -9,7 +9,7 @@ struct command_parser_type : public qi::grammar<std::string::iterator, SKIPPER, 
 {
     typedef std::string::iterator Iterator;
 
-    command_parser_type() : command_parser_type::base_type(main)
+    command_parser_type() : command_parser_type::base_type(main, "command")
     {
         using qi::char_;
         using qi::ascii::space;

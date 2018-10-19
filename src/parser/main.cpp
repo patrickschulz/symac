@@ -1,4 +1,5 @@
 #define SKIPPER qi::ascii::blank_type
+#define BOOST_SPIRIT_DEBUG
 
 #include <iostream>
 #include <string>
@@ -40,10 +41,15 @@ class netlist
 
             if (r && iter == str.end())
             {
+                std::cout << "parse succeeded\n";
                 for(auto e : lines)
                 {
                     apply_visitor(netlist_printer, e);
                 }
+            }
+            else
+            {
+                std::cout << "parse failed. Remaining unparsed: " << std::string(iter, str.end()) << '\n';
             }
         }
 
