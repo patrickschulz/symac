@@ -24,25 +24,6 @@ enum component_types
     ct_current_controlled_current_source = 1 << 9
 };
 
-struct component_type_type : qi::symbols<char, component_types>
-{
-    component_type_type()
-    {
-        add
-            ("R", ct_resistor)
-            ("C", ct_capacitor)
-            ("L", ct_inductor)
-            ("V", ct_voltage_source)
-            ("I", ct_current_source)
-            ("O", ct_opamp)
-            ("E", ct_voltage_controlled_voltage_source)
-            ("F", ct_current_controlled_voltage_source)
-            ("G", ct_voltage_controlled_current_source)
-            ("H", ct_current_controlled_current_source)
-        ;
-    }
-} component_type;
-
 class component
 {
     public:
@@ -119,6 +100,25 @@ int number(component_types ct)
     return number_of_terminals[ct];
 }
 
+struct component_type_type : qi::symbols<char, component_types>
+{
+    component_type_type()
+    {
+        add
+            ("R", ct_resistor)
+            ("C", ct_capacitor)
+            ("L", ct_inductor)
+            ("V", ct_voltage_source)
+            ("I", ct_current_source)
+            ("O", ct_opamp)
+            ("E", ct_voltage_controlled_voltage_source)
+            ("F", ct_current_controlled_voltage_source)
+            ("G", ct_voltage_controlled_current_source)
+            ("H", ct_current_controlled_current_source)
+        ;
+    }
+} component_type;
+
 struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component(), qi::locals<component_types>>
 {
     typedef std::string::iterator Iterator;
@@ -147,5 +147,34 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::asc
     qi::rule<Iterator, qi::ascii::blank_type, std::vector<std::string>(component_types)> terminals;
     qi::rule<Iterator, qi::ascii::blank_type, component(), qi::locals<component_types>> main;
 } component_parser;
+
+/*
+struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component(), qi::locals<component_types>>
+{
+    typedef std::string::iterator Iterator;
+
+    component_parser_type() : component_parser_type::base_type(main, "component")
+    {
+        using qi::alnum;
+        using qi::char_;
+        using qi::repeat;
+        using qi::ascii::space;
+
+        type      %= component_type;
+        terminal  %= +(alnum | char_("-:_!"));
+        value     %= +(char_ - space);
+
+        two_terminal_device   = type >> repeat(2)[terminal] >> value;
+        three_terminal_device = type >> repeat(3)[terminal] >> value;
+        four_terminal_device  = type >> repeat(4)[terminal] >> value;
+
+        main %= two_terminal | three_terminal | four_terminal;
+    }
+
+    qi::rule<Iterator, component_types()> type;
+    qi::rule<Iterator, std::string()> terminal, value;
+    qi::rule<Iterator, component()> two_terminal_device, three_terminal_device, four_terminal_device, main;
+} component_parser;
+*/
 
 #endif // COMPONENT_PARSER_HPP

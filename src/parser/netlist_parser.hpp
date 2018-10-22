@@ -17,8 +17,8 @@ struct netlist_parser_type : public qi::grammar<std::string::iterator, qi::ascii
 
     netlist_parser_type() : netlist_parser_type::base_type(main, "netlist")
     {
-        line %= component_parser | command_parser | comment_parser | qi::eps;
-        main %= +(line >> qi::eol);
+        line %= component_parser | command_parser | comment_parser;
+        main %= -line % qi::eol;
     }
 
     qi::rule<Iterator, qi::ascii::blank_type, boost::variant<component, std::string>()> line;
