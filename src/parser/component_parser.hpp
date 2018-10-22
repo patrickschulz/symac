@@ -119,7 +119,7 @@ int number(component_types ct)
     return number_of_terminals[ct];
 }
 
-struct component_parser_type : public qi::grammar<std::string::iterator, SKIPPER, component(), qi::locals<component_types>>
+struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component(), qi::locals<component_types>>
 {
     typedef std::string::iterator Iterator;
 
@@ -144,40 +144,8 @@ struct component_parser_type : public qi::grammar<std::string::iterator, SKIPPER
     qi::rule<Iterator, component_types()> type;
     qi::rule<Iterator, std::string()> terminal;
     qi::rule<Iterator, std::string()> value;
-    qi::rule<Iterator, SKIPPER, std::vector<std::string>(component_types)> terminals;
-    qi::rule<Iterator, SKIPPER, component(), qi::locals<component_types>> main;
+    qi::rule<Iterator, qi::ascii::blank_type, std::vector<std::string>(component_types)> terminals;
+    qi::rule<Iterator, qi::ascii::blank_type, component(), qi::locals<component_types>> main;
 } component_parser;
-
-/*
-template<typename Skipper>
-struct component_parser_type : public qi::grammar<std::string::iterator, Skipper, component(), qi::locals<component_types>>
-{
-    typedef std::string::iterator Iterator;
-
-    component_parser_type() : component_parser_type::base_type(main)
-    {
-        using qi::alnum;
-        using qi::char_;
-        using qi::repeat;
-        using qi::ascii::space;
-        using qi::_1;
-        using qi::_a;
-        using qi::_r1;
-        using boost::phoenix::bind;
-
-        type      %= component_type;
-        terminal  %= +(alnum | char_("-:_!"));
-        terminals %= repeat(bind(number, _r1))[terminal];
-        value     %= +(char_ - space);
-        main      %= type[_a = _1] >> terminals(_a) >> value;
-    }
-
-    qi::rule<Iterator, component_types()> type;
-    qi::rule<Iterator, std::string()> terminal;
-    qi::rule<Iterator, std::string()> value;
-    qi::rule<Iterator, Skipper, std::vector<std::string>(component_types)> terminals;
-    qi::rule<Iterator, Skipper, component(), qi::locals<component_types>> main;
-};
-*/
 
 #endif // COMPONENT_PARSER_HPP

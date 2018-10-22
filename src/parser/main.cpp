@@ -1,4 +1,3 @@
-#define SKIPPER qi::ascii::blank_type
 #define BOOST_SPIRIT_DEBUG
 
 #include <iostream>
