@@ -29,7 +29,7 @@ class component
     public:
         friend std::ostream& operator<<(std::ostream& stream, const component& c);
 
-        void set_type(component_types ct)
+        void set_type(char ct)
         {
             type = ct;
         }
@@ -44,7 +44,7 @@ class component
             value = v;
         }
 
-        component_types get_type() const
+        char get_type() const
         {
             return type;
         }
@@ -60,7 +60,7 @@ class component
         }
 
     private:
-        component_types type;
+        char type;
         std::vector<std::string> nodes;
         std::string value;
 };
@@ -78,14 +78,14 @@ std::ostream& operator<<(std::ostream& stream, const component& c)
 
 BOOST_FUSION_ADAPT_ADT(
     component,
-    (component_types, component_types, obj.get_type(), obj.set_type(val))
+    (char, char, obj.get_type(), obj.set_type(val))
     (const std::vector<std::string>&, const std::vector<std::string>&, obj.get_nodes(), obj.set_nodes(val))
     (std::string, const std::string&, obj.get_value(), obj.set_value(val))
 )
 
-int number(component_types ct)
+int number(char ct)
 {
-    std::map<component_types, unsigned int> number_of_terminals {
+    std::map<char, unsigned int> number_of_terminals {
         { ct_resistor,                          2 },
         { ct_capacitor,                         2 },
         { ct_inductor,                          2 },
@@ -100,26 +100,26 @@ int number(component_types ct)
     return number_of_terminals[ct];
 }
 
-struct component_type_type : qi::symbols<char, component_types>
+struct component_type_type : qi::symbols<char, char>
 {
     component_type_type()
     {
         add
-            ("R", ct_resistor)
-            ("C", ct_capacitor)
-            ("L", ct_inductor)
-            ("V", ct_voltage_source)
-            ("I", ct_current_source)
-            ("O", ct_opamp)
-            ("E", ct_voltage_controlled_voltage_source)
-            ("F", ct_current_controlled_voltage_source)
-            ("G", ct_voltage_controlled_current_source)
-            ("H", ct_current_controlled_current_source)
+            ("R", 'R')
+            ("C", 'C')
+            ("L", 'L')
+            ("V", 'V')
+            ("I", 'I')
+            ("O", 'O')
+            ("E", 'E')
+            ("F", 'F')
+            ("G", 'G')
+            ("H", 'H')
         ;
     }
 } component_type;
 
-struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component(), qi::locals<component_types>>
+struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component(), qi::locals<char>>
 {
     typedef std::string::iterator Iterator;
 
@@ -141,15 +141,15 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::asc
         main      %= type[_a = _1] >> terminals(_a) >> value;
     }
 
-    qi::rule<Iterator, component_types()> type;
+    qi::rule<Iterator, char()> type;
     qi::rule<Iterator, std::string()> terminal;
     qi::rule<Iterator, std::string()> value;
-    qi::rule<Iterator, qi::ascii::blank_type, std::vector<std::string>(component_types)> terminals;
-    qi::rule<Iterator, qi::ascii::blank_type, component(), qi::locals<component_types>> main;
+    qi::rule<Iterator, qi::ascii::blank_type, std::vector<std::string>(char)> terminals;
+    qi::rule<Iterator, qi::ascii::blank_type, component(), qi::locals<char>> main;
 } component_parser;
 
 /*
-struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component(), qi::locals<component_types>>
+struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component()>
 {
     typedef std::string::iterator Iterator;
 
@@ -158,20 +158,20 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::asc
         using qi::alnum;
         using qi::char_;
         using qi::repeat;
-        using qi::ascii::space;
+        using qi::eol;
 
-        type      %= component_type;
-        terminal  %= +(alnum | char_("-:_!"));
-        value     %= +(char_ - space);
+        terminal = +(alnum | char_("-:_!"));
+        value    = +(char_ - eol);
 
-        two_terminal_device   = type >> repeat(2)[terminal] >> value;
-        three_terminal_device = type >> repeat(3)[terminal] >> value;
-        four_terminal_device  = type >> repeat(4)[terminal] >> value;
+        two_terminal_device   = char_("RCLVI") >> repeat(2)[terminal] >> value;
+        three_terminal_device = char_("O")     >> repeat(3)[terminal] >> value;
+        four_terminal_device  = char_("EFGH")  >> repeat(4)[terminal] >> value;
 
-        main %= two_terminal | three_terminal | four_terminal;
+        main = two_terminal_device | 
+                three_terminal_device | 
+                four_terminal_device;
     }
 
-    qi::rule<Iterator, component_types()> type;
     qi::rule<Iterator, std::string()> terminal, value;
     qi::rule<Iterator, component()> two_terminal_device, three_terminal_device, four_terminal_device, main;
 } component_parser;
