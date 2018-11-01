@@ -1,4 +1,6 @@
+
 * comment
 R 1 2 foo
-O 1 2 3 bar
-.print V(out)
+O 1 2 3
+
+G 1 2 3 4 gm

@@ -1,11 +1,11 @@
 #ifndef COMPONENT_PARSER_HPP
 #define COMPONENT_PARSER_HPP
 
+#include <vector>
+#include <string>
+
 #include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/include/adapt_adt.hpp>
-#include <boost/phoenix/phoenix.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 namespace qi = boost::spirit::qi;
 
@@ -27,42 +27,11 @@ enum component_types
 class component
 {
     public:
-        friend std::ostream& operator<<(std::ostream& stream, const component& c);
-
-        void set_type(char ct)
-        {
-            type = ct;
-        }
-
-        void set_nodes(const std::vector<std::string>& n)
-        {
-            nodes = n;
-        }
-
-        void set_value(const std::string& v)
-        {
-            value = v;
-        }
-
-        char get_type() const
-        {
-            return type;
-        }
-
-        const std::vector<std::string>& get_nodes() const
-        {
-            return nodes;
-        }
-
-        const std::string& get_value() const
-        {
-            return value;
-        }
-
-    private:
         char type;
         std::vector<std::string> nodes;
         std::string value;
+
+        friend std::ostream& operator<<(std::ostream& stream, const component& c);
 };
 
 std::ostream& operator<<(std::ostream& stream, const component& c)
@@ -76,11 +45,11 @@ std::ostream& operator<<(std::ostream& stream, const component& c)
     return stream;
 }
 
-BOOST_FUSION_ADAPT_ADT(
+BOOST_FUSION_ADAPT_STRUCT(
     component,
-    (char, char, obj.get_type(), obj.set_type(val))
-    (const std::vector<std::string>&, const std::vector<std::string>&, obj.get_nodes(), obj.set_nodes(val))
-    (std::string, const std::string&, obj.get_value(), obj.set_value(val))
+    (char, type)
+    (std::vector<std::string>, nodes)
+    (std::string, value)
 )
 
 int number(char ct)
@@ -119,42 +88,14 @@ struct component_type_type : qi::symbols<char, char>
     }
 } component_type;
 
-struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component(), qi::locals<char>>
+struct component_parser_type : public qi::grammar<std::string::iterator, component()>
 {
     typedef std::string::iterator Iterator;
 
     component_parser_type() : component_parser_type::base_type(main, "component")
     {
-        using qi::alnum;
-        using qi::char_;
-        using qi::repeat;
-        using qi::ascii::space;
-        using qi::_1;
-        using qi::_a;
-        using qi::_r1;
-        using boost::phoenix::bind;
-
-        type      %= component_type;
-        terminal  %= +(alnum | char_("-:_!"));
-        terminals %= repeat(bind(number, _r1))[terminal];
-        value     %= +(char_ - space);
-        main      %= type[_a = _1] >> terminals(_a) >> value;
-    }
-
-    qi::rule<Iterator, char()> type;
-    qi::rule<Iterator, std::string()> terminal;
-    qi::rule<Iterator, std::string()> value;
-    qi::rule<Iterator, qi::ascii::blank_type, std::vector<std::string>(char)> terminals;
-    qi::rule<Iterator, qi::ascii::blank_type, component(), qi::locals<char>> main;
-} component_parser;
-
-/*
-struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component()>
-{
-    typedef std::string::iterator Iterator;
-
-    component_parser_type() : component_parser_type::base_type(main, "component")
-    {
+        using qi::omit;
+        using qi::blank;
         using qi::alnum;
         using qi::char_;
         using qi::repeat;
@@ -163,18 +104,18 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::asc
         terminal = +(alnum | char_("-:_!"));
         value    = +(char_ - eol);
 
-        two_terminal_device   = char_("RCLVI") >> repeat(2)[terminal] >> value;
-        three_terminal_device = char_("O")     >> repeat(3)[terminal] >> value;
-        four_terminal_device  = char_("EFGH")  >> repeat(4)[terminal] >> value;
+        two_terminal_device   = char_("RCLVI") >> repeat(2)[omit[+blank] >> terminal] >> omit[+blank] >> value;
+        three_terminal_device = char_("O")     >> repeat(3)[omit[+blank] >> terminal];
+        four_terminal_device  = char_("EFGH")  >> repeat(4)[omit[+blank] >> terminal] >> omit[+blank] >> value;
 
-        main = two_terminal_device | 
-                three_terminal_device | 
-                four_terminal_device;
+        main = two_terminal_device   |
+               three_terminal_device |
+               four_terminal_device;
     }
 
     qi::rule<Iterator, std::string()> terminal, value;
-    qi::rule<Iterator, component()> two_terminal_device, three_terminal_device, four_terminal_device, main;
+    qi::rule<Iterator, component()> two_terminal_device, three_terminal_device, four_terminal_device;
+    qi::rule<Iterator, component()> main;
 } component_parser;
-*/
 
 #endif // COMPONENT_PARSER_HPP
