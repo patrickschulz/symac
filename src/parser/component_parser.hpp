@@ -18,6 +18,7 @@ namespace qi = boost::spirit::qi;
 struct component_proxy
 {
     component_types type;
+    std::string name;
     std::vector<std::string> nodes;
     GiNaC::symbol value;
 };
@@ -25,6 +26,7 @@ struct component_proxy
 BOOST_FUSION_ADAPT_STRUCT(
     component_proxy,
     (component_types, type)
+    (std::string, name)
     (std::vector<std::string>, nodes)
     (GiNaC::symbol, value)
 )
@@ -96,24 +98,26 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::asc
         using qi::attr_cast;
         using qi::alnum;
         using qi::char_;
+        using qi::graph;
         using qi::repeat;
         using qi::eol;
         using qi::_r1;
 
+        name = +graph;
         terminal = +(alnum | char_("-:_!"));
         value    = +(char_ - eol);
         terminals = repeat(_r1)[terminal];
 
-        two_terminal_device   = attr_cast(char_("RCLVI")) >> terminals(2) >> attr_cast(value);
-        three_terminal_device = attr_cast(char_("O"))     >> terminals(3) >> attr("OPDUMMY");
-        four_terminal_device  = attr_cast(char_("EFGH"))  >> terminals(4) >> attr_cast(value);
+        two_terminal_device   = attr_cast(char_("RCLVI")) >> name >> terminals(2) >> attr_cast(value);
+        three_terminal_device = attr_cast(char_("O"))     >> name >> terminals(3) >> attr("OPDUMMY");
+        four_terminal_device  = attr_cast(char_("EFGH"))  >> name >> terminals(4) >> attr_cast(value);
 
         main = two_terminal_device   |
                three_terminal_device |
                four_terminal_device;
     }
 
-    qi::rule<Iterator, std::string()> terminal, value;
+    qi::rule<Iterator, std::string()> name, terminal, value;
     qi::rule<Iterator, qi::ascii::blank_type, std::vector<std::string>(int)> terminals;
     qi::rule<Iterator, qi::ascii::blank_type, component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device;
     qi::rule<Iterator, qi::ascii::blank_type, component_proxy()> main;

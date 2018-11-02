@@ -7,12 +7,13 @@
 
 #include "componentlist.hpp"
 #include "nodemap.hpp"
+#include "command.hpp"
 
 class result
 {
     public:
         result(const componentlist& components,  const GiNaC::matrix& results, const nodemap& nmap);
-        void print(const std::vector<std::string>& print_cmd) const;
+        void print(const std::vector<command>& print_cmd) const;
 
         void print_all() const;
         void print_voltage(const std::string& voltage) const;

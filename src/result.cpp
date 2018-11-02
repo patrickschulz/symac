@@ -86,18 +86,18 @@ void result::print_helper(const std::string& p) const
 }
 
 
-void result::print(const std::vector<std::string>& print_cmd) const
+void result::print(const std::vector<command>& print_cmd) const
 {
     std::cout << GiNaC::csrc;
-    for(const auto& cmd : print_cmd)
+    for(const command& cmd : print_cmd)
     {
-        if(cmd == "all")
+        if(cmd.content == "all")
         {
             print_all();
         }
         else
         {
-            std::istringstream stream(cmd);
+            std::istringstream stream(cmd.content);
             std::vector<std::string> entries;
             std::string tmp;
             while(stream >> tmp)
@@ -117,44 +117,9 @@ void result::print(const std::vector<std::string>& print_cmd) const
             }
             else
             {
-                print_helper(cmd);
+                print_helper(cmd.content);
             }
         }
     }
-    /*
-    else if(mode == "tf")
-    {
-        std::vector<std::string> nodes { "1", "4" };
-        if(nodes.size() != 2){
-            std::cerr << "You have to specify two nodes (by using the -n argument two times)"<< '\n';
-            exit(1);
-        }
-        if(nodes[0] == "0" || nodes[1]== "0" || nodes[0] == "GND" || nodes[1] == "GND" )
-        {
-            std::cerr << " You can't use the GND node (node 0)" << '\n';
-            exit(1);
-        }
-        unsigned int first = nmap[nodes[0]];
-        unsigned int second= nmap[nodes[1]];
-        GiNaC::ex H = results(second - 1, 0) / results(first - 1, 0);
-        std::cout << "H(s) = " << H.normal() << '\n';
-        //std::cout << "H(s) to Latex" << '\n';
-        //std::cout << "H(s) = " <<GiNaC::latex << H << '\n';
-        //if(matlab_export)
-        //{
-        //    vvtf_matlab_export(filename,first,second);
-        //}
-        //if(nlist.is_simplification())
-        //{ 
-        //    std::string H_simple = vvtf_simplification(H);
-        //    std::cout << " Simplified (in Latex) "<< '\n';
-        //    std::cout << "H(s) = " << H_simple << '\n';
-        //}
-    }
-    else
-    {
-        std::cerr << "unknown mode '" << mode << "' given\n";
-    }
-    */
 }
 

@@ -18,10 +18,6 @@ int main(int argc, char** argv)
         nlist.read(filename);
         if(nlist)
         {
-            for(auto c : nlist.get_components())
-            {
-                std::cout << c << '\n';
-            }
             solver S(nlist.get_components());
             S.mna();
             if(commandline_options.count("print"))

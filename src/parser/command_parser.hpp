@@ -5,12 +5,9 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/fusion/include/vector.hpp>
 
-namespace qi = boost::spirit::qi;
+#include "../command.hpp"
 
-struct command
-{
-    std::string content;
-};
+namespace qi = boost::spirit::qi;
 
 BOOST_FUSION_ADAPT_STRUCT(
     command,

@@ -16,6 +16,11 @@ void netlist::add_component(const component& c)
     components.add_component(c);
 }
 
+void netlist::add_command(const command& c)
+{
+    commands.push_back(c);
+}
+
 struct netlist_printer_type : public boost::static_visitor<>
 {
     netlist_printer_type(netlist& nlist) :
@@ -24,18 +29,18 @@ struct netlist_printer_type : public boost::static_visitor<>
 
     void operator() (const component_proxy& p) const
     {
-        component c("DUMMY", p.type, p.nodes, p.value);
+        component c(p.name, p.type, p.nodes, p.value);
         nlist.add_component(c);
     }
 
     void operator() (const command& c) const
     {
-        std::cout << "command: " << c.content << '\n';
+        nlist.add_command(c);
     }
 
     void operator() (const comment& c) const
     {
-        std::cout << "comment: " << '"' << c.content << '"' << '\n';
+        //std::cout << "comment: " << '"' << c.content << '"' << '\n';
     }
 
     netlist& nlist;

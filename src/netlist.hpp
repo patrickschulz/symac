@@ -6,6 +6,7 @@
 
 #include "componentlist.hpp"
 #include "subcircuit.hpp"
+#include "command.hpp"
 
 class netlist
 {
@@ -14,15 +15,16 @@ class netlist
         
         component component_read_in(const std::string& line);
         void add_component(const component& c);
+        void add_command(const command& c);
 
         const componentlist& get_components() const
         {
             return components;
         }
 
-        std::vector<std::string> get_print_cmds() const
+        std::vector<command> get_print_cmds() const
         {
-            return std::vector<std::string>{ "all" };
+            return commands;
         }
 
         operator bool();
@@ -33,12 +35,9 @@ class netlist
 
     private:
         componentlist components;
+        std::vector<command> commands;
 
         bool valid;
-
-        // subcircuits
-        std::map<std::string, subcircuit> subcircuits;
-        subcircuit* current_subcircuit;
 };
 
 #endif //NETLIST_HPP
