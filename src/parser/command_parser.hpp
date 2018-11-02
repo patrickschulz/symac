@@ -3,10 +3,21 @@
 
 #include <string>
 #include <boost/spirit/include/qi.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 namespace qi = boost::spirit::qi;
 
-struct command_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, std::string()>
+struct command
+{
+    std::string content;
+};
+
+BOOST_FUSION_ADAPT_STRUCT(
+    command,
+    (std::string, content)
+)
+
+struct command_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, command()>
 {
     typedef std::string::iterator Iterator;
 
@@ -15,14 +26,14 @@ struct command_parser_type : public qi::grammar<std::string::iterator, qi::ascii
         using qi::char_;
         using qi::eol;
 
-        command  = ".print";
+        identifier = ".print";
         content = +(char_ - eol);
-        main = command >> content;
+        main = identifier >> content;
     }
 
-    qi::rule<Iterator> command;
+    qi::rule<Iterator> identifier;
     qi::rule<Iterator, std::string()> content;
-    qi::rule<Iterator, qi::ascii::blank_type, std::string()> main;
+    qi::rule<Iterator, qi::ascii::blank_type, command()> main;
 } command_parser;
 
 #endif // COMMAND_PARSER_HPP

@@ -3,3 +3,5 @@ G 1 2 3 4 gm
 O 1 2 3
 
 * comment with several words
+
+.print foo

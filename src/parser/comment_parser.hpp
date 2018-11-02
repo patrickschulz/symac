@@ -5,7 +5,17 @@
 
 namespace qi = boost::spirit::qi;
 
-struct comment_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, std::string()>
+struct comment
+{
+    std::string content;
+};
+
+BOOST_FUSION_ADAPT_STRUCT(
+    comment,
+    (std::string, content)
+)
+
+struct comment_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, comment()>
 {
     typedef std::string::iterator Iterator;
 
@@ -19,7 +29,7 @@ struct comment_parser_type : public qi::grammar<std::string::iterator, qi::ascii
     }
 
     qi::rule<Iterator, std::string()> content;
-    qi::rule<Iterator, qi::ascii::blank_type, std::string()> main;
+    qi::rule<Iterator, qi::ascii::blank_type, comment()> main;
 
 } comment_parser;
 

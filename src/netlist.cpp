@@ -27,9 +27,14 @@ struct netlist_printer_type : public boost::static_visitor<>
         nlist.add_component(c);
     }
 
-    void operator() (const std::string& str) const
+    void operator() (const command& c) const
     {
-        std::cout << '"' << str << '"' << '\n';
+        std::cout << "command: " << c.content << '\n';
+    }
+
+    void operator() (const comment& c) const
+    {
+        std::cout << "comment: " << '"' << c.content << '"' << '\n';
     }
 
     netlist& nlist;
@@ -41,14 +46,14 @@ void netlist::read(const std::string& filename)
     if(!file.is_open())
     {
         valid = false;
-        //return;
+        return;
     }
     std::stringstream buffer;
     buffer << file.rdbuf();
 
     std::string str = buffer.str();
     auto iter = str.begin();
-    std::vector<boost::variant<component, std::string>> lines;
+    std::vector<boost::variant<component, command, comment>> lines;
     bool r = qi::phrase_parse(iter, str.end(), netlist_parser, qi::ascii::blank, lines);
 
     netlist_printer_type visitor(*this);
