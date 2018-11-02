@@ -1,6 +1,7 @@
 #ifndef COMMAND_PARSER_HPP
 #define COMMAND_PARSER_HPP
 
+#include <string>
 #include <boost/spirit/include/qi.hpp>
 
 namespace qi = boost::spirit::qi;

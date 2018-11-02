@@ -10,6 +10,7 @@ class componentlist
 {
     public:
         void add_component(const component& c);
+        void add_component(const std::vector<component>& cv);
 
         std::vector<std::string> get_nodes() const;
 

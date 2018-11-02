@@ -1,8 +1,10 @@
 #include "component.hpp"
 
+#include <sstream>
+
 #include "symbol.hpp"
 
-component::component(const std::string& name, char chtype, const std::vector<std::string>& nodes, const GiNaC::ex& value) :
+component::component(const std::string& name, char chtype, const std::vector<std::string>& nodes, const GiNaC::symbol& value) :
     name(name), nodes(nodes), value(value)
 {   
     switch(chtype)
@@ -95,9 +97,34 @@ void component::set_nodes(const std::vector<std::string>& nodes)
     this->nodes = nodes;
 }
 
+std::string component::to_string() const
+{
+    std::ostringstream stream;
+    stream << type << " (" << value << ") ";
+    stream << "{ ";
+    for(auto node : nodes)
+    {
+        stream << node << ' ';
+    }
+    stream << '}';
+    return stream.str();
+}
+
 GiNaC::ex component::get_value() const
 {
     return value;
 }
+
+std::ostream& operator<<(std::ostream& stream, const component& c)
+{
+    stream << c.type << " (" << c.value << ") { ";
+    for(auto n : c.nodes)
+    {
+        stream << n << ' ';
+    }
+    stream << '}';
+    return stream;
+}
+
 
 // vim: nowrap

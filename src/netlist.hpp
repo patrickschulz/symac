@@ -13,7 +13,7 @@ class netlist
         netlist();
         netlist(const std::string& filename);
 
-        std::vector<std::string> read(std::string filename);
+        void read(std::string filename);
         
         component component_read_in(const std::string& line);
         void add_component(const component& c);

@@ -8,6 +8,14 @@ void componentlist::add_component(const component& c)
     components.push_back(c);
 }
 
+void componentlist::add_component(const std::vector<component>& cv)
+{
+    for(const auto& c : cv)
+    {
+        add_component(c);
+    }
+}
+
 std::vector<std::string> componentlist::get_nodes() const
 {
     std::set<std::string> all_nodes;
