@@ -11,11 +11,19 @@
 #include <boost/fusion/include/vector.hpp>
 
 #include "../symbol.hpp"
+#include "../component.hpp"
 
 namespace qi = boost::spirit::qi;
 
+struct component_proxy
+{
+    component_types type;
+    std::vector<std::string> nodes;
+    GiNaC::symbol value;
+};
+
 BOOST_FUSION_ADAPT_STRUCT(
-    component,
+    component_proxy,
     (component_types, type)
     (std::vector<std::string>, nodes)
     (GiNaC::symbol, value)
@@ -78,7 +86,7 @@ namespace boost { namespace spirit { namespace traits
     };
 }}}
 
-struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component()>
+struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component_proxy()>
 {
     typedef std::string::iterator Iterator;
 
@@ -107,8 +115,8 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::asc
 
     qi::rule<Iterator, std::string()> terminal, value;
     qi::rule<Iterator, qi::ascii::blank_type, std::vector<std::string>(int)> terminals;
-    qi::rule<Iterator, qi::ascii::blank_type, component()> two_terminal_device, three_terminal_device, four_terminal_device;
-    qi::rule<Iterator, qi::ascii::blank_type, component()> main;
+    qi::rule<Iterator, qi::ascii::blank_type, component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device;
+    qi::rule<Iterator, qi::ascii::blank_type, component_proxy()> main;
 } component_parser;
 
 #endif // COMPONENT_PARSER_HPP

@@ -20,6 +20,11 @@ class netlist
             return components;
         }
 
+        std::vector<std::string> get_print_cmds() const
+        {
+            return std::vector<std::string>{ "all" };
+        }
+
         operator bool();
 
         void translate_subcircuit(const std::string& line);

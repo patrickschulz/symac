@@ -11,7 +11,7 @@
 
 namespace qi = boost::spirit::qi;
 
-typedef boost::variant<component, command, comment> netlist_attribute_type;
+typedef boost::variant<component_proxy, command, comment> netlist_attribute_type;
 struct netlist_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, std::vector<netlist_attribute_type>()>
 {
     typedef std::string::iterator Iterator;

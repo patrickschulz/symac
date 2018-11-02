@@ -23,10 +23,8 @@ enum component_types
 class component
 {
     public:
-        component() = default;
-        component(const std::string& name, char type, const std::vector<std::string>& nodes, const GiNaC::symbol& value);
+        component(const std::string& name, component_types type, const std::vector<std::string>& nodes, const GiNaC::symbol& value);
         
-        component_types get_type() const;
         std::string get_name() const;
 
         // results
@@ -36,22 +34,25 @@ class component
 
         unsigned int element_size() const;
 
+        // getter and setter
+        const component_types& get_type() const;
+        void set_type(const component_types&);
+
         const std::vector<std::string>& get_nodes() const;
         void set_nodes(const std::vector<std::string>& nodes);
 
+        const GiNaC::symbol& get_value() const;
+        void set_value(const GiNaC::symbol&);
+
         std::string to_string() const;
 
-        GiNaC::ex get_value() const;
+        friend std::ostream& operator<<(std::ostream& stream, const component& c);
 
     private:
         std::string name;
-    public: // FIXME: hack for BOOST_ADAPT_STRUCT, since i currently i can't figure out how to use BOOST_ADAPT_ADT
         component_types type;
         std::vector<std::string> nodes;
         GiNaC::symbol value;
-
-        friend std::ostream& operator<<(std::ostream& stream, const component& c);
-    private:
 
         // constant component attributes
         unsigned int mna_size;

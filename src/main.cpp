@@ -20,8 +20,16 @@ int main(int argc, char** argv)
         {
             for(auto c : nlist.get_components())
             {
-                std::cout << c.to_string() << '\n';
+                std::cout << c << '\n';
             }
+            solver S(nlist.get_components());
+            S.mna();
+            if(commandline_options.count("print"))
+            {
+                S.print_matrices();
+            }
+            result res = S.solve();
+            res.print(nlist.get_print_cmds());
         }
         else
         {
