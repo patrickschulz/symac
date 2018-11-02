@@ -21,6 +21,24 @@ BOOST_FUSION_ADAPT_STRUCT(
     (GiNaC::symbol, value)
 )
 
+/*
+ * TODO: this is needed if numeric values should be supported (they should!)
+ * However, for this the components need to store a GiNaC::ex, not a GiNaC::symbol as value
+static GiNaC::ex check_and_convert_numeric_symbol(const std::string& v)
+{
+    GiNaC::ex value;
+    if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
+    {
+        value = std::stod(v);
+    }
+    else
+    {
+        value = get_symbol(v);
+    }
+    return value;
+}
+*/
+
 namespace boost { namespace spirit { namespace traits
 {
     template <>

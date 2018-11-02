@@ -12,12 +12,13 @@ struct comment_parser_type : public qi::grammar<std::string::iterator, qi::ascii
     comment_parser_type() : comment_parser_type::base_type(main, "comment")
     {
         using qi::char_;
-        using qi::ascii::space;
         using qi::eol;
 
-        main = "*" >> *(char_ - eol);
+        content = *(char_ - eol);
+        main = "*" >> content;
     }
 
+    qi::rule<Iterator, std::string()> content;
     qi::rule<Iterator, qi::ascii::blank_type, std::string()> main;
 
 } comment_parser;

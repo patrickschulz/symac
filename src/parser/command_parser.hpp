@@ -13,15 +13,15 @@ struct command_parser_type : public qi::grammar<std::string::iterator, qi::ascii
     command_parser_type() : command_parser_type::base_type(main, "command")
     {
         using qi::char_;
-        using qi::ascii::space;
+        using qi::eol;
 
         command  = ".print";
-        body    %= +(char_ - space);
-        main    %= command >> body;
+        content = +(char_ - eol);
+        main = command >> content;
     }
 
     qi::rule<Iterator> command;
-    qi::rule<Iterator, std::string()> body;
+    qi::rule<Iterator, std::string()> content;
     qi::rule<Iterator, qi::ascii::blank_type, std::string()> main;
 } command_parser;
 
