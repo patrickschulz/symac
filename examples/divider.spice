@@ -1,6 +1,6 @@
-R1 vin vout R1
-R2 vout 0 R2
-V0 vin 0 V0
+RR1 vin vout R1
+RR2 vout 0 R2
+VV0 vin 0 V0
 
 *.print V(vout)
 *.print I(R1)

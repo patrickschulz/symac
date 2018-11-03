@@ -10,92 +10,62 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/fusion/include/vector.hpp>
 
-#include "../symbol.hpp"
 #include "../component.hpp"
 
 namespace qi = boost::spirit::qi;
-
-struct component_proxy
-{
-    component_types type;
-    std::string name;
-    std::vector<std::string> nodes;
-    GiNaC::symbol value;
-};
 
 BOOST_FUSION_ADAPT_STRUCT(
     component_proxy,
     (component_types, type)
     (std::string, name)
     (std::vector<std::string>, nodes)
-    (GiNaC::symbol, value)
+    (std::string, value)
 )
 
-/*
- * TODO: this is needed if numeric values should be supported (they should!)
- * However, for this the components need to store a GiNaC::ex, not a GiNaC::symbol as value
-static GiNaC::ex check_and_convert_numeric_symbol(const std::string& v)
+struct two_terminal_identifier_type : qi::symbols<char, component_types>
 {
-    GiNaC::ex value;
-    if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
+    two_terminal_identifier_type()
     {
-        value = std::stod(v);
+        add
+            ("R", ct_resistor)
+            ("C", ct_capacitor)
+            ("L", ct_inductor)
+            ("V", ct_voltage_source)
+            ("I", ct_current_source)
+        ;
     }
-    else
-    {
-        value = get_symbol(v);
-    }
-    return value;
-}
-*/
+} two_terminal_identifier;
 
-namespace boost { namespace spirit { namespace traits
+struct three_terminal_identifier_type : qi::symbols<char, component_types>
 {
-    template <>
-    struct transform_attribute<component_types, char, qi::domain>
+    three_terminal_identifier_type()
     {
-        typedef char type;
-        static char pre(__attribute__((__unused__)) component_types& c) { return ' '; } //not useful in this case but required to avoid compiler errors
-        static void post(component_types& val, const char& attr) //`val` is the "returned" string, `attr` is what int_ parses
-        {
-            std::map<char, component_types> attribute_map {
-                { 'R', ct_resistor                           },
-                { 'C', ct_capacitor                          },
-                { 'L', ct_inductor                           },
-                { 'V', ct_voltage_source                     },
-                { 'I', ct_current_source                     },
-                { 'O', ct_opamp                              },
-                { 'E', ct_voltage_controlled_voltage_source  },
-                { 'F', ct_current_controlled_voltage_source  },
-                { 'G', ct_voltage_controlled_current_source  },
-                { 'H', ct_current_controlled_current_source  }
-            };
-            val = attribute_map[attr];
-        }
-        static void fail(component_types&) {}
-    };
+        add
+            ("O", ct_opamp)
+        ;
+    }
+} three_terminal_identifier;
 
-    template <>
-    struct transform_attribute<GiNaC::symbol, std::string, qi::domain>
+struct four_terminal_identifier_type : qi::symbols<char, component_types>
+{
+    four_terminal_identifier_type()
     {
-        typedef std::string type;
-        static std::string pre(__attribute__((__unused__)) GiNaC::symbol& c) { return ""; } //not useful in this case but required to avoid compiler errors
-        static void post(GiNaC::symbol& val, const std::string& attr) //`val` is the "returned" string, `attr` is what int_ parses
-        {
-            val = get_symbol(attr);
-        }
-        static void fail(GiNaC::symbol&) {}
-    };
-}}}
+        add
+            ("E", ct_voltage_controlled_voltage_source)
+            ("F", ct_current_controlled_voltage_source)
+            ("G", ct_voltage_controlled_current_source)
+            ("H", ct_current_controlled_current_source)
+        ;
+    }
+} four_terminal_identifier;
 
-struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component_proxy()>
+struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component()>
 {
     typedef std::string::iterator Iterator;
 
     component_parser_type() : component_parser_type::base_type(main, "component")
     {
         using qi::attr;
-        using qi::attr_cast;
         using qi::alnum;
         using qi::char_;
         using qi::graph;
@@ -108,9 +78,9 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::asc
         value    = +(char_ - eol);
         terminals = repeat(_r1)[terminal];
 
-        two_terminal_device   = attr_cast(char_("RCLVI")) >> name >> terminals(2) >> attr_cast(value);
-        three_terminal_device = attr_cast(char_("O"))     >> name >> terminals(3) >> attr("OPDUMMY");
-        four_terminal_device  = attr_cast(char_("EFGH"))  >> name >> terminals(4) >> attr_cast(value);
+        two_terminal_device   = two_terminal_identifier   >> name >> terminals(2) >> value;
+        three_terminal_device = three_terminal_identifier >> name >> terminals(3) >> attr("OPDUMMY");
+        four_terminal_device  = four_terminal_identifier  >> name >> terminals(4) >> value;
 
         main = two_terminal_device   |
                three_terminal_device |
@@ -120,7 +90,7 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::asc
     qi::rule<Iterator, std::string()> name, terminal, value;
     qi::rule<Iterator, qi::ascii::blank_type, std::vector<std::string>(int)> terminals;
     qi::rule<Iterator, qi::ascii::blank_type, component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device;
-    qi::rule<Iterator, qi::ascii::blank_type, component_proxy()> main;
+    qi::rule<Iterator, qi::ascii::blank_type, component()> main;
 } component_parser;
 
 #endif // COMPONENT_PARSER_HPP

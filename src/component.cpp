@@ -4,6 +4,29 @@
 
 #include "symbol.hpp"
 
+component::component(const component_proxy& p) :
+    component(p.name, p.type, p.nodes, get_symbol(p.value))
+{
+}
+
+/*
+ * TODO: this is needed if numeric values should be supported (they should!)
+ * However, for this the components need to store a GiNaC::ex, not a GiNaC::symbol as value
+static GiNaC::ex check_and_convert_numeric_symbol(const std::string& v)
+{
+    GiNaC::ex value;
+    if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
+    {
+        value = std::stod(v);
+    }
+    else
+    {
+        value = get_symbol(v);
+    }
+    return value;
+}
+*/
+
 component::component(const std::string& name, component_types type, const std::vector<std::string>& nodes, const GiNaC::symbol& value) :
     name(name), type(type), nodes(nodes), value(value)
 {   
@@ -59,11 +82,6 @@ const component_types& component::get_type() const
     return type;
 }
 
-void component::set_type(const component_types& t) 
-{
-    type = t;
-}
-
 const std::vector<std::string>& component::get_nodes() const
 {
     return nodes;
@@ -78,22 +96,5 @@ const GiNaC::symbol& component::get_value() const
 {
     return value;
 }
-
-void component::set_value(const GiNaC::symbol& v)
-{
-    value = v;
-}
-
-std::ostream& operator<<(std::ostream& stream, const component& c)
-{
-    stream << c.type << " (" << c.value << ") { ";
-    for(auto n : c.nodes)
-    {
-        stream << n << ' ';
-    }
-    stream << '}';
-    return stream;
-}
-
 
 // vim: nowrap

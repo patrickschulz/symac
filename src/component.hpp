@@ -20,9 +20,19 @@ enum component_types
     ct_current_controlled_current_source = 1 << 9
 };
 
+struct component_proxy
+{
+    component_types type;
+    std::string name;
+    std::vector<std::string> nodes;
+    std::string value;
+};
+
 class component
 {
     public:
+        component() = default;
+        component(const component_proxy& p);
         component(const std::string& name, component_types type, const std::vector<std::string>& nodes, const GiNaC::symbol& value);
         
         std::string get_name() const;
@@ -36,13 +46,11 @@ class component
 
         // getter and setter
         const component_types& get_type() const;
-        void set_type(const component_types&);
 
         const std::vector<std::string>& get_nodes() const;
         void set_nodes(const std::vector<std::string>& nodes);
 
         const GiNaC::symbol& get_value() const;
-        void set_value(const GiNaC::symbol&);
 
         std::string to_string() const;
 
