@@ -54,6 +54,8 @@ component::component(const std::string& name, component_types type, const std::v
         case ct_voltage_controlled_current_source:
             mna_size = 0;
             break;
+        case ct_none: // can't happen
+            break;
     }
 }
 
