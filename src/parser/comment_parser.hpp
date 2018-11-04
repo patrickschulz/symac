@@ -15,7 +15,7 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::string, content)
 )
 
-struct comment_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, comment()>
+struct comment_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, comment()>
 {
     typedef std::string::iterator Iterator;
 
@@ -29,7 +29,7 @@ struct comment_parser_type : public qi::grammar<std::string::iterator, qi::ascii
     }
 
     qi::rule<Iterator, std::string()> content;
-    qi::rule<Iterator, qi::ascii::blank_type, comment()> main;
+    qi::rule<Iterator, qi::blank_type, comment()> main;
 
 } comment_parser;
 

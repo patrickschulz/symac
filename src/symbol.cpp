@@ -1,4 +1,4 @@
-#include "stamp.hpp"
+#include "symbol.hpp"
 
 #include <map>
 #include <string>

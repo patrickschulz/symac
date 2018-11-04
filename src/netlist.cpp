@@ -39,6 +39,7 @@ struct netlist_printer_type : public boost::static_visitor<>
 
     void operator() (const comment& c) const
     {
+        (void)c;
         //std::cout << "comment: " << '"' << c.content << '"' << '\n';
     }
 
@@ -59,7 +60,7 @@ void netlist::read(const std::string& filename)
     std::string str = buffer.str();
     auto iter = str.begin();
     std::vector<boost::variant<component, command, comment>> lines;
-    bool r = qi::phrase_parse(iter, str.end(), netlist_parser, qi::ascii::blank, lines);
+    bool r = qi::phrase_parse(iter, str.end(), netlist_parser, qi::blank, lines);
 
     netlist_printer_type visitor(*this);
 

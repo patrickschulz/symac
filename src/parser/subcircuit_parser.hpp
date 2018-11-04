@@ -1,65 +1,39 @@
 #ifndef SUBCIRCUIT_PARSER_HPP
 #define SUBCIRCUIT_PARSER_HPP
 
-#include <boost/fusion/include/adapt_adt.hpp>
-
 #include <string>
-#include <ostream>
+#include <vector>
+
+#include <boost/spirit/include/qi.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 #include "component_parser.hpp"
 
 namespace qi = boost::spirit::qi;
+namespace fu = boost::fusion;
 
-class subcircuit
-{
-    public:
-        friend std::ostream& operator<<(std::ostream& stream, const subcircuit& sc);
-
-        void set_name(const std::string& n)
-        {
-            name = n;
-        }
-
-        const std::string& get_name() const
-        {
-            return name;
-        }
-
-    private:
-        std::string name;
-};
-
-std::ostream& operator<<(std::ostream& stream, const subcircuit& sc)
-{
-    stream << sc.name;
-    return stream;
-}
-
-BOOST_FUSION_ADAPT_ADT(
-    subcircuit,
-    (std::string, const std::string&, obj.get_name(), obj.set_name(val))
-)
-
-struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::ascii::space_type, std::string()>
+struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, fu::vector<std::string, std::vector<std::string>, std::vector<component>>()>
 {
     typedef std::string::iterator Iterator;
 
     subcircuit_parser_type() : subcircuit_parser_type::base_type(main)
     {
         using qi::alnum;
-        using qi::omit;
+        using qi::alpha;
+        using qi::eol;
 
-        name    %= +alnum;
-        header  %= ".subckt" >> name;
-        end      = ".end";
+        name      = alpha >> *alnum;
+        terminal  = alpha >> *alnum;
+        terminals = +terminal;
+        body      = component_parser % eol;
 
-        main    %= header >> name >> end;
+        main      = ".subckt" >> name >> terminals >> eol >> body >> eol >> ".end";
     }
 
-    qi::rule<Iterator> start, end;
-    qi::rule<Iterator, qi::ascii::space_type, std::string()> header;
-    qi::rule<Iterator, std::string()> name;
-    qi::rule<Iterator, qi::ascii::space_type, std::string()> main;
+    qi::rule<Iterator, std::string()> name, terminal;
+    qi::rule<Iterator, qi::blank_type, std::vector<std::string>()> terminals;
+    qi::rule<Iterator, qi::blank_type, std::vector<component>()> body;
+    qi::rule<Iterator, qi::blank_type, fu::vector<std::string, std::vector<std::string>, std::vector<component>>()> main;
 } subcircuit_parser;
 
 #endif // SUBCIRCUIT_PARSER_HPP

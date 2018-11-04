@@ -14,7 +14,7 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::string, content)
 )
 
-struct command_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, command()>
+struct command_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, command()>
 {
     typedef std::string::iterator Iterator;
 
@@ -30,7 +30,7 @@ struct command_parser_type : public qi::grammar<std::string::iterator, qi::ascii
 
     qi::rule<Iterator> identifier;
     qi::rule<Iterator, std::string()> content;
-    qi::rule<Iterator, qi::ascii::blank_type, command()> main;
+    qi::rule<Iterator, qi::blank_type, command()> main;
 } command_parser;
 
 #endif // COMMAND_PARSER_HPP

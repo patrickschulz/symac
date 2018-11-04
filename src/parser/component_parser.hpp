@@ -59,7 +59,7 @@ struct four_terminal_identifier_type : qi::symbols<char, component_types>
     }
 } four_terminal_identifier;
 
-struct component_parser_type : public qi::grammar<std::string::iterator, qi::ascii::blank_type, component()>
+struct component_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, component()>
 {
     typedef std::string::iterator Iterator;
 
@@ -88,9 +88,9 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::asc
     }
 
     qi::rule<Iterator, std::string()> name, terminal, value;
-    qi::rule<Iterator, qi::ascii::blank_type, std::vector<std::string>(int)> terminals;
-    qi::rule<Iterator, qi::ascii::blank_type, component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device;
-    qi::rule<Iterator, qi::ascii::blank_type, component()> main;
+    qi::rule<Iterator, qi::blank_type, std::vector<std::string>(int)> terminals;
+    qi::rule<Iterator, qi::blank_type, component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device;
+    qi::rule<Iterator, qi::blank_type, component()> main;
 } component_parser;
 
 #endif // COMPONENT_PARSER_HPP
