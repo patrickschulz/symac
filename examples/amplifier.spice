@@ -1,4 +1,4 @@
-- MOSFET amplifier
+*- MOSFET amplifier
 .subckt mosfet g s d
 *Cgs g s cgs
 G s d g s gm

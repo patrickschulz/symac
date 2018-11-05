@@ -37,6 +37,11 @@ struct netlist_printer_type : public boost::static_visitor<>
         nlist.add_command(c);
     }
 
+    void operator() (const subcircuit_proxy& s) const
+    {
+        (void)s;
+    }
+
     void operator() (const comment& c) const
     {
         (void)c;
@@ -59,7 +64,7 @@ void netlist::read(const std::string& filename)
 
     std::string str = buffer.str();
     auto iter = str.begin();
-    std::vector<boost::variant<component, command, comment>> lines;
+    std::vector<boost::variant<component, command, comment, subcircuit_proxy>> lines;
     bool r = qi::phrase_parse(iter, str.end(), netlist_parser, qi::blank, lines);
 
     netlist_printer_type visitor(*this);

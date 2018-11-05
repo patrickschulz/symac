@@ -12,7 +12,21 @@
 namespace qi = boost::spirit::qi;
 namespace fu = boost::fusion;
 
-struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, fu::vector<std::string, std::vector<std::string>, std::vector<component>>()>
+struct subcircuit_proxy
+{
+    std::string name;
+    std::vector<std::string> terminals;
+    std::vector<component> components;
+};
+
+BOOST_FUSION_ADAPT_STRUCT(
+    subcircuit_proxy,
+    (std::string, name)
+    (std::vector<std::string>, terminals)
+    (std::vector<component>, components)
+)
+
+struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, subcircuit_proxy()>
 {
     typedef std::string::iterator Iterator;
 
@@ -33,7 +47,7 @@ struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::bl
     qi::rule<Iterator, std::string()> name, terminal;
     qi::rule<Iterator, qi::blank_type, std::vector<std::string>()> terminals;
     qi::rule<Iterator, qi::blank_type, std::vector<component>()> body;
-    qi::rule<Iterator, qi::blank_type, fu::vector<std::string, std::vector<std::string>, std::vector<component>>()> main;
+    qi::rule<Iterator, qi::blank_type, subcircuit_proxy()> main;
 } subcircuit_parser;
 
 #endif // SUBCIRCUIT_PARSER_HPP

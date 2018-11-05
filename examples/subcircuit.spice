@@ -1,0 +1,7 @@
+R1 in out foo
+
+.subckt mosfet p n
+R0 p n R0
+.end
+
+O2 1 2 3
