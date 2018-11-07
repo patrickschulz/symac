@@ -1,6 +1,6 @@
 R1 in out foo
 
-.subckt mosfet p n
+.subckt mosfet g d s
 R0 p n R0
 .end
 

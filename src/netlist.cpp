@@ -39,7 +39,27 @@ struct netlist_printer_type : public boost::static_visitor<>
 
     void operator() (const subcircuit_proxy& s) const
     {
-        (void)s;
+        for(auto t : s.terminals)
+        {
+            std::cout << t << ' ';
+        }
+        std::cout << '\n';
+        for(auto c : s.components)
+        {
+            std::cout << c << '\n';
+        }
+    }
+
+    void operator() (const subcircuit_instance_proxy& s) const
+    {
+        std::cout << "Subcircuit Instance:\n";
+        std::cout << s.name << '\n';
+        std::cout << "Size: " << s.terminals.size() << '\n';
+        for(auto t : s.terminals)
+        {
+            std::cout << t << ' ';
+        }
+        std::cout << '\n';
     }
 
     void operator() (const comment& c) const
@@ -63,7 +83,7 @@ void netlist::read(const std::string& filename)
 
     std::string str = buffer.str();
     auto iter = str.begin();
-    std::vector<boost::variant<component, command, comment, subcircuit_proxy>> lines;
+    std::vector<netlist_attribute_type> lines;
     bool r = qi::phrase_parse(iter, str.end(), netlist_parser, qi::blank, lines);
 
     netlist_printer_type visitor(*this);

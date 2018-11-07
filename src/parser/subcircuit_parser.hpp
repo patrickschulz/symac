@@ -30,7 +30,7 @@ struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::bl
 {
     typedef std::string::iterator Iterator;
 
-    subcircuit_parser_type() : subcircuit_parser_type::base_type(main)
+    subcircuit_parser_type() : subcircuit_parser_type::base_type(main, "subcircuit")
     {
         using qi::alnum;
         using qi::alpha;
@@ -49,5 +49,43 @@ struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::bl
     qi::rule<Iterator, qi::blank_type, std::vector<component>()> body;
     qi::rule<Iterator, qi::blank_type, subcircuit_proxy()> main;
 } subcircuit_parser;
+
+struct subcircuit_instance_proxy
+{
+    std::string name;
+    std::vector<std::string> terminals;
+};
+
+BOOST_FUSION_ADAPT_STRUCT(
+    subcircuit_instance_proxy,
+    (std::string, name)
+    (std::vector<std::string>, terminals)
+)
+
+struct subcircuit_instance_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, subcircuit_instance_proxy()>
+{
+    typedef std::string::iterator Iterator;
+
+    subcircuit_instance_parser_type() : subcircuit_instance_parser_type::base_type(main, "subcircuit_instance")
+    {
+        using qi::alnum;
+        using qi::alpha;
+        using qi::char_;
+        using qi::repeat;
+        using qi::_r1;
+
+        identifier = char_("X");
+        name = alpha >> * alnum;
+        terminal = +(alnum | char_("-:_!"));
+        terminals = repeat(_r1)[terminal];
+
+        main = identifier >> name >> terminals(3);
+    }
+
+    qi::rule<Iterator> identifier;
+    qi::rule<Iterator, std::string()> name, terminal;
+    qi::rule<Iterator, qi::blank_type, std::vector<std::string>(int)> terminals;
+    qi::rule<Iterator, qi::blank_type, subcircuit_instance_proxy()> main;
+} subcircuit_instance_parser;
 
 #endif // SUBCIRCUIT_PARSER_HPP

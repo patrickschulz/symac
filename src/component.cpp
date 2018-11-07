@@ -99,4 +99,10 @@ const GiNaC::symbol& component::get_value() const
     return value;
 }
 
+std::ostream& operator<<(std::ostream& stream, const component& c)
+{
+    stream << c.name << ' ' << c.nodes[0] << ' ' << c.nodes[1] << ' ' << c.value;
+    return stream;
+}
+
 // vim: nowrap
