@@ -45,7 +45,6 @@ struct netlist_printer_type : public boost::static_visitor<>
     void operator() (const comment& c) const
     {
         (void)c;
-        //std::cout << "comment: " << '"' << c.content << '"' << '\n';
     }
 
     netlist& nlist;
