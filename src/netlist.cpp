@@ -3,12 +3,9 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <algorithm>
-#include <regex>
-#include <ginac/ginac.h>
 
-#include "util.hpp"
 #include "symbol.hpp"
+#include "subcircuit.hpp"
 #include "parser/netlist_parser.hpp"
 
 void netlist::add_component(const component& c)

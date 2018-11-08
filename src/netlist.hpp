@@ -5,7 +5,6 @@
 #include <map>
 
 #include "componentlist.hpp"
-#include "subcircuit.hpp"
 #include "command.hpp"
 
 class netlist
@@ -28,10 +27,6 @@ class netlist
         }
 
         operator bool();
-
-        void translate_subcircuit(const std::string& line);
-
-        std::vector<std::string> get_values();
 
     private:
         componentlist components;
