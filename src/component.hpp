@@ -56,6 +56,8 @@ class component
 
         friend std::ostream& operator<<(std::ostream& stream, const component& c);
 
+        bool operator==(component_types) const;
+
     private:
         std::string name;
         component_types type;

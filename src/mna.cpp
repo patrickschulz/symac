@@ -17,7 +17,7 @@ static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
     {
         case ct_resistor:
         case ct_inductor:
-            if(c.get_type() == ct_inductor)
+            if(c == ct_inductor)
             {
                 value = s * value;
             }
@@ -156,11 +156,11 @@ namespace mna {
         unsigned int offset = components.number_of_nodes();
         for(const auto& c : components)
         {
-            if(c.get_type() == ct_voltage_source)
+            if(c == ct_voltage_source)
             {
                 z(offset, 0) += c.get_value();
             }
-            if(c.get_type() == ct_current_source)
+            if(c == ct_current_source)
             {
                 std::vector<unsigned int> nodes = nmap[c.get_nodes()];
                 if(nodes[0] > 0)

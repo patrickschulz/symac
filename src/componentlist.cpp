@@ -39,11 +39,6 @@ unsigned int componentlist::number_of_nodes() const
     return nodes.size();
 }
 
-unsigned int componentlist::number_of_devices(component_types type) const
-{
-    return std::count_if(components.begin(), components.end(), [type] (const component& c) { return c.get_type() & type; });
-}
-
 unsigned int componentlist::network_size() const
 {
     unsigned int num = 0;

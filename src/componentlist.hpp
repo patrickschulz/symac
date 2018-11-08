@@ -15,7 +15,6 @@ class componentlist
         std::vector<std::string> get_nodes() const;
 
         unsigned int number_of_nodes() const;
-        unsigned int number_of_devices(component_types type) const;
         unsigned int network_size() const;
 
         std::vector<component>::const_iterator begin() const;

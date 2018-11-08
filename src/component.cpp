@@ -99,6 +99,11 @@ const GiNaC::symbol& component::get_value() const
     return value;
 }
 
+bool component::operator==(component_types ct) const
+{
+    return type == ct;
+}
+
 std::ostream& operator<<(std::ostream& stream, const component& c)
 {
     stream << c.name << ' ';
