@@ -1,5 +1,6 @@
 * Numeric Test
-I0 vout 0 1
-R0 vout 0 50
+VV0 vin 0 1
+RR1 vin vout 1000
+RR2 vout 0 1000
 
 .print V(vout)

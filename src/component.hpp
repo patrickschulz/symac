@@ -33,7 +33,6 @@ class component
     public:
         component() = default;
         component(const component_proxy& p);
-        component(const std::string& name, component_types type, const std::vector<std::string>& nodes, const GiNaC::symbol& value);
         
         std::string get_name() const;
 
@@ -50,7 +49,7 @@ class component
         const std::vector<std::string>& get_nodes() const;
         void set_nodes(const std::vector<std::string>& nodes);
 
-        const GiNaC::symbol& get_value() const;
+        const GiNaC::ex& get_value() const;
 
         std::string to_string() const;
 
@@ -59,10 +58,12 @@ class component
         bool operator==(component_types) const;
 
     private:
+        component(const std::string& name, component_types type, const std::vector<std::string>& nodes);
+
         std::string name;
         component_types type;
         std::vector<std::string> nodes;
-        GiNaC::symbol value;
+        GiNaC::ex value;
 
         // constant component attributes
         unsigned int mna_size;

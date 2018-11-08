@@ -5,30 +5,20 @@
 #include "symbol.hpp"
 
 component::component(const component_proxy& p) :
-    component(p.name, p.type, p.nodes, get_symbol(p.value))
+    component(p.name, p.type, p.nodes)
 {
-}
-
-/*
- * TODO: this is needed if numeric values should be supported (they should!)
- * However, for this the components need to store a GiNaC::ex, not a GiNaC::symbol as value
-static GiNaC::ex check_and_convert_numeric_symbol(const std::string& v)
-{
-    GiNaC::ex value;
-    if(v.size() > 0 && v.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
+    if(p.value.size() > 0 && p.value.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
     {
-        value = std::stod(v);
+        value = std::stod(p.value);
     }
     else
     {
-        value = get_symbol(v);
+        value = get_symbol(p.value);
     }
-    return value;
 }
-*/
 
-component::component(const std::string& name, component_types type, const std::vector<std::string>& nodes, const GiNaC::symbol& value) :
-    name(name), type(type), nodes(nodes), value(value)
+component::component(const std::string& name, component_types type, const std::vector<std::string>& nodes) :
+    name(name), type(type), nodes(nodes)
 {   
     switch(type)
     {
@@ -94,7 +84,7 @@ void component::set_nodes(const std::vector<std::string>& n)
     nodes = n;
 }
 
-const GiNaC::symbol& component::get_value() const
+const GiNaC::ex& component::get_value() const
 {
     return value;
 }
