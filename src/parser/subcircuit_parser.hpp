@@ -77,9 +77,10 @@ struct subcircuit_instance_parser_type : public qi::grammar<std::string::iterato
         identifier = char_("X");
         name = alpha >> * alnum;
         terminal = +(alnum | char_("-:_!"));
-        terminals = repeat(_r1)[terminal];
+        //terminals = repeat(_r1)[terminal];
+        terminals = +terminal;
 
-        main = identifier >> name >> terminals(3);
+        main = identifier >> name >> terminals(2);
     }
 
     qi::rule<Iterator> identifier;

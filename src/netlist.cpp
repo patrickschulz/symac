@@ -37,29 +37,26 @@ struct netlist_printer_type : public boost::static_visitor<>
         nlist.add_command(c);
     }
 
-    void operator() (const subcircuit_proxy& s) const
+    void operator() (const subcircuit_proxy& s)
     {
-        for(auto t : s.terminals)
-        {
-            std::cout << t << ' ';
-        }
-        std::cout << '\n';
-        for(auto c : s.components)
-        {
-            std::cout << c << '\n';
-        }
+        subcircuits[s.name] = s;
     }
 
-    void operator() (const subcircuit_instance_proxy& s) const
+    void operator() (const subcircuit_instance_proxy& inst)
     {
-        std::cout << "Subcircuit Instance:\n";
-        std::cout << s.name << '\n';
-        std::cout << "Size: " << s.terminals.size() << '\n';
-        for(auto t : s.terminals)
+        subcircuit_proxy proxy = subcircuits[inst.name];
+        subcircuit sub = subcircuit(proxy.name, proxy.terminals);
+        for(const component& c : proxy.components)
         {
-            std::cout << t << ' ';
+            sub.add_component(c);
         }
-        std::cout << '\n';
+        std::vector<component> subcomponents = sub.get_mapped_components(inst.terminals);
+        for(component& c : subcomponents)
+        {
+            std::string instname = "sub";
+            c.name_prepend(instname + "/");
+            nlist.add_component(c);
+        }
     }
 
     void operator() (const comment& c) const
@@ -68,6 +65,7 @@ struct netlist_printer_type : public boost::static_visitor<>
     }
 
     netlist& nlist;
+    std::map<std::string, subcircuit_proxy> subcircuits;
 };
 
 void netlist::read(const std::string& filename)

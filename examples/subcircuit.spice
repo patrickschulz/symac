@@ -1,7 +1,9 @@
-R1 in out foo
-
-.subckt mosfet g d s
-R0 p n R0
+.subckt sub p n
+RR1 p xx R1
+RR2 xx n R2
 .end
 
-O2 1 2 3
+VV0 vin 0 vin
+X sub vin 0
+
+.print all

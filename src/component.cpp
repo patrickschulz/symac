@@ -101,7 +101,12 @@ const GiNaC::symbol& component::get_value() const
 
 std::ostream& operator<<(std::ostream& stream, const component& c)
 {
-    stream << c.name << ' ' << c.nodes[0] << ' ' << c.nodes[1] << ' ' << c.value;
+    stream << c.name << ' ';
+    for(const std::string& n : c.nodes)
+    {
+        stream << n << ' ';
+    }
+    stream << c.value;
     return stream;
 }
 
