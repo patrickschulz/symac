@@ -3,119 +3,94 @@
 
 #include <vector>
 #include <string>
+#include <map>
+
+#include <ginac/ginac.h>
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/fusion/include/vector.hpp>
 
+#include "../component.hpp"
+
 namespace qi = boost::spirit::qi;
 
-enum component_types
-{
-    ct_none                              = 0,
-    ct_resistor                          = 1 << 0,
-    ct_capacitor                         = 1 << 1,
-    ct_inductor                          = 1 << 2,
-    ct_voltage_source                    = 1 << 3,
-    ct_current_source                    = 1 << 4,
-    ct_opamp                             = 1 << 5,
-    ct_voltage_controlled_voltage_source = 1 << 6,
-    ct_current_controlled_voltage_source = 1 << 7,
-    ct_voltage_controlled_current_source = 1 << 8,
-    ct_current_controlled_current_source = 1 << 9
-};
-
-class component
-{
-    public:
-        char type;
-        std::vector<std::string> nodes;
-        std::string value;
-
-        friend std::ostream& operator<<(std::ostream& stream, const component& c);
-};
-
-std::ostream& operator<<(std::ostream& stream, const component& c)
-{
-    stream << c.type << " (" << c.value << ") { ";
-    for(auto n : c.nodes)
-    {
-        stream << n << ' ';
-    }
-    stream << '}';
-    return stream;
-}
-
 BOOST_FUSION_ADAPT_STRUCT(
-    component,
-    (char, type)
+    component_proxy,
+    (component_types, type)
+    (std::string, name)
     (std::vector<std::string>, nodes)
     (std::string, value)
 )
 
-int number(char ct)
+struct two_terminal_identifier_type : qi::symbols<char, component_types>
 {
-    std::map<char, unsigned int> number_of_terminals {
-        { ct_resistor,                          2 },
-        { ct_capacitor,                         2 },
-        { ct_inductor,                          2 },
-        { ct_voltage_source,                    2 },
-        { ct_current_source,                    2 },
-        { ct_opamp,                             3 },
-        { ct_voltage_controlled_voltage_source, 4 },
-        { ct_current_controlled_voltage_source, 4 },
-        { ct_voltage_controlled_current_source, 4 },
-        { ct_current_controlled_current_source, 4 }
-    };
-    return number_of_terminals[ct];
-}
-
-struct component_type_type : qi::symbols<char, char>
-{
-    component_type_type()
+    two_terminal_identifier_type()
     {
         add
-            ("R", 'R')
-            ("C", 'C')
-            ("L", 'L')
-            ("V", 'V')
-            ("I", 'I')
-            ("O", 'O')
-            ("E", 'E')
-            ("F", 'F')
-            ("G", 'G')
-            ("H", 'H')
+            ("R", ct_resistor)
+            ("C", ct_capacitor)
+            ("L", ct_inductor)
+            ("V", ct_voltage_source)
+            ("I", ct_current_source)
         ;
     }
-} component_type;
+} two_terminal_identifier;
 
-struct component_parser_type : public qi::grammar<std::string::iterator, component()>
+struct three_terminal_identifier_type : qi::symbols<char, component_types>
+{
+    three_terminal_identifier_type()
+    {
+        add
+            ("O", ct_opamp)
+        ;
+    }
+} three_terminal_identifier;
+
+struct four_terminal_identifier_type : qi::symbols<char, component_types>
+{
+    four_terminal_identifier_type()
+    {
+        add
+            ("E", ct_voltage_controlled_voltage_source)
+            ("F", ct_current_controlled_voltage_source)
+            ("G", ct_voltage_controlled_current_source)
+            ("H", ct_current_controlled_current_source)
+        ;
+    }
+} four_terminal_identifier;
+
+struct component_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, component()>
 {
     typedef std::string::iterator Iterator;
 
     component_parser_type() : component_parser_type::base_type(main, "component")
     {
-        using qi::omit;
-        using qi::blank;
+        using qi::attr;
         using qi::alnum;
         using qi::char_;
+        using qi::graph;
         using qi::repeat;
         using qi::eol;
+        using qi::_r1;
 
+        name = +graph;
         terminal = +(alnum | char_("-:_!"));
         value    = +(char_ - eol);
+        terminals = repeat(_r1)[terminal];
 
-        two_terminal_device   = char_("RCLVI") >> repeat(2)[omit[+blank] >> terminal] >> omit[+blank] >> value;
-        three_terminal_device = char_("O")     >> repeat(3)[omit[+blank] >> terminal];
-        four_terminal_device  = char_("EFGH")  >> repeat(4)[omit[+blank] >> terminal] >> omit[+blank] >> value;
+        two_terminal_device   = two_terminal_identifier   >> name >> terminals(2) >> value;
+        three_terminal_device = three_terminal_identifier >> name >> terminals(3) >> attr("OPDUMMY");
+        four_terminal_device  = four_terminal_identifier  >> name >> terminals(4) >> value;
 
         main = two_terminal_device   |
                three_terminal_device |
                four_terminal_device;
     }
 
-    qi::rule<Iterator, std::string()> terminal, value;
-    qi::rule<Iterator, component()> two_terminal_device, three_terminal_device, four_terminal_device;
-    qi::rule<Iterator, component()> main;
+    qi::rule<Iterator, std::string()> name, terminal, value;
+    qi::rule<Iterator, qi::blank_type, std::vector<std::string>(int)> terminals;
+    qi::rule<Iterator, qi::blank_type, component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device;
+    qi::rule<Iterator, qi::blank_type, component()> main;
 } component_parser;
 
 #endif // COMPONENT_PARSER_HPP

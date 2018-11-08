@@ -15,23 +15,17 @@ int main(int argc, char** argv)
     {
         std::string filename = commandline_options["netlist"].as<std::string>();
         netlist nlist;
-        auto print_cmds = nlist.read(filename);
+        nlist.read(filename);
         if(nlist)
         {
-            std::vector<std::string> nodes = commandline_options["nodes"].as<std::vector<std::string>>();
             solver S(nlist.get_components());
             S.mna();
             if(commandline_options.count("print"))
             {
                 S.print_matrices();
             }
-            //const std::string mode  = commandline_options["mode"].as<std::string>();
             result res = S.solve();
-            res.print(print_cmds);
-            if(commandline_options.count("matlab_export"))
-            {
-                //res.export_matlab();
-            }
+            res.print(nlist.get_print_cmds());
         }
         else
         {

@@ -1,68 +1,52 @@
 #include "component.hpp"
 
+#include <sstream>
+
 #include "symbol.hpp"
 
-component::component(const std::string& name, char chtype, const std::vector<std::string>& nodes, const GiNaC::ex& value) :
-    name(name), nodes(nodes), value(value)
-{   
-    switch(chtype)
+component::component(const component_proxy& p) :
+    component(p.name, p.type, p.nodes)
+{
+    if(p.value.size() > 0 && p.value.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
     {
-        case 'R':
-            type = ct_resistor;
+        value = std::stod(p.value);
+    }
+    else
+    {
+        value = get_symbol(p.value);
+    }
+}
+
+component::component(const std::string& name, component_types type, const std::vector<std::string>& nodes) :
+    name(name), type(type), nodes(nodes)
+{   
+    switch(type)
+    {
+        case ct_resistor:
+        case ct_capacitor:
+        case ct_inductor:
+        case ct_voltage_source:
+        case ct_current_source:
+        case ct_voltage_controlled_voltage_source:
+        case ct_current_controlled_current_source:
             mna_size = 1;
             terminals.push_back(".p");
             break;
-        case 'C':
-            type = ct_capacitor;
-            mna_size = 1;
-            terminals.push_back(".p");
-            break;
-        case 'L':
-            type = ct_inductor;
-            mna_size = 1;
-            terminals.push_back(".p");
-            break;
-        case 'V':
-            type = ct_voltage_source;
-            mna_size = 1;
-            terminals.push_back(".p");
-            break;
-        case 'I':
-            type = ct_current_source;
-            mna_size = 1;
-            terminals.push_back(".p");
-            break;
-        case 'O':
-            type = ct_opamp;
+        case ct_opamp:
             mna_size = 1;
             terminals.push_back(".out");
             break;
-        case 'E':
-            type = ct_voltage_controlled_voltage_source;
-            mna_size = 1;
-            terminals.push_back(".p");
-            break;
-        case 'F':
-            type = ct_current_controlled_voltage_source;
+        case ct_current_controlled_voltage_source:
             mna_size = 2;
             terminals.push_back(".p");
             terminals.push_back(".cp");
             break;
-        case 'G':
-            type = ct_voltage_controlled_current_source;
+        case ct_voltage_controlled_current_source:
             mna_size = 0;
             break;
-        case 'H':
-            type = ct_current_controlled_current_source;
-            mna_size = 1;
-            terminals.push_back(".p");
+        case ct_none: // can't happen
             break;
     }
-}
-
-component_types component::get_type() const
-{
-    return type;
 }
 
 std::string component::get_name() const
@@ -85,19 +69,40 @@ unsigned int component::element_size() const
     return mna_size;
 }
 
+const component_types& component::get_type() const
+{
+    return type;
+}
+
 const std::vector<std::string>& component::get_nodes() const
 {
     return nodes;
 }
 
-void component::set_nodes(const std::vector<std::string>& nodes)
+void component::set_nodes(const std::vector<std::string>& n)
 {
-    this->nodes = nodes;
+    nodes = n;
 }
 
-GiNaC::ex component::get_value() const
+const GiNaC::ex& component::get_value() const
 {
     return value;
+}
+
+bool component::operator==(component_types ct) const
+{
+    return type == ct;
+}
+
+std::ostream& operator<<(std::ostream& stream, const component& c)
+{
+    stream << c.name << ' ';
+    for(const std::string& n : c.nodes)
+    {
+        stream << n << ' ';
+    }
+    stream << c.value;
+    return stream;
 }
 
 // vim: nowrap

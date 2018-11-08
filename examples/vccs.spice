@@ -1,7 +1,7 @@
-- Voltage controlled voltage source
-V0 vin 0 vin
-R0 vout 0 Ro
-G 0 vout vin 0 gm
+* Voltage controlled voltage source
+VV0 vin 0 vin
+RR0 vout 0 Ro
+GG0 0 vout vin 0 gm
 
 .print V(vout)
 .print I(R0.p)

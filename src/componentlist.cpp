@@ -8,6 +8,14 @@ void componentlist::add_component(const component& c)
     components.push_back(c);
 }
 
+void componentlist::add_component(const std::vector<component>& cv)
+{
+    for(const auto& c : cv)
+    {
+        add_component(c);
+    }
+}
+
 std::vector<std::string> componentlist::get_nodes() const
 {
     std::set<std::string> all_nodes;
@@ -29,11 +37,6 @@ unsigned int componentlist::number_of_nodes() const
 {
     const auto& nodes = get_nodes();
     return nodes.size();
-}
-
-unsigned int componentlist::number_of_devices(component_types type) const
-{
-    return std::count_if(components.begin(), components.end(), [type] (const component& c) { return c.get_type() & type; });
 }
 
 unsigned int componentlist::network_size() const
