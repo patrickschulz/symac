@@ -13,7 +13,7 @@
 namespace qi = boost::spirit::qi;
 namespace fu = boost::fusion;
 
-struct subcircuit_proxy
+struct subcircuit
 {
     std::string name;
     std::vector<std::string> terminals;
@@ -21,13 +21,13 @@ struct subcircuit_proxy
 };
 
 BOOST_FUSION_ADAPT_STRUCT(
-    subcircuit_proxy,
+    subcircuit,
     (std::string, name)
     (std::vector<std::string>, terminals)
     (std::vector<component>, components)
 )
 
-struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, subcircuit_proxy()>
+struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, subcircuit()>
 {
     typedef std::string::iterator Iterator;
 
@@ -51,10 +51,10 @@ struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::bl
     qi::rule<Iterator, qi::blank_type, component()> bodyline;
     qi::rule<Iterator, qi::blank_type, std::vector<component>()> body;
     qi::rule<Iterator, qi::blank_type, std::vector<std::string>()> terminals;
-    qi::rule<Iterator, qi::blank_type, subcircuit_proxy()> main;
+    qi::rule<Iterator, qi::blank_type, subcircuit()> main;
 } subcircuit_parser;
 
-struct subcircuit_instance_proxy
+struct subcircuit_instance
 {
     std::string instance;
     std::string name;
@@ -62,13 +62,13 @@ struct subcircuit_instance_proxy
 };
 
 BOOST_FUSION_ADAPT_STRUCT(
-    subcircuit_instance_proxy,
+    subcircuit_instance,
     (std::string, instance)
     (std::string, name)
     (std::vector<std::string>, terminals)
 )
 
-struct subcircuit_instance_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, subcircuit_instance_proxy()>
+struct subcircuit_instance_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, subcircuit_instance()>
 {
     typedef std::string::iterator Iterator;
 
@@ -90,7 +90,7 @@ struct subcircuit_instance_parser_type : public qi::grammar<std::string::iterato
     qi::rule<Iterator, std::string()> identifier;
     qi::rule<Iterator, std::string()> name, terminal;
     qi::rule<Iterator, qi::blank_type, std::vector<std::string>()> terminals;
-    qi::rule<Iterator, qi::blank_type, subcircuit_instance_proxy()> main;
+    qi::rule<Iterator, qi::blank_type, subcircuit_instance()> main;
 } subcircuit_instance_parser;
 
 #endif // SUBCIRCUIT_PARSER_HPP

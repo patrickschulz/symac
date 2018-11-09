@@ -17,7 +17,7 @@ void netlist::add_command(const command& c)
     commands.push_back(c);
 }
 
-std::vector<component> get_mapped_components(const subcircuit_proxy& sub, const std::string& instance, const std::vector<std::string>& nodes)
+std::vector<component> get_mapped_components(const subcircuit& sub, const std::string& instance, const std::vector<std::string>& nodes)
 {
     // map the subcircuit terminals to the instance terminals
     std::map<std::string, std::string> submap;
@@ -69,14 +69,14 @@ struct netlist_processor_type : public boost::static_visitor<>
         nlist.add_command(c);
     }
 
-    void operator() (const subcircuit_proxy& s)
+    void operator() (const subcircuit& s)
     {
         subcircuits[s.name] = s;
     }
 
-    void operator() (const subcircuit_instance_proxy& inst)
+    void operator() (const subcircuit_instance& inst)
     {
-        subcircuit_proxy sub = subcircuits[inst.name];
+        subcircuit sub = subcircuits[inst.name];
         std::vector<component> subcomponents = get_mapped_components(sub, inst.instance, inst.terminals);
         for(component& c : subcomponents)
         {
@@ -91,7 +91,7 @@ struct netlist_processor_type : public boost::static_visitor<>
     }
 
     netlist& nlist;
-    std::map<std::string, subcircuit_proxy> subcircuits;
+    std::map<std::string, subcircuit> subcircuits;
 };
 
 void netlist::read(const std::string& filename)

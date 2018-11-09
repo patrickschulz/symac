@@ -11,7 +11,7 @@
 
 namespace qi = boost::spirit::qi;
 
-typedef boost::variant<component, command, comment, subcircuit_proxy, subcircuit_instance_proxy> netlist_attribute_type;
+typedef boost::variant<component, command, comment, subcircuit, subcircuit_instance> netlist_attribute_type;
 
 struct netlist_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, std::vector<netlist_attribute_type>()>
 {
