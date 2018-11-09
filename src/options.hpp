@@ -47,6 +47,7 @@ class options
                 ("help,h"    , "produce help message")
                 ("version,v" , "show version")
                 ("print,p"   , "print network matrices")
+                ("reslist,N" , "print resulting netlist (after transformation of subcircuits)")
                 ("language,l", value<std::string>()->default_value("spice"), "select netlist language. Possible values: spice (default), spectre (not implemented)")
                 ("devices,D" , "print information about the usage of all components")
                 ("nosolve,s" , "don't solve the network")

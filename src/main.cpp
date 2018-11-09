@@ -18,6 +18,17 @@ int main(int argc, char** argv)
         nlist.read(filename);
         if(nlist)
         {
+            if(commandline_options.count("reslist"))
+            {
+                std::cout << "Resulting netlist:\n";
+                std::cout << "------------------\n";
+                for(const component& c : nlist.get_components())
+                {
+                    std::cout << c << '\n';
+                }
+                std::cout << "------------------\n";
+            }
+
             solver S(nlist.get_components());
             S.mna();
             if(commandline_options.count("print"))

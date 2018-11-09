@@ -61,11 +61,12 @@ component::component(const std::string& name, component_types type, const std::v
         case ct_none: // can't happen
             break;
     }
+    this->name.insert(0, 1, type_map[type]);
 }
 
 std::string component::get_name() const
 {
-    return type_map[type] + name;
+    return name;
 }
 
 std::vector<std::string> component::get_terminal_names() const

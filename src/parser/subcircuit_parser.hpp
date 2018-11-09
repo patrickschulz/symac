@@ -56,12 +56,14 @@ struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::bl
 
 struct subcircuit_instance_proxy
 {
+    std::string instance;
     std::string name;
     std::vector<std::string> terminals;
 };
 
 BOOST_FUSION_ADAPT_STRUCT(
     subcircuit_instance_proxy,
+    (std::string, instance)
     (std::string, name)
     (std::vector<std::string>, terminals)
 )
@@ -75,21 +77,19 @@ struct subcircuit_instance_parser_type : public qi::grammar<std::string::iterato
         using qi::alnum;
         using qi::alpha;
         using qi::char_;
-        using qi::repeat;
-        using qi::_r1;
+        using qi::omit;
 
-        identifier = char_("X");
-        name = alpha >> * alnum;
+        identifier = omit[char_("X")] >> +alnum;
+        name = alpha >> *alnum;
         terminal = +(alnum | char_("-:_!"));
-        //terminals = repeat(_r1)[terminal];
         terminals = +terminal;
 
-        main = identifier >> name >> terminals(2);
+        main = identifier >> name >> terminals;
     }
 
-    qi::rule<Iterator> identifier;
+    qi::rule<Iterator, std::string()> identifier;
     qi::rule<Iterator, std::string()> name, terminal;
-    qi::rule<Iterator, qi::blank_type, std::vector<std::string>(int)> terminals;
+    qi::rule<Iterator, qi::blank_type, std::vector<std::string>()> terminals;
     qi::rule<Iterator, qi::blank_type, subcircuit_instance_proxy()> main;
 } subcircuit_instance_parser;
 
