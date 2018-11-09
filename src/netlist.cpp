@@ -112,9 +112,8 @@ void netlist::read(const std::string& filename)
 
     netlist_processor_type visitor(*this);
 
-    if (r && iter == str.end())
+    if (r && iter == str.end()) // parse succeeded
     {
-        std::cout << "parse succeeded\n";
         for(auto e : lines)
         {
             apply_visitor(visitor, e);
