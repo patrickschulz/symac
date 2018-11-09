@@ -5,17 +5,18 @@
 
 #include "symbol.hpp"
 
-std::map<component_types, char> type_map {
-    { ct_resistor,                          'R' },
-    { ct_capacitor,                         'C' },
-    { ct_inductor,                          'L' },
-    { ct_voltage_source,                    'V' },
-    { ct_current_source,                    'I' },
-    { ct_opamp,                             'O' },
-    { ct_voltage_controlled_voltage_source, 'E' },
-    { ct_current_controlled_voltage_source, 'F' },
-    { ct_voltage_controlled_current_source, 'G' },
-    { ct_current_controlled_current_source, 'H' }
+std::map<component_types, std::string> type_map {
+    { ct_none,                              "NONE" },
+    { ct_resistor,                          "R"    },
+    { ct_capacitor,                         "C"    },
+    { ct_inductor,                          "L"    },
+    { ct_voltage_source,                    "V"    },
+    { ct_current_source,                    "I"    },
+    { ct_opamp,                             "O"    },
+    { ct_voltage_controlled_voltage_source, "E"    },
+    { ct_current_controlled_voltage_source, "F"    },
+    { ct_voltage_controlled_current_source, "G"    },
+    { ct_current_controlled_current_source, "H"    }
 };
 
 component::component(const component_proxy& p) :
@@ -61,7 +62,7 @@ component::component(const std::string& name, component_types type, const std::v
         case ct_none: // can't happen
             break;
     }
-    this->name.insert(0, 1, type_map[type]);
+    this->name.insert(0, type_map[type]);
 }
 
 std::string component::get_name() const
