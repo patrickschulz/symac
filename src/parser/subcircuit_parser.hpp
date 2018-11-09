@@ -41,14 +41,12 @@ struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::bl
         name      = alpha >> *alnum;
         terminal  = alpha >> *alnum;
         terminals = +terminal;
-        bodyline  = component_parser | omit[comment_parser];
-        body      = bodyline % eol;
+        body      = (component_parser | omit[comment_parser]) % eol;
 
         main      = ".subckt" >> name >> terminals >> eol >> body >> eol >> ".end";
     }
 
     qi::rule<Iterator, std::string()> name, terminal;
-    qi::rule<Iterator, qi::blank_type, component()> bodyline;
     qi::rule<Iterator, qi::blank_type, std::vector<component>()> body;
     qi::rule<Iterator, qi::blank_type, std::vector<std::string>()> terminals;
     qi::rule<Iterator, qi::blank_type, subcircuit()> main;
