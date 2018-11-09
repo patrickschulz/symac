@@ -1,8 +1,22 @@
 #include "component.hpp"
 
 #include <sstream>
+#include <map>
 
 #include "symbol.hpp"
+
+std::map<component_types, char> type_map {
+    { ct_resistor,                          'R' },
+    { ct_capacitor,                         'C' },
+    { ct_inductor,                          'L' },
+    { ct_voltage_source,                    'V' },
+    { ct_current_source,                    'I' },
+    { ct_opamp,                             'O' },
+    { ct_voltage_controlled_voltage_source, 'E' },
+    { ct_current_controlled_voltage_source, 'F' },
+    { ct_voltage_controlled_current_source, 'G' },
+    { ct_current_controlled_current_source, 'H' }
+};
 
 component::component(const component_proxy& p) :
     component(p.name, p.type, p.nodes)
@@ -51,7 +65,7 @@ component::component(const std::string& name, component_types type, const std::v
 
 std::string component::get_name() const
 {
-    return name;
+    return type_map[type] + name;
 }
 
 std::vector<std::string> component::get_terminal_names() const

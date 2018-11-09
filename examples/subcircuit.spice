@@ -1,9 +1,9 @@
 .subckt sub p n
-RR1 p xx R1
-RR2 xx n R2
+* comment
+R2 p n R2
 .end
 
-VV0 vin 0 vin
+V0 vin 0 vin
 X sub vin 0
 
 .print all
