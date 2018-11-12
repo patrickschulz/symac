@@ -72,15 +72,16 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::bla
         using qi::repeat;
         using qi::eol;
         using qi::_r1;
+        using qi::no_skip;
 
         name = +graph;
         terminal = +(alnum | char_("-:_!"));
         value    = +(char_ - eol);
         terminals = repeat(_r1)[terminal];
 
-        two_terminal_device   = two_terminal_identifier   >> name >> terminals(2) >> value;
-        three_terminal_device = three_terminal_identifier >> name >> terminals(3) >> attr("OPDUMMY");
-        four_terminal_device  = four_terminal_identifier  >> name >> terminals(4) >> value;
+        two_terminal_device   = two_terminal_identifier   >> no_skip[name] >> terminals(2) >> value;
+        three_terminal_device = three_terminal_identifier >> no_skip[name] >> terminals(3) >> attr("OPDUMMY");
+        four_terminal_device  = four_terminal_identifier  >> no_skip[name] >> terminals(4) >> value;
 
         main = two_terminal_device   |
                three_terminal_device |
