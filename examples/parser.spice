@@ -1,7 +1,7 @@
-R in out R0
-G 1 2 3 4 gm
-O 1 2 3
+R0 in out R0
+G0 1 2 3 4 gm
+O0 1 2 3
 
 * comment with several words
 
-.print foo
+.print all
