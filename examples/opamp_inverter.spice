@@ -1,7 +1,7 @@
-- Opamp inverter
+* Opamp inverter
 V0 vin 0 Vin
-R1 vin vx R1
-R2 vx vout R2
+Rf vin vx Rf
+Rfb vx vout Rfb
 Op 0 vx vout
 
-.print all
+.print V(vout) / V(vin)

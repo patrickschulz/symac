@@ -11,8 +11,20 @@ namespace qi = boost::spirit::qi;
 
 BOOST_FUSION_ADAPT_STRUCT(
     command,
+    (command_type, type)
     (std::string, content)
 )
+
+struct command_type_parser_type : qi::symbols<char, command_type>
+{
+    command_type_parser_type()
+    {
+        add
+            (".print"  , com_print)
+            (".replace", com_replace)
+        ;
+    }
+} command_type_parser;
 
 struct command_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, command()>
 {
@@ -22,13 +34,14 @@ struct command_parser_type : public qi::grammar<std::string::iterator, qi::blank
     {
         using qi::char_;
         using qi::eol;
+        using qi::lit;
 
-        identifier = ".print";
+        identifier = command_type_parser;
         content = +(char_ - eol);
         main = identifier >> content;
     }
 
-    qi::rule<Iterator> identifier;
+    qi::rule<Iterator, command_type()> identifier;
     qi::rule<Iterator, std::string()> content;
     qi::rule<Iterator, qi::blank_type, command()> main;
 } command_parser;

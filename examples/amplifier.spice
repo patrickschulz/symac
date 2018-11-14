@@ -7,7 +7,7 @@ Rro d s ro
 
 VV0 vinx 0 vin
 RV0 vinx vin Rs
-X mosfet vin 0 vout
+X0 mosfet vin 0 vout
 
 *.print all
 .print V(vout)

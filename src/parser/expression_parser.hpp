@@ -1,3 +1,6 @@
+#ifndef EXPRESSION_PARSER_HPP
+#define EXPRESSION_PARSER_HPP
+
 #include <boost/spirit/include/qi.hpp>
 #include <boost/variant/recursive_variant.hpp>
 #include <boost/variant/apply_visitor.hpp>
@@ -151,3 +154,5 @@ struct symbolic_calculator : qi::grammar<Iterator, ast::expression(), qi::blank_
     qi::rule<Iterator, ast::operand(), qi::blank_type> factor;
     qi::rule<Iterator, std::string()> identifier;
 };
+
+#endif // EXPRESSION_PARSER_HPP
