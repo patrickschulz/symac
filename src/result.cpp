@@ -6,6 +6,8 @@
 
 #include "component.hpp"
 
+#include "parser/expression_parser.hpp"
+
 result::result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap)
 {
     // parse results and store all in the results map
