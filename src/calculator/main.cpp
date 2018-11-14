@@ -17,7 +17,7 @@ namespace ast
 
     typedef boost::variant<
             nil
-          , double
+          , std::string
           , boost::recursive_wrapper<signed_>
           , boost::recursive_wrapper<program>
         >
@@ -62,15 +62,54 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 namespace ast
 {
-    ///////////////////////////////////////////////////////////////////////////
-    //  The AST evaluator
-    ///////////////////////////////////////////////////////////////////////////
+    struct printer
+    {
+        typedef void result_type;
+
+        void operator()(nil) const { std::cout << "nil"; }
+        void operator()(const std::string& s) const { std::cout << s; }
+
+        void operator()(operation const& x) const
+        {
+            boost::apply_visitor(*this, x.operand_);
+            switch (x.operator_)
+            {
+                case '+': std::cout << " add"; break;
+                case '-': std::cout << " sub"; break;
+                case '*': std::cout << " mult"; break;
+                case '/': std::cout << " div"; break;
+            }
+        }
+
+        void operator()(signed_ const& x) const
+        {
+            boost::apply_visitor(*this, x.operand_);
+            switch (x.sign)
+            {
+                case '-': std::cout << " neg"; break;
+                case '+': std::cout << " pos"; break;
+            }
+        }
+
+        void operator()(program const& x) const
+        {
+            boost::apply_visitor(*this, x.first);
+            BOOST_FOREACH(operation const& oper, x.rest)
+            {
+                std::cout << ' ';
+                (*this)(oper);
+            }
+        }
+    };
+
     struct eval
     {
         typedef double result_type;
 
         double operator()(nil) const { BOOST_ASSERT(0); return 0; }
         double operator()(double n) const { return n; }
+
+        double operator()(const std::string& s) const { return 1.0; }
 
         double operator()(operation const& x, double lhs) const
         {
@@ -111,7 +150,7 @@ namespace ast
 }
 
 template <typename Iterator>
-struct symbolic_calculator : qi::grammar<Iterator, qi::blank_type>
+struct symbolic_calculator : qi::grammar<Iterator, ast::program(), qi::blank_type>
 {
     symbolic_calculator() : symbolic_calculator::base_type(expression)
     {
@@ -143,10 +182,10 @@ struct symbolic_calculator : qi::grammar<Iterator, qi::blank_type>
         identifier = alpha >> *alnum;
     }
 
-    qi::rule<Iterator, qi::blank_type> expression;
-    qi::rule<Iterator, qi::blank_type> term;
-    qi::rule<Iterator, qi::blank_type> factor;
-    qi::rule<Iterator> identifier;
+    qi::rule<Iterator, ast::program(), qi::blank_type> expression;
+    qi::rule<Iterator, ast::program(), qi::blank_type> term;
+    qi::rule<Iterator, ast::operand(), qi::blank_type> factor;
+    qi::rule<Iterator, std::string()> identifier;
 };
 
 int main()
@@ -157,8 +196,8 @@ int main()
     std::cout << "Type an expression...or [q or Q] to quit\n\n";
 
     typedef std::string::const_iterator iterator_type;
-    typedef calculator<iterator_type> calculator;
     typedef ast::program ast_program;
+    typedef ast::printer ast_print;
     typedef ast::eval ast_eval;
 
     std::string str;
@@ -167,9 +206,9 @@ int main()
         if (str.empty() || str[0] == 'q' || str[0] == 'Q')
             break;
 
-        calculator calc;
         symbolic_calculator<iterator_type> symcalc;
         ast_program program;
+        ast_print print;
         ast_eval eval;
 
         std::string::const_iterator iter = str.begin();
@@ -180,6 +219,7 @@ int main()
         {
             std::cout << "-------------------------\n";
             std::cout << "Parsing succeeded\n";
+            print(program);
             //std::cout << "\nResult: " << eval(program) << std::endl;
             std::cout << "-------------------------\n";
         }
