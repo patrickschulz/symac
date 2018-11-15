@@ -1,11 +1,11 @@
-.subckt sub p n
-R1 p !out R1
-R2 !out n R2
-R3 p !0 R3
+.subckt sub p n out
+R1 p out R1
+R2 out n R2
 .end
 
 V0 vin 0 vin
-Xsub sub vin 0
+Xsub sub vin 0 vout
 
 *.print all
-.print V(!out)
+.print V(vin) / V(vout)
+.print V(vin)

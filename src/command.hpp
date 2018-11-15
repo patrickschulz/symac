@@ -6,6 +6,7 @@
 enum command_type
 {
     com_print,
+    com_printlatex,
     com_replace
 };
 

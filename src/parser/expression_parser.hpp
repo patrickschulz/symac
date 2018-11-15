@@ -74,9 +74,17 @@ namespace ast
     {
         typedef GiNaC::ex result_type;
 
+        eval(const std::map<std::string, GiNaC::ex>& m) :
+            resultmap(m)
+        { }
+
         result_type operator()(nil) const { BOOST_ASSERT(0); return 0; }
 
-        result_type operator()(const std::string& s) const { return get_symbol(s); }
+        result_type operator()(const std::string& s) const 
+        {
+            auto it = resultmap.find(s);
+            return it->second;
+        }
 
         result_type operator()(operation const& x, result_type lhs) const
         {
@@ -113,13 +121,14 @@ namespace ast
             }
             return state;
         }
+
+        const std::map<std::string, GiNaC::ex>& resultmap;
     };
 }
 
-template <typename Iterator>
-struct symbolic_calculator : qi::grammar<Iterator, ast::expression(), qi::blank_type>
+struct symbolic_expression_type : qi::grammar<std::string::iterator, ast::expression(), qi::blank_type>
 {
-    symbolic_calculator() : symbolic_calculator::base_type(expression)
+    symbolic_expression_type() : symbolic_expression_type::base_type(expression)
     {
         using qi::char_;
         using qi::alpha;
@@ -146,13 +155,13 @@ struct symbolic_calculator : qi::grammar<Iterator, ast::expression(), qi::blank_
             |   (char_('+') >> factor)
             ;
 
-        identifier = alpha >> *alnum;
+        identifier = "V(" >> alpha >> *alnum >> ")";
     }
 
-    qi::rule<Iterator, ast::expression(), qi::blank_type> expression;
-    qi::rule<Iterator, ast::expression(), qi::blank_type> term;
-    qi::rule<Iterator, ast::operand(), qi::blank_type> factor;
-    qi::rule<Iterator, std::string()> identifier;
-};
+    qi::rule<std::string::iterator, ast::expression(), qi::blank_type> expression;
+    qi::rule<std::string::iterator, ast::expression(), qi::blank_type> term;
+    qi::rule<std::string::iterator, ast::operand(), qi::blank_type> factor;
+    qi::rule<std::string::iterator, std::string()> identifier;
+} symbolic_expression;
 
 #endif // EXPRESSION_PARSER_HPP

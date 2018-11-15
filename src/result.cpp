@@ -38,90 +38,32 @@ void result::print_all() const
     }
 }
 
-void result::print_voltage(const std::string& voltage) const
-{
-    auto it = resultmap.find(voltage);
-    std::cout << "V(" << voltage << ")";
-    if(it != resultmap.end())
-    {
-        std::cout << " = " << it->second << '\n';
-    }
-    else
-    {
-        std::cout << " not found\n";
-    }
-}
-
-void result::print_voltage(const std::string& voltage1, const std::string& voltage2) const
-{
-    auto it1 = resultmap.find(voltage1);
-    auto it2 = resultmap.find(voltage2);
-    std::cout << voltage1 << " - " << voltage2 << " = " << it1->second - it2->second << '\n';
-}
-
-void result::print_current(const std::string& device) const
-{
-    auto it = resultmap.find(device);
-    std::cout << "I(" << device << ")";
-    if(it != resultmap.end())
-    {
-        std::cout << " = " << it->second << '\n';
-    }
-    else
-    {
-        std::cout << " not found\n";
-    }
-}
-
-void result::print_helper(const std::string& p) const
-{
-    char domain = p[0];
-    std::string symbol = p.substr(2, p.size() - 3);
-    if(domain == 'V')
-    {
-        print_voltage(symbol);
-    }
-    else
-    {
-        print_current(symbol);
-    }
-}
-
-
 void result::print(const std::vector<command>& print_cmd) const
 {
     std::cout << GiNaC::csrc;
-    for(const command& cmd : print_cmd)
+    for(command cmd : print_cmd)
     {
-        if(cmd.content == "all")
+        ast::expression expression;
+        ast::eval eval(resultmap);
+
+        phrase_parse(cmd.content.begin(), cmd.content.end(), symbolic_expression, qi::blank, expression);
+        std::cout << eval(expression) << '\n';
+
+        /*
+        if (r)
         {
-            print_all();
+            std::cout << "-------------------------\n";
+            std::cout << "Parsing succeeded\n";
+            std::cout << "\nResult: " << eval(expression) << std::endl;
+            std::cout << "-------------------------\n";
         }
         else
         {
-            std::istringstream stream(cmd.content);
-            std::vector<std::string> entries;
-            std::string tmp;
-            while(stream >> tmp)
-            {
-                entries.push_back(tmp);
-            }
-            if(entries.size() > 1)
-            {
-                std::string op1 = entries[0].substr(2, entries[0].size() - 3);
-                std::string op2 = entries[2].substr(2, entries[2].size() - 3);
-                auto it1 = resultmap.find(op1);
-                auto it2 = resultmap.find(op2);
-                GiNaC::ex res = it1->second / it2->second;
-                res = res.expand();
-                res = res.normal();
-                std::cout << res << '\n';
-            }
-            else
-            {
-                print_helper(cmd.content);
-            }
+            std::cout << "-------------------------\n";
+            std::cout << "Parsing failed\n";
+            std::cout << "-------------------------\n";
         }
+        */
     }
 }
 

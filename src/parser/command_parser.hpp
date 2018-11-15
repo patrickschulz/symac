@@ -21,6 +21,7 @@ struct command_type_parser_type : qi::symbols<char, command_type>
     {
         add
             (".print"  , com_print)
+            (".printl" , com_printlatex)
             (".replace", com_replace)
         ;
     }
