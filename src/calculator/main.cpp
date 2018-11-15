@@ -156,7 +156,7 @@ struct symbolic_calculator : qi::grammar<Iterator, ast::program(), qi::blank_typ
             |   (char_('+') >> factor)
             ;
 
-        identifier = alpha >> *alnum;
+        identifier = "V(" >> alpha >> *alnum >> ")";
     }
 
     qi::rule<Iterator, ast::program(), qi::blank_type> expression;
