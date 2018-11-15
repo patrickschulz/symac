@@ -172,12 +172,14 @@ struct symbolic_expression_type : qi::grammar<std::string::iterator, ast::expres
         using qi::char_;
         using qi::alpha;
         using qi::alnum;
+        using qi::lit;
 
         expression =
             term
             >> *(   (char_('+') >> term)
                 |   (char_('-') >> term)
                 )
+            >> qi::eoi
             ;
 
         term =
@@ -194,13 +196,14 @@ struct symbolic_expression_type : qi::grammar<std::string::iterator, ast::expres
             |   (char_('+') >> factor)
             ;
 
-        identifier = "V(" >> alpha >> *alnum >> ")";
+        voltage = "V(" >> alpha >> *alnum >> ")";
+        current = "I(" >> alpha >> *alnum >> char_(".") >> alpha >> *alnum >> ")";
+        identifier = current | voltage;
     }
 
-    qi::rule<std::string::iterator, ast::expression(), qi::blank_type> expression;
-    qi::rule<std::string::iterator, ast::expression(), qi::blank_type> term;
+    qi::rule<std::string::iterator, ast::expression(), qi::blank_type> expression, term;
     qi::rule<std::string::iterator, ast::operand(), qi::blank_type> factor;
-    qi::rule<std::string::iterator, std::string()> identifier;
+    qi::rule<std::string::iterator, std::string()> voltage, current, identifier;
 } symbolic_expression;
 
 #endif // EXPRESSION_PARSER_HPP
