@@ -59,6 +59,16 @@ struct four_terminal_identifier_type : qi::symbols<char, component_types>
     }
 } four_terminal_identifier;
 
+struct port_identifier_type : qi::symbols<char, component_types>
+{
+    port_identifier_type()
+    {
+        add
+            ("P", ct_port)
+        ;
+    }
+} port_identifier;
+
 struct component_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, component()>
 {
     typedef std::string::iterator Iterator;
@@ -82,15 +92,17 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::bla
         two_terminal_device   = two_terminal_identifier   >> no_skip[name] >> terminals(2) >> value;
         three_terminal_device = three_terminal_identifier >> no_skip[name] >> terminals(3) >> attr("OPDUMMY");
         four_terminal_device  = four_terminal_identifier  >> no_skip[name] >> terminals(4) >> value;
+        port                  = port_identifier           >> no_skip[name] >> terminals(2) >> attr("PORTDUMMY");
 
         main = two_terminal_device   |
                three_terminal_device |
-               four_terminal_device;
+               four_terminal_device  |
+               port                  ;
     }
 
     qi::rule<Iterator, std::string()> name, terminal, value;
     qi::rule<Iterator, qi::blank_type, std::vector<std::string>(int)> terminals;
-    qi::rule<Iterator, qi::blank_type, component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device;
+    qi::rule<Iterator, qi::blank_type, component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device, port;
     qi::rule<Iterator, qi::blank_type, component()> main;
 } component_parser;
 

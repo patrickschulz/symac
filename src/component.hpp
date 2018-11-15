@@ -17,7 +17,8 @@ enum component_types
     ct_voltage_controlled_voltage_source = 1 << 6,
     ct_current_controlled_voltage_source = 1 << 7,
     ct_voltage_controlled_current_source = 1 << 8,
-    ct_current_controlled_current_source = 1 << 9
+    ct_current_controlled_current_source = 1 << 9,
+    ct_port                              = 1 << 10
 };
 
 struct component_proxy

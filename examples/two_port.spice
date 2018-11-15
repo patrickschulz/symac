@@ -1,0 +1,11 @@
+Gm 0 vout vin 0 gm
+Rout vout 0 rout
+Cgs vin 0 Cgs
+Vin vin 0 vin
+P1 vin 0
+P2 vout 0
+
+*.print Z(1, 1)
+*.print Z(1, 2)
+*.print Z(2, 1)
+*.print Z(2, 2)

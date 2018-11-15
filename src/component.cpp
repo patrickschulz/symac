@@ -16,7 +16,8 @@ std::map<component_types, std::string> type_map {
     { ct_voltage_controlled_voltage_source, "E"    },
     { ct_current_controlled_voltage_source, "F"    },
     { ct_voltage_controlled_current_source, "G"    },
-    { ct_current_controlled_current_source, "H"    }
+    { ct_current_controlled_current_source, "H"    },
+    { ct_port                             , "P"    }
 };
 
 component::component(const component_proxy& p) :
@@ -59,6 +60,8 @@ component::component(const std::string& name, component_types type, const std::v
         case ct_voltage_controlled_current_source:
             mna_size = 0;
             break;
+        case ct_port: // TODO
+            mna_size = 0;
         case ct_none: // can't happen
             break;
     }
