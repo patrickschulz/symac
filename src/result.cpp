@@ -30,40 +30,31 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
     // TODO: fill the result map with the remaining terminal currents
 }
 
-void result::print_all() const
-{
-    for(auto entry : resultmap)
-    {
-        std::cout << entry.first << " = " << entry.second << '\n';
-    }
-}
-
 void result::print(const std::vector<command>& print_cmd) const
 {
     std::cout << GiNaC::csrc;
     for(command cmd : print_cmd)
     {
         ast::expression expression;
-        ast::eval eval(resultmap);
 
-        phrase_parse(cmd.content.begin(), cmd.content.end(), symbolic_expression, qi::blank, expression);
-        std::cout << eval(expression) << '\n';
-
-        /*
+        bool r = phrase_parse(cmd.content.begin(), cmd.content.end(), symbolic_expression, qi::blank, expression);
         if (r)
         {
-            std::cout << "-------------------------\n";
-            std::cout << "Parsing succeeded\n";
-            std::cout << "\nResult: " << eval(expression) << std::endl;
-            std::cout << "-------------------------\n";
+            ast::checker checker(resultmap);
+            if(checker(expression))
+            {
+                ast::eval eval(resultmap);
+                std::cout << eval(expression) << '\n';
+            }
+            else
+            {
+                std::cerr << "expression " << '"' <<  cmd.content << '"' << " contains unknown symbols\n";
+            }
         }
         else
         {
-            std::cout << "-------------------------\n";
-            std::cout << "Parsing failed\n";
-            std::cout << "-------------------------\n";
+            std::cerr << "could not parse expression " << '"' << cmd.content << '"' << '\n';
         }
-        */
     }
 }
 

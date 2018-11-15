@@ -70,6 +70,45 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 namespace ast
 {
+    struct checker
+    {
+        checker(const std::map<std::string, GiNaC::ex>& m) :
+            resultmap(m)
+        { }
+
+        bool operator()(nil) const { BOOST_ASSERT(0); return 0; }
+
+        bool operator()(const std::string& s) const 
+        {
+            auto it = resultmap.find(s);
+            return it != resultmap.end();
+        }
+
+        bool operator()(operation const& x, bool lhs) const
+        {
+            bool rhs = boost::apply_visitor(*this, x.operand_);
+            return lhs && rhs;
+        }
+
+        bool operator()(signed_ const& x) const
+        {
+            bool rhs = boost::apply_visitor(*this, x.operand_);
+            return rhs;
+        }
+
+        bool operator()(expression const& x) const
+        {
+            bool state = boost::apply_visitor(*this, x.first);
+            BOOST_FOREACH(operation const& oper, x.rest)
+            {
+                state = (*this)(oper, state);
+            }
+            return state;
+        }
+
+        const std::map<std::string, GiNaC::ex>& resultmap;
+    };
+
     struct eval
     {
         typedef GiNaC::ex result_type;

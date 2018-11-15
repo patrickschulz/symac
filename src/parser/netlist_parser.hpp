@@ -25,7 +25,7 @@ struct netlist_parser_type : public qi::grammar<std::string::iterator, qi::blank
                subcircuit_parser            | 
                subcircuit_instance_parser;
 
-        main = (-line % qi::eol) >> qi::eoi;
+        main = -line % qi::eol >> qi::eoi;
     }
 
     qi::rule<Iterator, qi::blank_type, netlist_attribute_type()> line;
