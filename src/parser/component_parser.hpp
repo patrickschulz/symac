@@ -78,13 +78,12 @@ struct component_parser_type : public qi::grammar<std::string::iterator, qi::bla
         using qi::attr;
         using qi::alnum;
         using qi::char_;
-        using qi::graph;
         using qi::repeat;
         using qi::eol;
         using qi::_r1;
         using qi::no_skip;
 
-        name = +graph;
+        name = +alnum;
         terminal = +(alnum | char_("-:_!"));
         value    = +(char_ - eol);
         terminals = repeat(_r1)[terminal];

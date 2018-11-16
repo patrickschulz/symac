@@ -8,3 +8,4 @@ Xsub sub vin 0 vout
 
 .print V(vin) / V(vout)
 .print V(vin)
+.print I(V0.p)

@@ -196,8 +196,8 @@ struct symbolic_expression_type : qi::grammar<std::string::iterator, ast::expres
             |   (char_('+') >> factor)
             ;
 
-        voltage = "V(" >> alpha >> *alnum >> ")";
-        current = "I(" >> alpha >> *alnum >> char_(".") >> alpha >> *alnum >> ")";
+        voltage = "V(" >> +(alnum | char_("-:_!")) >> ")";
+        current = "I(" >> +alnum >> char_(".") >> +alpha >> ")";
         identifier = current | voltage;
     }
 

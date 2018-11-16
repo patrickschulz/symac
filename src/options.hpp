@@ -52,9 +52,6 @@ class options
                 ("devices,D" , "print information about the usage of all components")
                 ("nosolve,s" , "don't solve the network")
                 ("report,r"  , "create a report")
-                ("mode,m"    , value<std::string>()->default_value("ac"), "simulation mode (possible values: ac (default), sp (S-Parameters), tf (transfer function)")
-                ("nodes"     , value<std::vector<std::string>>()->multitoken()->default_value(std::vector<std::string>{}, ""), "Nodes for transfer function")
-                ("result"    , "which results should be shown? (show all if none are given)")
                 ("matlab"    , value<std::string>(), "export results to MatLab, specify filename")
                 ;
 

@@ -21,8 +21,6 @@ Here is a list of stuff i want to implement, in no particular order:
     - plot tool to show (qualitively) how the result behaves with regard to frequency/component values/...
         This of course needs numeric values as start, here one could work with a bunch of default values (say the gate cap is always around this value...)
     
-    - Implement transfer functions for all voltage nodes but also for all currents so that impedances are possible too
-
     - Implement S-parameter simulation
 
     - Enhance readability of output, similar perhaps to sympy. Also improve (and implement correctly) the latex report, because this provides the best output.
