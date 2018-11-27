@@ -4,10 +4,9 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/variant.hpp>
 
-#include "component_parser.hpp"
-#include "command_parser.hpp"
-#include "comment_parser.hpp"
-#include "subcircuit_parser.hpp"
+#include "../comment.hpp"
+#include "../subcircuit.hpp"
+#include "../command.hpp"
 
 namespace qi = boost::spirit::qi;
 

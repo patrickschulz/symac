@@ -1,14 +1,11 @@
 #ifndef COMMENT_PARSER_HPP
 #define COMMENT_PARSER_HPP
 
+#include "../comment.hpp"
+
 #include <boost/spirit/include/qi.hpp>
 
 namespace qi = boost::spirit::qi;
-
-struct comment
-{
-    std::string content;
-};
 
 BOOST_FUSION_ADAPT_STRUCT(
     comment,
