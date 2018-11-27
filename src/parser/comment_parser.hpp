@@ -19,18 +19,12 @@ struct comment_parser_type : public qi::grammar<std::string::iterator, comment()
 {
     typedef std::string::iterator Iterator;
 
-    comment_parser_type() : comment_parser_type::base_type(main, "comment")
-    {
-        using qi::char_;
-        using qi::eol;
-
-        content = *(char_ - eol);
-        main = "*" >> content;
-    }
+    comment_parser_type();
 
     qi::rule<Iterator, std::string()> content;
     qi::rule<Iterator, comment()> main;
 
-} comment_parser;
+};
+extern comment_parser_type comment_parser;
 
 #endif // COMMENT_PARSER_HPP

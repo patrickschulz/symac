@@ -15,21 +15,12 @@ typedef boost::variant<component, command, comment, subcircuit, subcircuit_insta
 
 struct netlist_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, std::vector<netlist_attribute_type>()>
 {
-    typedef std::string::iterator Iterator;
+    netlist_parser_type();
 
-    netlist_parser_type() : netlist_parser_type::base_type(main, "netlist")
-    {
-        line = component_parser             | 
-               command_parser               |  
-               comment_parser               | 
-               subcircuit_parser            | 
-               subcircuit_instance_parser;
+    qi::rule<std::string::iterator, qi::blank_type, netlist_attribute_type()> line;
+    qi::rule<std::string::iterator, qi::blank_type, std::vector<netlist_attribute_type>()> main;
+};
 
-        main = -line % qi::eol >> qi::eoi;
-    }
-
-    qi::rule<Iterator, qi::blank_type, netlist_attribute_type()> line;
-    qi::rule<Iterator, qi::blank_type, std::vector<netlist_attribute_type>()> main;
-} netlist_parser;
+extern netlist_parser_type netlist_parser;
 
 #endif // NETLIST_PARSER_HPP
