@@ -1,0 +1,5 @@
+I0 vin 0 iin
+
+R0 vin 0 k * T * gm
+
+.print V(vin)

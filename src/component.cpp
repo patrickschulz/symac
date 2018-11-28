@@ -4,6 +4,7 @@
 #include <map>
 
 #include "symbol.hpp"
+#include "parser/expression_parser.hpp"
 
 std::map<component_types, std::string> type_map {
     { ct_none,                              "NONE" },
@@ -20,17 +21,42 @@ std::map<component_types, std::string> type_map {
     { ct_port                             , "P"    }
 };
 
-component::component(const component_proxy& p) :
-    component(p.name, p.type, p.nodes)
+GiNaC::ex convert_symbol(const std::string& s)
 {
-    if(p.value.size() > 0 && p.value.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
+    if(s.size() > 0 && s.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
     {
-        value = std::stod(p.value);
+        return std::stod(s);
     }
     else
     {
-        value = get_symbol(p.value);
+        return get_symbol(s);
     }
+}
+
+GiNaC::ex convert_expression(std::string s)
+{
+    qi::rule<std::string::iterator, std::string()> identifier = +(qi::char_ - qi::blank);
+    symbolic_expression_type symbolic_expression(identifier);
+
+    ast::expression expression;
+
+    bool r = phrase_parse(s.begin(), s.end(), symbolic_expression, qi::blank, expression);
+    if (r)
+    {
+        ast::eval eval(convert_symbol);
+        return eval(expression);
+    }
+    else
+    {
+        std::cerr << "could not parse expression " << '"' << s << '"' << '\n';
+    }
+    return GiNaC::ex();
+}
+
+component::component(const component_proxy& p) :
+    component(p.name, p.type, p.nodes)
+{
+    value = convert_expression(p.value);
 }
 
 component::component(const std::string& name, component_types type, const std::vector<std::string>& nodes) :

@@ -91,6 +91,7 @@ static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
             stmp.write(offset, nodes[3], -1);
             stmp.write(nodes[3], offset, -1);
             break;
+        //case ct_port:
         case ct_none:
         case ct_current_source:
             // suppress warning

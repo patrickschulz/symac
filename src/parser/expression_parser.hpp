@@ -80,21 +80,23 @@ namespace ast
         bool operator()(signed_ const& x) const;
         bool operator()(expression const& x) const;
 
-        const std::map<std::string, GiNaC::ex>& resultmap;
+        const std::map<std::string, GiNaC::ex>& symbolmap;
     };
 
     struct eval
     {
         typedef GiNaC::ex result_type;
 
-        eval(const std::map<std::string, GiNaC::ex>& m);
+        //eval(const std::map<std::string, GiNaC::ex>& m);
+        eval(std::function<GiNaC::ex(const std::string&)> f);
         result_type operator()(nil) const;
         result_type operator()(const std::string& s) const;
         result_type operator()(operation const& x, result_type lhs) const;
         result_type operator()(signed_ const& x) const;
         result_type operator()(expression const& x) const;
 
-        const std::map<std::string, GiNaC::ex>& resultmap;
+        //const std::map<std::string, GiNaC::ex>& symbolmap;
+        const std::function<GiNaC::ex(const std::string&)> symbolfunc;
     };
 }
 
@@ -106,7 +108,5 @@ struct symbolic_expression_type : qi::grammar<std::string::iterator, ast::expres
     qi::rule<std::string::iterator, ast::operand(), qi::blank_type> factor;
     qi::rule<std::string::iterator, std::string()> identifier;
 };
-
-extern symbolic_expression_type symbolic_expression;
 
 #endif // EXPRESSION_PARSER_HPP

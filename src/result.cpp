@@ -5,8 +5,22 @@
 #include <boost/format.hpp>
 
 #include "component.hpp"
-
 #include "parser/expression_parser.hpp"
+
+struct get_quantity_
+{
+    get_quantity_(const std::map<std::string, GiNaC::ex>& m) :
+        resultmap(m)
+    { }
+
+    GiNaC::ex operator()(const std::string& s)
+    {
+        auto it = resultmap.find(s);
+        return it->second;
+    }
+
+    const std::map<std::string, GiNaC::ex> resultmap;
+};
 
 result::result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap)
 {
@@ -35,6 +49,12 @@ void result::print(const std::vector<command>& print_cmd) const
     std::cout << GiNaC::csrc;
     for(command cmd : print_cmd)
     {
+        // create the expression parser
+        qi::rule<std::string::iterator, std::string()> voltage = "V(" >> +(qi::alnum | qi::char_("-:_!")) >> ")";
+        qi::rule<std::string::iterator, std::string()> current = "I(" >> +qi::alnum >> qi::char_(".") >> +qi::alpha >> ")";
+        qi::rule<std::string::iterator, std::string()> identifier = voltage | current;
+        symbolic_expression_type symbolic_expression(identifier);
+
         ast::expression expression;
 
         bool r = phrase_parse(cmd.content.begin(), cmd.content.end(), symbolic_expression, qi::blank, expression);
@@ -43,7 +63,8 @@ void result::print(const std::vector<command>& print_cmd) const
             ast::checker checker(resultmap);
             if(checker(expression))
             {
-                ast::eval eval(resultmap);
+                get_quantity_ get_quantity(resultmap);
+                ast::eval eval(get_quantity);
                 std::cout << eval(expression) << '\n';
             }
             else

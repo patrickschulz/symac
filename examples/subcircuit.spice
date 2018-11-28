@@ -6,6 +6,4 @@
 V0 vin 0 vin
 Xsub sub vin 0 vout
 
-.print V(vin) / V(vout)
-.print V(vin)
-.print I(V0.p)
+.print V(vout) / V(vin)
