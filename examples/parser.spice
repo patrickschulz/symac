@@ -1,9 +1,8 @@
+simulator lang=spectre
+
 R0 in out R0
 G0 1 2 3 4 gm
 O0 1 2 3
 
 * comment with several words
-
-.print all
-
-.replace gm = A0 / rout
+// spectre-type comment

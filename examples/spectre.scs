@@ -1,0 +1,18 @@
+// Generated for: spectre
+// Generated on: Sep 30 16:11:38 2008
+// Design library name: test
+// Design cell name: Inverter
+// Design view name: schematic
+simulator lang=spectre
+global vss vdd
+
+// Library name: test
+// Cell name: Inverter
+// View name: schematic
+subckt Inverter ip_inv op_inv
+    R0 (net16 op_inv) resistor r=100.0m m=1
+    R1 (op_inv net17) resistor r=100.0m m=1
+    M0 (net17 ip_inv vss vss) Nch w=15u l=0.35u m=1 region=triode
+    M1 (net16 ip_inv vdd vdd) Pch w=20u l=0.35u m=1 region=triode
+ends Inverter
+// End of subcircuit definition.

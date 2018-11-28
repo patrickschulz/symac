@@ -17,6 +17,8 @@ struct netlist_parser_type : public qi::grammar<std::string::iterator, qi::blank
     netlist_parser_type();
 
     qi::rule<std::string::iterator, qi::blank_type, netlist_attribute_type()> line;
+    qi::rule<std::string::iterator, qi::blank_type> language;
+    qi::rule<std::string::iterator, std::string()> simulator_string;
     qi::rule<std::string::iterator, qi::blank_type, std::vector<netlist_attribute_type>()> main;
 };
 

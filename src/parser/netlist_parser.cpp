@@ -5,14 +5,24 @@
 #include "comment_parser.hpp"
 #include "subcircuit_parser.hpp"
 
+#include <iostream>
+
+void simulator(const std::string& s)
+{
+    std::cout << s << '\n';
+}
 
 netlist_parser_type::netlist_parser_type() : netlist_parser_type::base_type(main, "netlist")
 {
-    line = component_parser             | 
-           command_parser               |  
-           comment_parser               | 
-           subcircuit_parser            | 
+    line = qi::omit[language]             |
+           component_parser               | 
+           command_parser                 |  
+           comment_parser                 | 
+           subcircuit_parser              | 
            subcircuit_instance_parser;
+
+    language = qi::lit("simulator") >> qi::lit("lang") >> qi::lit("=") >> simulator_string[&simulator];
+    simulator_string = +qi::alpha;
 
     main = -line % qi::eol >> qi::eoi;
 }
