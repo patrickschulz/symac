@@ -5,30 +5,44 @@
 #include "comment_parser.hpp"
 #include "subcircuit_parser.hpp"
 
-#include <iostream>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
 
-void simulator(const std::string& s)
+namespace bp = boost::phoenix;
+
+netlist_parser_type::netlist_parser_type() : 
+    netlist_parser_type::base_type(main, "netlist"),
+    local(&spice)
 {
-    std::cout << s << '\n';
-}
+    using qi::lit;
+    using qi::omit;
+    using qi::_1;
+    using qi::lazy;
 
-netlist_parser_type::netlist_parser_type() : netlist_parser_type::base_type(main, "netlist")
-{
-    line = qi::omit[language]             |
-           component_parser               | 
-           command_parser                 |  
-           comment_parser                 | 
-           subcircuit_parser              | 
-           subcircuit_instance_parser;
+    spice = component_parser            | 
+            command_parser              |  
+            comment_parser              | 
+            subcircuit_parser           | 
+            subcircuit_instance_parser;
 
-    //language = qi::lit("simulator") >> qi::lit("lang") >> qi::lit("=") >> simulator_string[&simulator];
+    spectre = component_parser            | 
+              command_parser              |  
+              comment_parser              | 
+              subcircuit_parser           | 
+              subcircuit_instance_parser;
 
-    language.add
-        ("spectre", &spectre_line)
-        ("spice", &spice_line)
+    switch_map.add
+        ("spice",  &spice)
+        ("spectre", &spectre)
         ;
+    switch_rule = lit("simulator") >> lit("lang") >> lit("=") >> switch_map;
 
-    main = -line % qi::eol >> qi::eoi;
+    main = -(
+                omit[switch_rule[bp::ref(local) = _1]] | 
+                lazy(*bp::ref(local))
+            ) % qi::eol 
+        >> qi::eoi
+        ;
 }
 
 netlist_parser_type netlist_parser;

@@ -7,7 +7,6 @@
 #include "parser/expression_parser.hpp"
 
 std::map<component_types, std::string> type_map {
-    { ct_none,                              "NONE" },
     { ct_resistor,                          "R"    },
     { ct_capacitor,                         "C"    },
     { ct_inductor,                          "L"    },
@@ -88,8 +87,6 @@ component::component(const std::string& name, component_types type, const std::v
             break;
         case ct_port: // TODO
             mna_size = 0;
-        case ct_none: // can't happen
-            break;
     }
     this->name.insert(0, type_map[type]);
 }
