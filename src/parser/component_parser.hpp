@@ -7,12 +7,11 @@
 
 #include <ginac/ginac.h>
 
-#include <boost/spirit/include/qi.hpp>
 #include <boost/fusion/include/vector.hpp>
 
 #include "../component.hpp"
 
-namespace qi = boost::spirit::qi;
+#include "parser_common.hpp"
 
 BOOST_FUSION_ADAPT_STRUCT(
     component_proxy,
@@ -22,16 +21,14 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::string, value)
 )
 
-struct component_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, component()>
+struct component_parser_type : public qi::grammar<Iterator, Skipper_type, component()>
 {
-    typedef std::string::iterator Iterator;
-
     component_parser_type();
 
     qi::rule<Iterator, std::string()> name, terminal, value;
-    qi::rule<Iterator, qi::blank_type, std::vector<std::string>(int)> terminals;
-    qi::rule<Iterator, qi::blank_type, component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device, port;
-    qi::rule<Iterator, qi::blank_type, component()> main;
+    qi::rule<Iterator, Skipper_type, std::vector<std::string>(int)> terminals;
+    qi::rule<Iterator, Skipper_type, component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device, port;
+    qi::rule<Iterator, Skipper_type, component()> main;
 };
 
 extern component_parser_type component_parser;

@@ -15,7 +15,7 @@
 
 #include "../symbol.hpp"
 
-namespace qi = boost::spirit::qi;
+#include "parser_common.hpp"
 
 namespace ast
 {
@@ -100,13 +100,13 @@ namespace ast
     };
 }
 
-struct symbolic_expression_type : qi::grammar<std::string::iterator, ast::expression(), qi::blank_type>
+struct symbolic_expression_type : qi::grammar<Iterator, ast::expression(), Skipper_type>
 {
-    symbolic_expression_type(const qi::rule<std::string::iterator, std::string()> idf);
+    symbolic_expression_type(const qi::rule<Iterator, std::string()> idf);
 
-    qi::rule<std::string::iterator, ast::expression(), qi::blank_type> expression, term;
-    qi::rule<std::string::iterator, ast::operand(), qi::blank_type> factor;
-    qi::rule<std::string::iterator, std::string()> identifier;
+    qi::rule<Iterator, ast::expression(), Skipper_type> expression, term;
+    qi::rule<Iterator, ast::operand(), Skipper_type> factor;
+    qi::rule<Iterator, std::string()> identifier;
 };
 
 #endif // EXPRESSION_PARSER_HPP

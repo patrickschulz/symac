@@ -5,6 +5,8 @@
 
 #include <boost/spirit/include/qi.hpp>
 
+#include "parser_common.hpp"
+
 namespace qi = boost::spirit::qi;
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -12,10 +14,8 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::string, content)
 )
 
-struct comment_parser_type : public qi::grammar<std::string::iterator, comment()>
+struct comment_parser_type : public qi::grammar<Iterator, comment()>
 {
-    typedef std::string::iterator Iterator;
-
     comment_parser_type();
 
     qi::rule<Iterator, std::string()> content;

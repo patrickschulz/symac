@@ -11,8 +11,9 @@
 #include "component_parser.hpp"
 #include "comment_parser.hpp"
 
+#include "parser_common.hpp"
+
 namespace qi = boost::spirit::qi;
-namespace fu = boost::fusion;
 
 BOOST_FUSION_ADAPT_STRUCT(
     subcircuit,
@@ -21,10 +22,8 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::vector<component>, components)
 )
 
-struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, subcircuit()>
+struct subcircuit_parser_type : public qi::grammar<Iterator, Skipper_type, subcircuit()>
 {
-    typedef std::string::iterator Iterator;
-
     subcircuit_parser_type() : subcircuit_parser_type::base_type(main, "subcircuit")
     {
         using qi::alnum;
@@ -41,9 +40,9 @@ struct subcircuit_parser_type : public qi::grammar<std::string::iterator, qi::bl
     }
 
     qi::rule<Iterator, std::string()> name, terminal;
-    qi::rule<Iterator, qi::blank_type, std::vector<component>()> body;
-    qi::rule<Iterator, qi::blank_type, std::vector<std::string>()> terminals;
-    qi::rule<Iterator, qi::blank_type, subcircuit()> main;
+    qi::rule<Iterator, Skipper_type, std::vector<component>()> body;
+    qi::rule<Iterator, Skipper_type, std::vector<std::string>()> terminals;
+    qi::rule<Iterator, Skipper_type, subcircuit()> main;
 } subcircuit_parser;
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -53,7 +52,7 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::vector<std::string>, terminals)
 )
 
-struct subcircuit_instance_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, subcircuit_instance()>
+struct subcircuit_instance_parser_type : public qi::grammar<std::string::iterator, Skipper_type, subcircuit_instance()>
 {
     typedef std::string::iterator Iterator;
 
@@ -74,8 +73,8 @@ struct subcircuit_instance_parser_type : public qi::grammar<std::string::iterato
 
     qi::rule<Iterator, std::string()> identifier;
     qi::rule<Iterator, std::string()> name, terminal;
-    qi::rule<Iterator, qi::blank_type, std::vector<std::string>()> terminals;
-    qi::rule<Iterator, qi::blank_type, subcircuit_instance()> main;
+    qi::rule<Iterator, Skipper_type, std::vector<std::string>()> terminals;
+    qi::rule<Iterator, Skipper_type, subcircuit_instance()> main;
 } subcircuit_instance_parser;
 
 #endif // SUBCIRCUIT_PARSER_HPP

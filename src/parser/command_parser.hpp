@@ -7,6 +7,8 @@
 
 #include "../command.hpp"
 
+#include "parser_common.hpp"
+
 namespace qi = boost::spirit::qi;
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -15,13 +17,13 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::string, content)
 )
 
-struct command_parser_type : public qi::grammar<std::string::iterator, qi::blank_type, command()>
+struct command_parser_type : public qi::grammar<Iterator, Skipper_type, command()>
 {
     command_parser_type();
 
-    qi::rule<std::string::iterator, command_type()> identifier;
-    qi::rule<std::string::iterator, std::string()> content;
-    qi::rule<std::string::iterator, qi::blank_type, command()> main;
+    qi::rule<Iterator, command_type()> identifier;
+    qi::rule<Iterator, std::string()> content;
+    qi::rule<Iterator, Skipper_type, command()> main;
 };
 
 extern command_parser_type command_parser;
