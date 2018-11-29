@@ -64,8 +64,10 @@ component::component(const std::string& name, component_types type, const std::v
     switch(type)
     {
         case ct_resistor:
-        case ct_capacitor:
         case ct_inductor:
+            //mna_size = 0; // <---- use for G-matrix-based approach
+            //break;
+        case ct_capacitor:
         case ct_voltage_source:
         case ct_current_source:
         case ct_voltage_controlled_voltage_source:

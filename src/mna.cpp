@@ -21,6 +21,13 @@ static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
             {
                 value = s * value;
             }
+            // G-matrix-based
+            /*
+            stmp.write(nodes[0], nodes[0], 1/value);
+            stmp.write(nodes[1], nodes[1], 1/value);
+            stmp.write(nodes[0], nodes[1], -1/value);
+            stmp.write(nodes[1], nodes[0], -1/value);
+            */
             // impedance-based
             stmp.write(offset, nodes[0], 1);
             stmp.write(nodes[0], offset, 1);
