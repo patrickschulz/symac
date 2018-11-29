@@ -22,7 +22,10 @@ class sum
 
 std::ostream& operator<<(std::ostream& stream, const sum& s)
 {
-    stream << '(';
+    if(s.vec.size() > 1)
+    {
+        stream << '(';
+    }
     for(unsigned int i = 0; i < s.vec.size(); ++i)
     {
         stream << s.vec[i];
@@ -31,7 +34,10 @@ std::ostream& operator<<(std::ostream& stream, const sum& s)
             stream << " + ";
         }
     }
-    stream << ')';
+    if(s.vec.size() > 1)
+    {
+        stream << ')';
+    }
     return stream;
 }
 

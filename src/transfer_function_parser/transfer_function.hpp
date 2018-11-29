@@ -95,6 +95,24 @@ class transfer_function
             }
         }
 
+        transfer_function(const polynom& num, const polynom& den) :
+            numerator(num), denominator(den)
+        { }
+
+        transfer_function low_frequency()
+        {
+            polynom num = numerator.select_monoms(0);
+            polynom den = denominator.select_monoms(0);
+            return transfer_function(num, den);
+        }
+
+        transfer_function high_frequency()
+        {
+            polynom num = numerator.select_monoms(numerator.degree());
+            polynom den = denominator.select_monoms(denominator.degree());
+            return transfer_function(num, den);
+        }
+
         friend std::ostream& operator<<(std::ostream& stream, const transfer_function& tf);
 
     private:

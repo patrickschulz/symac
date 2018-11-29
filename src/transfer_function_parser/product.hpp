@@ -13,9 +13,11 @@ class product
     public:
         product() :
             prefix(1)
-        {
+        { }
 
-        }
+        product(int i) :
+            prefix(GiNaC::numeric(i))
+        { }
 
         void add_factor(const GiNaC::symbol& sym)
         {

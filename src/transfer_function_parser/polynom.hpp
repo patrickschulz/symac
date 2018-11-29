@@ -6,8 +6,13 @@
 #include "sspace_symbols.hpp"
 #include "sum.hpp"
 
-struct polelement
+struct monom
 {
+    monom() : valid(false)
+    { }
+
+    //monom(
+
     std::vector<sum> sums;
     bool valid;
 };
@@ -15,10 +20,16 @@ struct polelement
 class polynom
 {
     public:
-        void add_sum(const sum& p, unsigned int degree)
+        void set_monom(const monom& m, unsigned int degree)
         {
             vec.resize(degree + 1);
-            vec[degree].sums.push_back(p);
+            vec[degree] = m;
+        }
+
+        void add_sum(const sum& s, unsigned int degree)
+        {
+            vec.resize(degree + 1);
+            vec[degree].sums.push_back(s);
             vec[degree].valid = true;
         }
 
@@ -27,10 +38,22 @@ class polynom
             return vec.size() - 1;
         }
 
+        monom get_monom(unsigned int degree)
+        {
+            return vec[degree];
+        }
+
+        polynom select_monoms(unsigned int degree)
+        {
+            polynom pol;
+            pol.set_monom(get_monom(degree), degree);
+            return pol;
+        }
+
         friend std::ostream& operator<<(std::ostream& stream, const polynom& p);
 
     private:
-        std::vector<polelement> vec;
+        std::vector<monom> vec;
 };
 
 std::ostream& operator<<(std::ostream& stream, const polynom& p)
@@ -39,7 +62,18 @@ std::ostream& operator<<(std::ostream& stream, const polynom& p)
     {
         if(p.vec[i].valid)
         {
-            stream << "s^" << i << " * ";
+            if(i > 0)
+            {
+                if(i > 1)
+                {
+                    stream << "s^" << i;
+                }
+                else
+                {
+                    stream << s;
+                }
+                stream << " * ";
+            }
             if(p.vec[i].sums.size() > 1)
             {
                 stream << '(';
