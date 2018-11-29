@@ -21,8 +21,12 @@ netlist_parser_type::netlist_parser_type() : netlist_parser_type::base_type(main
            subcircuit_parser              | 
            subcircuit_instance_parser;
 
-    language = qi::lit("simulator") >> qi::lit("lang") >> qi::lit("=") >> simulator_string[&simulator];
-    simulator_string = +qi::alpha;
+    //language = qi::lit("simulator") >> qi::lit("lang") >> qi::lit("=") >> simulator_string[&simulator];
+
+    language.add
+        ("spectre", &spectre_line)
+        ("spice", &spice_line)
+        ;
 
     main = -line % qi::eol >> qi::eoi;
 }
