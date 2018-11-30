@@ -12,6 +12,7 @@ class componentlist
         void add_component(const component& c);
         void add_component(const std::vector<component>& cv);
 
+        std::vector<component> get_components_by_type(component_types ct) const;
         std::vector<std::string> get_nodes() const;
 
         unsigned int number_of_nodes() const;

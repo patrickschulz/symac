@@ -1,11 +1,15 @@
-Gm 0 vout vin 0 gm
-Rout vout 0 rout
-Cgs vin 0 Cgs
-Vin vin 0 vin
-P1 vin 0
-P2 vout 0
+R1 v1 v1cp z11
+F1 v1cn 0 v2cp v2cn z12
+R2 v2 v2cp z22
+F2 v2cn 0 v1cp v1cn z21
 
-*.print Z(1, 1)
-*.print Z(1, 2)
-*.print Z(2, 1)
-*.print Z(2, 2)
+P1 v1 0
+P2 v2 0
+
+*V1 v1 0 v1
+*.print V(v1) / -I(V1.p)
+*.print V(v2) / -I(V1.p)
+
+*V2 v2 0 v2
+*.print V(v1) / -I(V2.p)
+*.print V(v2) / -I(V2.p)

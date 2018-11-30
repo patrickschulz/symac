@@ -16,7 +16,7 @@ class netlist
         void add_component(const component& c);
         void add_command(const command& c);
 
-        const componentlist& get_components() const
+        componentlist& get_components() 
         {
             return components;
         }

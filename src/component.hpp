@@ -39,6 +39,8 @@ class component
 {
     public:
         component() = default;
+        component(const component&) = default;
+
         component(const spice_component_proxy& p);
         component(const spectre_component_proxy& p);
         
@@ -52,12 +54,14 @@ class component
         unsigned int element_size() const;
 
         // getter and setter
-        const component_types& get_type() const;
+        component_types get_type() const;
+        void set_type(component_types ct);
 
         const std::vector<std::string>& get_nodes() const;
         void set_nodes(const std::vector<std::string>& nodes);
 
         const GiNaC::ex& get_value() const;
+        void set_value(const GiNaC::ex& e);
 
         std::string to_string() const;
 

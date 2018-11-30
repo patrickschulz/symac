@@ -29,7 +29,6 @@ int main(int argc, char** argv)
             }
 
             solver S(nlist.get_components());
-            S.mna();
             if(commandline_options.count("print"))
             {
                 S.print_matrices();

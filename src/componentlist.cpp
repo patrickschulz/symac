@@ -16,6 +16,19 @@ void componentlist::add_component(const std::vector<component>& cv)
     }
 }
 
+std::vector<component> componentlist::get_components_by_type(component_types ct) const
+{
+    std::vector<component> subset;
+    for(const component& c : components)
+    {
+        if(c.get_type() == ct)
+        {
+            subset.push_back(c);
+        }
+    }
+    return subset;
+}
+
 std::vector<std::string> componentlist::get_nodes() const
 {
     std::set<std::string> all_nodes;
