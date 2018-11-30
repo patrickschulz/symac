@@ -20,6 +20,8 @@ result solver::solve()
 {
     // n-port 
     std::vector<component> ports = components.get_components_by_type(ct_port);
+    component_types active_port = ct_voltage_source;
+    component_types inactive_port = ct_current_source;
     if(ports.size() > 0)
     {
         GiNaC::matrix port_matrix(ports.size(), ports.size());
@@ -31,29 +33,29 @@ result solver::solve()
                 if(j != i)
                 {
                     component c = ports[i];
-                    c.set_type(ct_current_source);
+                    c.set_type(inactive_port);
                     c.set_value(0);
                     components_tmp.add_component(c);
                 }
             }
             component p = ports[i];
-            p.set_type(ct_voltage_source);
-            p.set_value(get_symbol("VPORT"));
+            p.set_type(active_port);
+            p.set_value(get_symbol("PORT"));
             components_tmp.add_component(p);
             // create matrices and solve
             GiNaC::matrix A = mna::create_A_matrix(nmap, components_tmp);
             GiNaC::matrix x = mna::create_x_vector(components_tmp);
             GiNaC::matrix z = mna::create_z_vector(nmap, components_tmp);
             GiNaC::matrix res = A.solve(x, z, GiNaC::solve_algo::gauss);
-            // print matrices and result
-            //print_network_matrices(A, x, z);
             for(unsigned int j = 0; j < ports.size(); ++j)
             {
                 component pp = ports[j];
-                unsigned int vindex = nmap[pp.get_nodes()[0]];
-                unsigned int iindex = components_tmp.network_size();
-                //std::cout << res(vindex - 1, 0) / -res(iindex - 1, 0) << '\n';
-                port_matrix(j, i) = res(vindex - 1, 0) / -res(iindex - 1, 0);
+                unsigned int numindex = nmap[pp.get_nodes()[0]];
+                unsigned int denindex = components_tmp.network_size();
+                // Y-matrix
+                //numindex = components_tmp.network_size();
+                //denindex = nmap[pp.get_nodes()[0]];
+                port_matrix(j, i) = res(numindex - 1, 0) / -res(denindex - 1, 0);
             }
         }
         std::cout << port_matrix << '\n';

@@ -1,0 +1,8 @@
+Gm 0 vout vin 0 gm
+Rout vout 0 rout
+
+V0 vin 0 0
+
+In vout 0 noise=1
+
+.print V(vout)

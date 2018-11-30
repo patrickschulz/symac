@@ -34,7 +34,7 @@ GiNaC::ex convert_symbol(const std::string& s)
 
 GiNaC::ex convert_expression(std::string s)
 {
-    qi::rule<std::string::iterator, std::string()> identifier = +(qi::char_ - qi::blank);
+    qi::rule<std::string::iterator, std::string()> identifier = +qi::alnum;
     symbolic_expression_type symbolic_expression(identifier);
 
     ast::expression expression;
