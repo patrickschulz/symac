@@ -9,17 +9,7 @@
 
 #include <boost/fusion/include/vector.hpp>
 
-#include "../component.hpp"
-
 #include "parser_common.hpp"
-
-BOOST_FUSION_ADAPT_STRUCT(
-    component_proxy,
-    (component_types, type)
-    (std::string, name)
-    (std::vector<std::string>, nodes)
-    (std::string, value)
-)
 
 struct component_parser_type : public qi::grammar<Iterator, Skipper_type, component()>
 {
@@ -27,7 +17,7 @@ struct component_parser_type : public qi::grammar<Iterator, Skipper_type, compon
 
     qi::rule<Iterator, std::string()> name, terminal, value;
     qi::rule<Iterator, Skipper_type, std::vector<std::string>(int)> terminals;
-    qi::rule<Iterator, Skipper_type, component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device, port;
+    qi::rule<Iterator, Skipper_type, spice_component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device, port;
     qi::rule<Iterator, Skipper_type, component()> main;
 };
 

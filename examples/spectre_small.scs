@@ -1,0 +1,5 @@
+simulator lang=spectre
+R0 (net1 0) resistor r=1K
+
+simulator lang = spice
+R1 net1 0 R1

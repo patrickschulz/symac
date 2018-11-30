@@ -1,18 +1,32 @@
 // Generated for: spectre
-// Generated on: Sep 30 16:11:38 2008
-// Design library name: test
-// Design cell name: Inverter
+// Generated on: Nov 30 13:34:23 2018
+// Design library name: testing
+// Design cell name: netlist
 // Design view name: schematic
 simulator lang=spectre
-global vss vdd
+global 0
+include "/home/tech/GF/GF22FDX/Models/Spectre/models/design_wrapper.lib.scs" section=tt_pre
 
-// Library name: test
-// Cell name: Inverter
+// Library name: testing
+// Cell name: netlist
 // View name: schematic
-subckt Inverter ip_inv op_inv
-    R0 (net16 op_inv) resistor r=100.0m m=1
-    R1 (op_inv net17) resistor r=100.0m m=1
-    M0 (net17 ip_inv vss vss) Nch w=15u l=0.35u m=1 region=triode
-    M1 (net16 ip_inv vdd vdd) Pch w=20u l=0.35u m=1 region=triode
-ends Inverter
-// End of subcircuit definition.
+R0 (net1 0) resistor r=1K
+C0 (net1 0) capacitor c=1p
+L0 (net1 0) inductor l=1n
+E0 (net1 0 0 0) vcvs gain=1.0
+H0 (net1 0) ccvs rm=1.0
+G0 (net1 0 0 0) vccs gm=1.0
+F0 (net1 0) cccs gain=1.0
+V0 (net1 0) vsource type=dc
+I0 (net1 0) isource type=dc
+simulatorOptions options reltol=1e-3 vabstol=1e-6 iabstol=1e-12 temp=27 \
+    tnom=27 scalem=1.0 scale=1.0 gmin=1e-12 rforce=1 maxnotes=5 maxwarns=5 \
+    digits=5 cols=80 pivrel=1e-3 sensfile="../psf/sens.output" \
+    checklimitdest=psf 
+modelParameter info what=models where=rawfile
+element info what=inst where=rawfile
+outputParameter info what=output where=rawfile
+designParamVals info what=parameters where=rawfile
+primitives info what=primitives where=rawfile
+subckts info what=subckts where=rawfile
+saveOptions options save=allpub

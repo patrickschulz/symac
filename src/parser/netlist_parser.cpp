@@ -1,6 +1,7 @@
 #include "netlist_parser.hpp"
 
 #include "component_parser.hpp"
+#include "spectre_component_parser.hpp"
 #include "command_parser.hpp"
 #include "comment_parser.hpp"
 #include "subcircuit_parser.hpp"
@@ -25,7 +26,7 @@ netlist_parser_type::netlist_parser_type() :
             subcircuit_parser           | 
             subcircuit_instance_parser;
 
-    spectre = component_parser            | 
+    spectre = spectre_component_parser    | 
               command_parser              |  
               comment_parser              | 
               subcircuit_parser           | 

@@ -52,7 +52,13 @@ GiNaC::ex convert_expression(std::string s)
     return GiNaC::ex();
 }
 
-component::component(const component_proxy& p) :
+component::component(const spice_component_proxy& p) :
+    component(p.name, p.type, p.nodes)
+{
+    value = convert_expression(p.value);
+}
+
+component::component(const spectre_component_proxy& p) :
     component(p.name, p.type, p.nodes)
 {
     value = convert_expression(p.value);

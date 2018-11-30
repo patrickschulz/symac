@@ -20,7 +20,14 @@ enum component_types
     ct_port                              = 1 << 10
 };
 
-struct component_proxy
+struct spice_component_proxy
+{
+    component_types type;
+    std::string name;
+    std::vector<std::string> nodes;
+    std::string value;
+};
+struct spectre_component_proxy
 {
     component_types type;
     std::string name;
@@ -32,7 +39,8 @@ class component
 {
     public:
         component() = default;
-        component(const component_proxy& p);
+        component(const spice_component_proxy& p);
+        component(const spectre_component_proxy& p);
         
         std::string get_name() const;
 
