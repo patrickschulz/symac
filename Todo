@@ -1,28 +1,7 @@
-Here is a list of stuff i want to implement, in no particular order:
-    - implement a better lexer/parser
-        This is needed to implement more features into the netlist parser, for example to read result printing statements or also support spectre netlists
-
-    - implement n-port simulations, Z, Y, H, S, ...
-        This needs a generic port component which defines the port of the circuit. This then can be accordingly used.
-
-    - implement noise simulations
-        Currently i have no idea on this, this could use the port component of the n-port simulations.
-
-    - simplification of terms with approximate value, e.g.:
-        set prop a > c
-        set prop a > d
-        set prop b > c
-        set prop b > d
-        x = a * b + c * d
-         => x == a * b
-        This is easy to resolve since we have the product of two big numbers and the product of two small numbers. This becomes harder if we mix individual terms. 
-        This will need some kind of level of aggresiveness.
-
-    - plot tool to show (qualitively) how the result behaves with regard to frequency/component values/...
-        This of course needs numeric values as start, here one could work with a bunch of default values (say the gate cap is always around this value...)
-    
-    - Implement S-parameter simulation
-
-    - Enhance readability of output, similar perhaps to sympy. Also improve (and implement correctly) the latex report, because this provides the best output.
-
-    - Add a utility to generate matlab/octave files in order to postprocess the results.
+[ ] Support n-port parameters (Z, Y, S, ABCD, ...)
+[ ] Fully support spectre netlists
+[ ] Implement Noise simulations
+[ ] Integrate simplification from Jan, improve
+[ ] Enhance readability of output, similar perhaps to sympy. Also improve (and implement correctly) the latex report, because this provides the best output.
+[ ] Add a utility to generate matlab/octave files in order to postprocess the results.
+[ ] plot tool to show (qualitively) how the result behaves with regard to frequency/component values/...
