@@ -16,51 +16,74 @@ solver::solver(componentlist& components) :
 
 void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, const GiNaC::matrix& z);
 
-result solver::solve()
+result solver::solve(solver_mode mode)
 {
-    // n-port 
-    std::vector<component> ports = components.get_components_by_type(ct_port);
-    component_types active_port = ct_voltage_source;
-    component_types inactive_port = ct_current_source;
-    if(ports.size() > 0)
+    switch(mode)
     {
-        GiNaC::matrix port_matrix(ports.size(), ports.size());
-        for(unsigned int i = 0; i < ports.size(); ++i)
+        case solve_nport:
         {
-            componentlist components_tmp(components);
-            for(unsigned int j = 0; j < ports.size(); ++j)
+            std::vector<component> ports = components.get_components_by_type(ct_port);
+            component_types active_port = ct_voltage_source;
+            component_types inactive_port = ct_current_source;
+            if(ports.size() > 0)
             {
-                if(j != i)
+                GiNaC::matrix port_matrix(ports.size(), ports.size());
+                for(unsigned int i = 0; i < ports.size(); ++i)
                 {
-                    component c = ports[i];
-                    c.set_type(inactive_port);
-                    c.set_value(0);
-                    components_tmp.add_component(c);
+                    componentlist components_tmp(components);
+                    for(unsigned int j = 0; j < ports.size(); ++j)
+                    {
+                        if(j != i)
+                        {
+                            component c = ports[i];
+                            c.set_type(inactive_port);
+                            c.set_value(0);
+                            components_tmp.add_component(c);
+                        }
+                    }
+                    component p = ports[i];
+                    p.set_type(active_port);
+                    p.set_value(get_symbol("PORT"));
+                    components_tmp.add_component(p);
+                    // create matrices and solve
+                    GiNaC::matrix A = mna::create_A_matrix(nmap, components_tmp);
+                    GiNaC::matrix x = mna::create_x_vector(components_tmp);
+                    GiNaC::matrix z = mna::create_z_vector(nmap, components_tmp);
+                    GiNaC::matrix res = A.solve(x, z, GiNaC::solve_algo::gauss);
+                    for(unsigned int j = 0; j < ports.size(); ++j)
+                    {
+                        component pp = ports[j];
+                        //unsigned int numindex = nmap[pp.get_nodes()[0]];
+                        unsigned int denindex = components_tmp.network_size();
+                        GiNaC::ex numerator = get_symbol("PORT");
+                        GiNaC::ex denominator = -res(denindex - 1, 0);
+                        // Y-matrix
+                        //numindex = components_tmp.network_size();
+                        //denindex = nmap[pp.get_nodes()[0]];
+                        port_matrix(j, i) = res(numindex - 1, 0) / -res(denindex - 1, 0);
+                    }
                 }
+                std::cout << port_matrix << '\n';
             }
-            component p = ports[i];
-            p.set_type(active_port);
-            p.set_value(get_symbol("PORT"));
-            components_tmp.add_component(p);
-            // create matrices and solve
-            GiNaC::matrix A = mna::create_A_matrix(nmap, components_tmp);
-            GiNaC::matrix x = mna::create_x_vector(components_tmp);
-            GiNaC::matrix z = mna::create_z_vector(nmap, components_tmp);
-            GiNaC::matrix res = A.solve(x, z, GiNaC::solve_algo::gauss);
-            for(unsigned int j = 0; j < ports.size(); ++j)
-            {
-                component pp = ports[j];
-                unsigned int numindex = nmap[pp.get_nodes()[0]];
-                unsigned int denindex = components_tmp.network_size();
-                // Y-matrix
-                //numindex = components_tmp.network_size();
-                //denindex = nmap[pp.get_nodes()[0]];
-                port_matrix(j, i) = res(numindex - 1, 0) / -res(denindex - 1, 0);
-            }
+            break;
         }
-        std::cout << port_matrix << '\n';
+        case solve_ac:
+        {
+            // regular AC
+            GiNaC::matrix A = mna::create_A_matrix(nmap, components);
+            GiNaC::matrix x = mna::create_x_vector(components);
+            GiNaC::matrix z = mna::create_z_vector(nmap, components);
+            GiNaC::matrix res = A.solve(x, z, GiNaC::solve_algo::gauss);
+            return result(components, res, nmap);
+            break;
+        }
+        case solve_noise:
+        {
+            break;
+        }
     }
-    // regular AC
+    // FIXME: this is just a dummy to ensure correct compilation
+    // This will be changed once a unified result system for all simulation types is established
     GiNaC::matrix A = mna::create_A_matrix(nmap, components);
     GiNaC::matrix x = mna::create_x_vector(components);
     GiNaC::matrix z = mna::create_z_vector(nmap, components);

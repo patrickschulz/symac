@@ -21,7 +21,7 @@ class solver
 {
     public:
         solver(componentlist& components);
-        result solve();
+        result solve(solver_mode);
         void print_matrices();
 
     private:
