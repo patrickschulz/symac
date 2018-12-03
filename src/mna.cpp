@@ -5,6 +5,7 @@
 #include "componentlist.hpp"
 
 #include <string>
+#include <vector>
 #include <boost/format.hpp>
 
 static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)

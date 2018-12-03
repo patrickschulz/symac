@@ -10,16 +10,22 @@
 #include "nodemap.hpp"
 #include "result.hpp"
 
+enum solver_mode
+{
+    solve_ac,
+    solve_noise,
+    solve_nport
+};
+
 class solver
 {
     public:
-        solver(const componentlist& components);
-        void mna();
-        result solve();
+        solver(componentlist& components);
+        result solve(solver_mode);
         void print_matrices();
 
     private:
-        const componentlist& components;
+        componentlist& components;
         nodemap nmap;
 
         GiNaC::matrix A;

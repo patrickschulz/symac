@@ -29,12 +29,11 @@ int main(int argc, char** argv)
             }
 
             solver S(nlist.get_components());
-            S.mna();
             if(commandline_options.count("print"))
             {
                 S.print_matrices();
             }
-            result res = S.solve();
+            result res = S.solve(solve_nport);
             res.print(nlist.get_print_cmds());
         }
         else

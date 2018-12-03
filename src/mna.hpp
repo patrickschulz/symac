@@ -1,7 +1,10 @@
 #ifndef MNA_HPP
 #define MNA_HPP
 
+#include <vector>
 #include <ginac/ginac.h>
+
+#include "component.hpp"
 
 class componentlist;
 class nodemap;

@@ -48,3 +48,5 @@ designParamVals info what=parameters where=rawfile
 primitives info what=primitives where=rawfile
 subckts info what=subckts where=rawfile
 saveOptions options save=allpub
+
+// vim: ft=spectre

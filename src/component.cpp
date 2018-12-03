@@ -34,7 +34,7 @@ GiNaC::ex convert_symbol(const std::string& s)
 
 GiNaC::ex convert_expression(std::string s)
 {
-    qi::rule<std::string::iterator, std::string()> identifier = +(qi::char_ - qi::blank);
+    qi::rule<std::string::iterator, std::string()> identifier = +qi::alnum;
     symbolic_expression_type symbolic_expression(identifier);
 
     ast::expression expression;
@@ -64,10 +64,42 @@ component::component(const spectre_component_proxy& p) :
     value = convert_expression(p.value);
 }
 
-component::component(const std::string& name, component_types type, const std::vector<std::string>& nodes) :
-    name(name), type(type), nodes(nodes)
+component::component(const std::string& name, component_types ct, const std::vector<std::string>& nodes) :
+    name(name), type(ct), nodes(nodes)
 {   
-    switch(type)
+    set_type(ct);
+    this->name.insert(0, type_map[type]);
+}
+
+std::string component::get_name() const
+{
+    return name;
+}
+
+std::vector<std::string> component::get_terminal_names() const
+{
+    return terminals;
+}
+
+void component::name_prepend(const std::string& prefix)
+{
+    name = prefix + name;
+}
+
+unsigned int component::element_size() const
+{
+    return mna_size;
+}
+
+component_types component::get_type() const
+{
+    return type;
+}
+
+void component::set_type(component_types ct)
+{
+    type = ct;
+    switch(ct)
     {
         case ct_resistor:
         case ct_inductor:
@@ -96,33 +128,8 @@ component::component(const std::string& name, component_types type, const std::v
         case ct_port: // TODO
             mna_size = 0;
     }
-    this->name.insert(0, type_map[type]);
 }
 
-std::string component::get_name() const
-{
-    return name;
-}
-
-std::vector<std::string> component::get_terminal_names() const
-{
-    return terminals;
-}
-
-void component::name_prepend(const std::string& prefix)
-{
-    name = prefix + name;
-}
-
-unsigned int component::element_size() const
-{
-    return mna_size;
-}
-
-const component_types& component::get_type() const
-{
-    return type;
-}
 
 const std::vector<std::string>& component::get_nodes() const
 {
@@ -137,6 +144,11 @@ void component::set_nodes(const std::vector<std::string>& n)
 const GiNaC::ex& component::get_value() const
 {
     return value;
+}
+
+void component::set_value(const GiNaC::ex& e)
+{
+    value = e;
 }
 
 bool component::operator==(component_types ct) const
