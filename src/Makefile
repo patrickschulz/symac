@@ -4,7 +4,7 @@ CXX      := g++
 #INCLUDES := -I/home/pschulz/Workspace/program_options
 #LIBS     := -L/home/pschulz/Workspace/program_options -lginac -lboost_program_options
 INCLUDES := 
-LIBS     := -lginac
+LIBS     := -lginac -lboost_program_options
 EXT      := cpp
 BUILDDIR := .build
 
