@@ -53,7 +53,7 @@ result solver::solve(solver_mode mode)
                     for(unsigned int j = 0; j < ports.size(); ++j)
                     {
                         component pp = ports[j];
-                        //unsigned int numindex = nmap[pp.get_nodes()[0]];
+                        unsigned int numindex = nmap[pp.get_nodes()[0]];
                         unsigned int denindex = components_tmp.network_size();
                         GiNaC::ex numerator = get_symbol("PORT");
                         GiNaC::ex denominator = -res(denindex - 1, 0);
