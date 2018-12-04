@@ -33,7 +33,7 @@ int main(int argc, char** argv)
             {
                 S.print_matrices();
             }
-            result res = S.solve(solve_nport);
+            result res = S.solve(solve_ac);
             res.print(nlist.get_print_cmds());
         }
         else
