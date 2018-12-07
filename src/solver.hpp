@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include <ginac/ginac.h>
 
@@ -16,6 +17,8 @@ enum solver_mode
     solve_noise,
     solve_nport
 };
+
+std::istream& operator>>(std::istream& stream, solver_mode& mode);
 
 class solver
 {

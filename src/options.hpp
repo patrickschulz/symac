@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <boost/program_options.hpp>
 
+#include "solver.hpp"
+
 void print_usage(const boost::program_options::options_description& opt)
 {
     std::cout << "Usage: symac [OPTION] netlist\n"
@@ -33,7 +35,7 @@ void print_devices()
 
 void print_version()
 {
-    std::cout << "Symac 0.2\n";
+    std::cout << "Symac 0.3\n";
 }
 
 class options
@@ -48,11 +50,11 @@ class options
                 ("version,v" , "show version")
                 ("print,p"   , "print network matrices")
                 ("reslist,N" , "print resulting netlist (after transformation of subcircuits)")
-                ("language,l", value<std::string>()->default_value("spice"), "select netlist language. Possible values: spice (default), spectre (not implemented)")
                 ("devices,D" , "print information about the usage of all components")
                 ("nosolve,s" , "don't solve the network")
                 ("report,r"  , "create a report")
                 ("matlab"    , value<std::string>(), "export results to MatLab, specify filename")
+                ("mode,m"    , value<solver_mode>()->default_value(solve_ac), "simulation mode")
                 ;
 
             options_description hidden("Hidden options");

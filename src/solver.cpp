@@ -9,12 +9,37 @@
 #include "mna.hpp"
 #include "symbol.hpp"
 
+std::istream& operator>>(std::istream& stream, solver_mode& mode)
+{
+    std::string token;
+    stream >> token;
+    if(token == "ac")
+    {
+        mode = solve_ac;
+    }
+    else if(token == "nport")
+    {
+        mode = solve_nport;
+    }
+    else
+    {
+        stream.setstate(std::ios_base::failbit);
+    }
+    return stream;
+}
+
 solver::solver(componentlist& components) :
     components(components)
 {
 }
 
 void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, const GiNaC::matrix& z);
+
+#define ZMATRIX
+#define YMATRIX
+
+#undef ZMATRIX
+//#undef YMATRIX
 
 result solver::solve(solver_mode mode)
 {
@@ -24,7 +49,12 @@ result solver::solve(solver_mode mode)
         {
             std::vector<component> ports = components.get_components_by_type(ct_port);
             component_types active_port = ct_voltage_source;
+#ifdef ZMATRIX
             component_types inactive_port = ct_current_source;
+#endif
+#ifdef YMATRIX
+            component_types inactive_port = ct_current_source;
+#endif
             if(ports.size() > 0)
             {
                 GiNaC::matrix port_matrix(ports.size(), ports.size());
@@ -35,7 +65,7 @@ result solver::solve(solver_mode mode)
                     {
                         if(j != i)
                         {
-                            component c = ports[i];
+                            component c = ports[j];
                             c.set_type(inactive_port);
                             c.set_value(0);
                             components_tmp.add_component(c);
@@ -53,13 +83,17 @@ result solver::solve(solver_mode mode)
                     for(unsigned int j = 0; j < ports.size(); ++j)
                     {
                         component pp = ports[j];
-                        unsigned int numindex = nmap[pp.get_nodes()[0]];
-                        unsigned int denindex = components_tmp.network_size();
+                        //unsigned int numindex = nmap[pp.get_nodes()[0]];
+                        //unsigned int denindex = components_tmp.network_size();
+                        //GiNaC::ex numerator = res(nmap[pp.get_nodes()[0]] - 1, 0);
+#ifdef ZMATRIX
                         GiNaC::ex numerator = get_symbol("PORT");
-                        GiNaC::ex denominator = -res(denindex - 1, 0);
-                        // Y-matrix
-                        //numerator = -res[components_tmp.network_size()];
-                        //denominator = get_symbol("PORT");
+                        GiNaC::ex denominator = -res(components_tmp.network_size() - 1, 0);
+#endif
+#ifdef YMATRIX
+                        GiNaC::ex numerator = -res(components_tmp.network_size() - 1, 0);
+                        GiNaC::ex denominator = get_symbol("PORT");
+#endif
                         port_matrix(j, i) = numerator / denominator;
                     }
                 }
