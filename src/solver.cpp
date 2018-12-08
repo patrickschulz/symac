@@ -145,7 +145,7 @@ result solver::solve(solver_mode mode, bool print)
                             unsigned int iindex = components_tmp.network_size();
                             GiNaC::ex denominator = -res(iindex - 1, 0);
 
-                            parameter = numerator / denominator;
+                            port_matrix(j, i) = numerator / denominator;
                         }
                         if(mode == solve_yport)
                         {
@@ -172,12 +172,10 @@ result solver::solve(solver_mode mode, bool print)
                             {
                                 denominator = denominator - res(node2 - 1, 0);
                             }
-                            parameter = numerator / denominator;
+                            port_matrix(j, i) = numerator / denominator;
                         }
-                        port_matrix(j, i) = parameter;
                     }
                 }
-                std::cout << port_matrix << '\n';
             }
             break;
         }
