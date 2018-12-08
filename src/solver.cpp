@@ -43,11 +43,12 @@ result solver::solve(solver_mode mode, bool print)
         case solve_nport:
         {
             std::vector<component> ports = components.get_components_by_type(ct_port);
-            component_types active_port = ct_voltage_source;
 #ifdef NPORT_ZMATRIX
+            component_types active_port = ct_voltage_source;
             component_types inactive_port = ct_current_source;
 #endif
 #ifdef NPORT_YMATRIX
+            component_types active_port = ct_current_source;
             component_types inactive_port = ct_voltage_source;
 #endif
 #if !defined NPORT_ZMATRIX && !defined NPORT_YMATRIX 
@@ -83,7 +84,6 @@ result solver::solve(solver_mode mode, bool print)
                         print_network_matrices(A, x, z);
                     }
                     GiNaC::matrix res = A.solve(x, z, GiNaC::solve_algo::gauss);
-                    std::cout << res << '\n';
                     for(unsigned int j = 0; j < ports.size(); ++j)
                     {
 #ifdef NPORT_ZMATRIX
@@ -91,8 +91,28 @@ result solver::solve(solver_mode mode, bool print)
                         GiNaC::ex denominator = -res(components_tmp.network_size() - 1, 0);
 #endif
 #ifdef NPORT_YMATRIX
-                        GiNaC::ex numerator = -res(components_tmp.network_size() - j - 1, 0);
-                        GiNaC::ex denominator = get_symbol("PORT");
+                        // get current
+                        GiNaC::ex numerator;
+                        if(j == i)
+                        {
+                            numerator = get_symbol("PORT");
+                        }
+                        else
+                        {
+                            numerator = -res(components_tmp.network_size() - 1, 0);
+                        }
+                        // get voltage
+                        unsigned int node1 = nmap[p.get_nodes()[0]];
+                        unsigned int node2 = nmap[p.get_nodes()[1]];
+                        GiNaC::ex denominator;
+                        if(node1 != 0)
+                        {
+                            denominator = res(node1 - 1, 0);
+                        }
+                        if(node2 != 0)
+                        {
+                            denominator = denominator - res(node2 - 1, 0);
+                        }
 #endif
                         port_matrix(j, i) = numerator / denominator;
                     }

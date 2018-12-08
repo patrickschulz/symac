@@ -2,4 +2,3 @@ I0 vx 0 I0
 R0 vx 0 R1
 
 .print V(vx)
-.print I(R0)

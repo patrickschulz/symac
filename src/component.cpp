@@ -119,7 +119,6 @@ void component::set_type(component_types ct)
             break;
         case ct_capacitor:
         case ct_voltage_source:
-        case ct_current_source:
         case ct_voltage_controlled_voltage_source:
         case ct_current_controlled_current_source:
             mna_size = 1;
@@ -135,10 +134,10 @@ void component::set_type(component_types ct)
             terminals.push_back(".cp");
             break;
         case ct_voltage_controlled_current_source:
-            mna_size = 0;
-            break;
+        case ct_current_source:
         case ct_port: // TODO
             mna_size = 0;
+            break;
     }
 }
 

@@ -1,6 +1,6 @@
 R1 v1 0 R1
 R2 v2 0 R2
-*R3 v1 v2 R3
+R3 v1 v2 R3
 
 P1 v1 0
 P2 v2 0
