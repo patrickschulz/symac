@@ -1,4 +1,5 @@
 #include "component.hpp"
+#include "config.hpp"
 
 #include <sstream>
 #include <map>
@@ -103,8 +104,19 @@ void component::set_type(component_types ct)
     {
         case ct_resistor:
         case ct_inductor:
-            //mna_size = 0; // <---- use for G-matrix-based approach
-            //break;
+#ifdef IMPEDANCES_GMATRIX_APPROACH
+            mna_size = 0;
+#endif
+#ifdef IMPEDANCES_IMPEDANCE_APPROACH
+            mna_size = 1;
+#endif
+#ifdef IMPEDANCES_ADMITTANCE_APPROACH
+            mna_size = 1;
+#endif
+#if !defined IMPEDANCES_GMATRIX_APPROACH && !defined IMPEDANCES_IMPEDANCE_APPROACH && !defined IMPEDANCES_ADMITTANCE_APPROACH
+    #error You must define one of IMPEDANCES_IMPEDANCE_APPROACH, IMPEDANCES_ADMITTANCE_APPROACH or IMPEDANCES_GMATRIX_APPROACH
+#endif
+            break;
         case ct_capacitor:
         case ct_voltage_source:
         case ct_current_source:

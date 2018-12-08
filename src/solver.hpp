@@ -24,16 +24,12 @@ class solver
 {
     public:
         solver(componentlist& components);
-        result solve(solver_mode);
+        result solve(solver_mode, bool print);
         void print_matrices();
 
     private:
         componentlist& components;
         nodemap nmap;
-
-        GiNaC::matrix A;
-        GiNaC::matrix x;
-        GiNaC::matrix z;
 };
 
 #endif // SOLVER_HPP

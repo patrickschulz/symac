@@ -1,4 +1,5 @@
 #include "solver.hpp"
+#include "config.hpp"
 
 #include <boost/format.hpp>
 #include <numeric>
@@ -35,13 +36,7 @@ solver::solver(componentlist& components) :
 
 void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, const GiNaC::matrix& z);
 
-#define ZMATRIX
-#define YMATRIX
-
-#undef ZMATRIX
-//#undef YMATRIX
-
-result solver::solve(solver_mode mode)
+result solver::solve(solver_mode mode, bool print)
 {
     switch(mode)
     {
@@ -49,11 +44,14 @@ result solver::solve(solver_mode mode)
         {
             std::vector<component> ports = components.get_components_by_type(ct_port);
             component_types active_port = ct_voltage_source;
-#ifdef ZMATRIX
+#ifdef NPORT_ZMATRIX
             component_types inactive_port = ct_current_source;
 #endif
-#ifdef YMATRIX
-            component_types inactive_port = ct_current_source;
+#ifdef NPORT_YMATRIX
+            component_types inactive_port = ct_voltage_source;
+#endif
+#if !defined NPORT_ZMATRIX && !defined NPORT_YMATRIX 
+#error You must define one of NPORT_ZMATRIX or NPORT_YMATRIX
 #endif
             if(ports.size() > 0)
             {
@@ -79,19 +77,21 @@ result solver::solve(solver_mode mode)
                     GiNaC::matrix A = mna::create_A_matrix(nmap, components_tmp);
                     GiNaC::matrix x = mna::create_x_vector(components_tmp);
                     GiNaC::matrix z = mna::create_z_vector(nmap, components_tmp);
+                    if(print)
+                    {
+                        std::cout << i + 1 << ". iteration\n";
+                        print_network_matrices(A, x, z);
+                    }
                     GiNaC::matrix res = A.solve(x, z, GiNaC::solve_algo::gauss);
+                    std::cout << res << '\n';
                     for(unsigned int j = 0; j < ports.size(); ++j)
                     {
-                        component pp = ports[j];
-                        //unsigned int numindex = nmap[pp.get_nodes()[0]];
-                        //unsigned int denindex = components_tmp.network_size();
-                        //GiNaC::ex numerator = res(nmap[pp.get_nodes()[0]] - 1, 0);
-#ifdef ZMATRIX
+#ifdef NPORT_ZMATRIX
                         GiNaC::ex numerator = get_symbol("PORT");
                         GiNaC::ex denominator = -res(components_tmp.network_size() - 1, 0);
 #endif
-#ifdef YMATRIX
-                        GiNaC::ex numerator = -res(components_tmp.network_size() - 1, 0);
+#ifdef NPORT_YMATRIX
+                        GiNaC::ex numerator = -res(components_tmp.network_size() - j - 1, 0);
                         GiNaC::ex denominator = get_symbol("PORT");
 #endif
                         port_matrix(j, i) = numerator / denominator;
@@ -107,9 +107,12 @@ result solver::solve(solver_mode mode)
             GiNaC::matrix A = mna::create_A_matrix(nmap, components);
             GiNaC::matrix x = mna::create_x_vector(components);
             GiNaC::matrix z = mna::create_z_vector(nmap, components);
+            if(print)
+            {
+                print_network_matrices(A, x, z);
+            }
             GiNaC::matrix res = A.solve(x, z, GiNaC::solve_algo::gauss);
             return result(components, res, nmap);
-            break;
         }
         case solve_noise:
         {
@@ -205,11 +208,6 @@ void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, cons
         std::cout << '\n';
     }
     std::cout << '\n';
-}
-
-void solver::print_matrices()
-{
-    //print_network_matrices(A, x, z);
 }
 
 /*

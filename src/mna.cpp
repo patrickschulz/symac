@@ -1,4 +1,6 @@
 #include "component.hpp"
+#include "config.hpp"
+
 #include "mna.hpp"
 #include "stamp.hpp"
 #include "nodemap.hpp"
@@ -22,29 +24,32 @@ static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
             {
                 value = s * value;
             }
-            // G-matrix-based
-            /*
+#ifdef IMPEDANCES_GMATRIX_APPROACH
             stmp.write(nodes[0], nodes[0], 1/value);
             stmp.write(nodes[1], nodes[1], 1/value);
             stmp.write(nodes[0], nodes[1], -1/value);
             stmp.write(nodes[1], nodes[0], -1/value);
-            */
-            // impedance-based
+#endif
+
+#ifdef IMPEDANCES_IMPEDANCE_APPROACH
             stmp.write(offset, nodes[0], 1);
             stmp.write(nodes[0], offset, 1);
             stmp.write(offset, nodes[1], -1);
             stmp.write(nodes[1], offset, -1);
             stmp.write(offset, offset, -value);
+#endif
 
-            // admittance-based
-            /*
+#ifdef IMPEDANCES_ADMITTANCE_APPROACH
             value = 1 / value;
             stmp.write(offset, nodes[0], value);
             stmp.write(nodes[0], offset, 1);
             stmp.write(offset, nodes[1], -value);
             stmp.write(nodes[1], offset, -1);
             stmp.write(offset, offset, -1);
-            */
+#endif
+#if !defined IMPEDANCES_GMATRIX_APPROACH && !defined IMPEDANCES_IMPEDANCE_APPROACH && !defined IMPEDANCES_ADMITTANCE_APPROACH
+    #error You must define one of IMPEDANCES_IMPEDANCE_APPROACH, IMPEDANCES_ADMITTANCE_APPROACH or IMPEDANCES_GMATRIX_APPROACH
+#endif
             break;
         case ct_capacitor: // use an admittance-based approach for capacitors, this allows the use of 0 for the capacitance
             value = s * value;
@@ -140,14 +145,17 @@ namespace mna {
             x(row, 0) = get_symbol(str);
         }        
 
-        unsigned int i = 0;
         for(const auto& c : components)
         {
             for(unsigned int j = 0; j < c.element_size(); ++j)
             {
-                boost::format fmter = boost::format("I%d") % (i + j + 1);
-                ++i;
+                boost::format fmter = boost::format("I%s") % (c.get_name());
                 std::string str = fmter.str();
+                if(c.element_size() > 1)
+                {
+                    boost::format apxfmt = boost::format("%d") % (j);
+                    std::string appendix = apxfmt.str();
+                }
                 x(row, 0) = get_symbol(str);
                 ++row;
             }

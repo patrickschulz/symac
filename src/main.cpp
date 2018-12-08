@@ -29,11 +29,11 @@ int main(int argc, char** argv)
             }
 
             solver S(nlist.get_components());
-            if(commandline_options.count("print"))
-            {
-                S.print_matrices();
-            }
-            result res = S.solve(commandline_options["mode"].as<solver_mode>());
+            result res = S.solve
+                (
+                    commandline_options["mode"].as<solver_mode>(), 
+                    commandline_options.count("print")
+                );
             res.print(nlist.get_print_cmds());
         }
         else
