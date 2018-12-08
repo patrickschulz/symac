@@ -15,7 +15,9 @@ enum solver_mode
 {
     solve_ac,
     solve_noise,
-    solve_nport
+    solve_zport,
+    solve_yport,
+    solve_sport
 };
 
 std::istream& operator>>(std::istream& stream, solver_mode& mode);

@@ -18,9 +18,17 @@ std::istream& operator>>(std::istream& stream, solver_mode& mode)
     {
         mode = solve_ac;
     }
-    else if(token == "nport")
+    else if(token == "zport")
     {
-        mode = solve_nport;
+        mode = solve_zport;
+    }
+    else if(token == "yport")
+    {
+        mode = solve_yport;
+    }
+    else if(token == "sport")
+    {
+        mode = solve_sport;
     }
     else
     {
@@ -36,24 +44,55 @@ solver::solver(componentlist& components) :
 
 void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, const GiNaC::matrix& z);
 
+component_types get_active_port(solver_mode mode)
+{
+    switch(mode)
+    {
+        case solve_zport:
+            return ct_voltage_source;
+            break;
+        case solve_yport:
+            return ct_current_source;
+            break;
+        case solve_sport: // TODO
+            return ct_voltage_source;
+            break;
+        default:
+            return ct_resistor; // dummy value, not needed
+            break;
+    }
+}
+
+component_types get_inactive_port(solver_mode mode)
+{
+    switch(mode)
+    {
+        case solve_zport:
+            return ct_current_source;
+            break;
+        case solve_yport:
+            return ct_voltage_source;
+            break;
+        case solve_sport: // TODO
+            return ct_voltage_source;
+            break;
+        default:
+            return ct_resistor; // dummy value, not needed
+            break;
+    }
+}
+
 result solver::solve(solver_mode mode, bool print)
 {
     switch(mode)
     {
-        case solve_nport:
+        case solve_zport:
+        case solve_yport:
+        case solve_sport:
         {
             std::vector<component> ports = components.get_components_by_type(ct_port);
-#ifdef NPORT_ZMATRIX
-            component_types active_port = ct_voltage_source;
-            component_types inactive_port = ct_current_source;
-#endif
-#ifdef NPORT_YMATRIX
-            component_types active_port = ct_current_source;
-            component_types inactive_port = ct_voltage_source;
-#endif
-#if !defined NPORT_ZMATRIX && !defined NPORT_YMATRIX 
-#error You must define one of NPORT_ZMATRIX or NPORT_YMATRIX
-#endif
+            component_types active_port = get_active_port(mode);
+            component_types inactive_port = get_inactive_port(mode);
             if(ports.size() > 0)
             {
                 GiNaC::matrix port_matrix(ports.size(), ports.size());
@@ -86,41 +125,64 @@ result solver::solve(solver_mode mode, bool print)
                     GiNaC::matrix res = A.solve(x, z, GiNaC::solve_algo::gauss);
                     for(unsigned int j = 0; j < ports.size(); ++j)
                     {
-#ifdef NPORT_ZMATRIX
-                        component pp = ports[j];
-                        unsigned int vindex = nmap[pp.get_nodes()[0]];
-                        unsigned int iindex = components_tmp.network_size();
-                        port_matrix(j, i) = res(vindex - 1, 0) / -res(iindex - 1, 0);
+                        GiNaC::ex parameter;
+                        if(mode == solve_zport)
+                        {
+                            // get voltage
+                            GiNaC::ex numerator;
+                            if(j == i)
+                            {
+                                numerator = get_symbol("PORT");
+                            }
+                            else
+                            {
+                                component pp = ports[j];
+                                unsigned int node1 = nmap[pp.get_nodes()[0]];
+                                unsigned int node2 = nmap[pp.get_nodes()[1]];
+                                if(node1 != 0)
+                                {
+                                    numerator = res(node1 - 1, 0);
+                                }
+                                if(node2 != 0)
+                                {
+                                    numerator = numerator - res(node2 - 1, 0);
+                                }
+                            }
 
-                        //GiNaC::ex numerator = get_symbol("PORT");
-                        GiNaC::ex numerator = res(vindex - 1, 0);
-                        GiNaC::ex denominator = -res(iindex - 1, 0);
-#endif
-#ifdef NPORT_YMATRIX
-                        // get current
-                        GiNaC::ex numerator;
-                        if(j == i)
-                        {
-                            numerator = get_symbol("PORT");
+                            // get current
+                            unsigned int iindex = components_tmp.network_size();
+                            GiNaC::ex denominator = -res(iindex - 1, 0);
+
+                            parameter = numerator / denominator;
                         }
-                        else
+                        if(mode == solve_yport)
                         {
-                            numerator = -res(components_tmp.network_size() - 1, 0);
+                            // get current
+                            GiNaC::ex numerator;
+                            if(j == i)
+                            {
+                                numerator = get_symbol("PORT");
+                            }
+                            else
+                            {
+                                numerator = -res(components_tmp.network_size() - 1, 0);
+                            }
+
+                            // get voltage
+                            unsigned int node1 = nmap[p.get_nodes()[0]];
+                            unsigned int node2 = nmap[p.get_nodes()[1]];
+                            GiNaC::ex denominator;
+                            if(node1 != 0)
+                            {
+                                denominator = res(node1 - 1, 0);
+                            }
+                            if(node2 != 0)
+                            {
+                                denominator = denominator - res(node2 - 1, 0);
+                            }
+                            parameter = numerator / denominator;
                         }
-                        // get voltage
-                        unsigned int node1 = nmap[p.get_nodes()[0]];
-                        unsigned int node2 = nmap[p.get_nodes()[1]];
-                        GiNaC::ex denominator;
-                        if(node1 != 0)
-                        {
-                            denominator = res(node1 - 1, 0);
-                        }
-                        if(node2 != 0)
-                        {
-                            denominator = denominator - res(node2 - 1, 0);
-                        }
-#endif
-                        port_matrix(j, i) = numerator / denominator;
+                        port_matrix(j, i) = parameter;
                     }
                 }
                 std::cout << port_matrix << '\n';
