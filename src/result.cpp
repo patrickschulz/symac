@@ -60,7 +60,12 @@ void result::print(const std::vector<command>& print_cmd) const
         bool r = phrase_parse(cmd.content.begin(), cmd.content.end(), symbolic_expression, qi::blank, expression);
         if (r)
         {
-            ast::checker checker(resultmap);
+            auto f = [&resultmap = resultmap](const std::string& s)
+            {
+                auto it = resultmap.find(s);
+                return it != resultmap.end();
+            };
+            ast::checker checker(f);
             if(checker(expression))
             {
                 get_quantity_ get_quantity(resultmap);

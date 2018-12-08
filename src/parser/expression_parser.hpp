@@ -3,15 +3,11 @@
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/variant/recursive_variant.hpp>
-#include <boost/variant/apply_visitor.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/foreach.hpp>
 
 #include <ginac/ginac.h>
 
-#include <iostream>
 #include <string>
-#include <map>
 
 #include "../symbol.hpp"
 
@@ -72,7 +68,7 @@ namespace ast
 {
     struct checker
     {
-        checker(const std::map<std::string, GiNaC::ex>& m);
+        checker(std::function<bool(const std::string&)> f);
 
         bool operator()(nil) const;
         bool operator()(const std::string& s) const;
@@ -80,14 +76,13 @@ namespace ast
         bool operator()(signed_ const& x) const;
         bool operator()(expression const& x) const;
 
-        const std::map<std::string, GiNaC::ex>& symbolmap;
+        const std::function<bool(const std::string&)> symbolfunc;
     };
 
     struct eval
     {
         typedef GiNaC::ex result_type;
 
-        //eval(const std::map<std::string, GiNaC::ex>& m);
         eval(std::function<GiNaC::ex(const std::string&)> f);
         result_type operator()(nil) const;
         result_type operator()(const std::string& s) const;
@@ -95,7 +90,6 @@ namespace ast
         result_type operator()(signed_ const& x) const;
         result_type operator()(expression const& x) const;
 
-        //const std::map<std::string, GiNaC::ex>& symbolmap;
         const std::function<GiNaC::ex(const std::string&)> symbolfunc;
     };
 }

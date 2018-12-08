@@ -1,5 +1,8 @@
 #include "expression_parser.hpp"
 
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/foreach.hpp>
+
 symbolic_expression_type::symbolic_expression_type(const qi::rule<std::string::iterator, std::string()> idf) : 
     symbolic_expression_type::base_type(expression),
     identifier(idf)
@@ -36,16 +39,15 @@ symbolic_expression_type::symbolic_expression_type(const qi::rule<std::string::i
 // expression checking and evaluation
 namespace ast
 {
-    checker::checker(const std::map<std::string, GiNaC::ex>& m) :
-        symbolmap(m)
+    checker::checker(std::function<bool(const std::string&)> f) :
+        symbolfunc(f)
     { }
 
     bool checker::operator()(nil) const { BOOST_ASSERT(0); return 0; }
 
     bool checker::operator()(const std::string& s) const 
     {
-        auto it = symbolmap.find(s);
-        return it != symbolmap.end();
+        return symbolfunc(s);
     }
 
     bool checker::operator()(operation const& x, bool lhs) const
@@ -70,11 +72,6 @@ namespace ast
         return state;
     }
 
-    /*
-    eval::eval(const std::map<std::string, GiNaC::ex>& m) :
-        symbolmap(m)
-    { }
-    */
     eval::eval(std::function<GiNaC::ex(const std::string&)> f) :
         symbolfunc(f)
     { }
@@ -84,8 +81,6 @@ namespace ast
     eval::result_type eval::operator()(const std::string& s) const 
     {
         return symbolfunc(s);
-        //auto it = symbolmap.find(s);
-        //return it->second;
     }
 
     eval::result_type eval::operator()(operation const& x, result_type lhs) const
