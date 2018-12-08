@@ -87,8 +87,14 @@ result solver::solve(solver_mode mode, bool print)
                     for(unsigned int j = 0; j < ports.size(); ++j)
                     {
 #ifdef NPORT_ZMATRIX
-                        GiNaC::ex numerator = get_symbol("PORT");
-                        GiNaC::ex denominator = -res(components_tmp.network_size() - 1, 0);
+                        component pp = ports[j];
+                        unsigned int vindex = nmap[pp.get_nodes()[0]];
+                        unsigned int iindex = components_tmp.network_size();
+                        port_matrix(j, i) = res(vindex - 1, 0) / -res(iindex - 1, 0);
+
+                        //GiNaC::ex numerator = get_symbol("PORT");
+                        GiNaC::ex numerator = res(vindex - 1, 0);
+                        GiNaC::ex denominator = -res(iindex - 1, 0);
 #endif
 #ifdef NPORT_YMATRIX
                         // get current
