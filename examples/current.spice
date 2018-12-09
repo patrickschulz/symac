@@ -1,4 +1,5 @@
 V0 vout 0 vout
 R0 vout 0 Rout
 
-.print V(vout) / I(R0.p)
+.print I(R0.p)
+.print I(R0.n)

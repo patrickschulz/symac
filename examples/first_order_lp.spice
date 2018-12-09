@@ -1,4 +1,3 @@
-- Lowpass
 V0 vin 0 vin
 R0 vin vout R
 C0 vout 0 C
