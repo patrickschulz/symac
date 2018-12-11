@@ -26,6 +26,7 @@ std::istream& operator>>(std::istream& stream, solver_mode& mode)
     }
     else
     {
+        std::cerr << "unknown simulation mode " << '"' << token << "\"\n";
         stream.setstate(std::ios_base::failbit);
     }
     return stream;
