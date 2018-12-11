@@ -51,6 +51,7 @@ class options
                 ("print,p"   , "print network matrices")
                 ("reslist,N" , "print resulting netlist (after transformation of subcircuits)")
                 ("devices,D" , "print information about the usage of all components")
+                ("nodemap"   , "print the nodemap (mapping from user (string-) nodes to internal (integer-) nodes)")
                 ("nosolve,s" , "don't solve the network")
                 ("report,r"  , "create a report")
                 ("matlab"    , value<std::string>(), "export results to MatLab, specify filename")

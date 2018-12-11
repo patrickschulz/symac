@@ -60,12 +60,13 @@ void result::print(const std::vector<command>& print_cmd) const
         bool r = phrase_parse(cmd.content.begin(), cmd.content.end(), symbolic_expression, qi::blank, expression);
         if (r)
         {
-            auto f = [&resultmap = resultmap](const std::string& s)
+            auto f = [](const std::string& s, const std::map<std::string, GiNaC::ex>& resmap)
             {
-                auto it = resultmap.find(s);
-                return it != resultmap.end();
+                auto it = resmap.find(s);
+                return it != resmap.end();
             };
-            ast::checker checker(f);
+            using namespace std::placeholders;
+            ast::checker checker(std::bind(f, _1, resultmap));
             if(checker(expression))
             {
                 get_quantity_ get_quantity(resultmap);

@@ -12,7 +12,7 @@
 class result
 {
     public:
-        result(const componentlist& components,  const GiNaC::matrix& results, const nodemap& nmap);
+        result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap);
         void print(const std::vector<command>& print_cmd) const;
 
         void print_all() const;
