@@ -14,50 +14,44 @@ static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
 {
     std::vector<unsigned int> nodes = nmap[c.get_nodes()];
     GiNaC::ex value = c.get_value();
+    if(c.get_type() == ct_inductor || c.get_type() == ct_capacitor)
+    {
+        value *= get_symbol("s");
+    }
     stamp stmp;
-    GiNaC::ex s = get_symbol("s");
     switch(c.get_type())
     {
         case ct_resistor:
-        case ct_inductor:
-            if(c == ct_inductor)
+            /*
+            if(value.is_zero()) // Impedance approach
             {
-                value = s * value;
+                stmp.write(offset, nodes[0],  value);
+                stmp.write(offset, nodes[1], -value);
+                stmp.write(nodes[0], offset,  1);
+                stmp.write(nodes[1], offset, -1);
+                stmp.write(offset,   offset, -1);
             }
-#ifdef IMPEDANCES_GMATRIX_APPROACH
-            stmp.write(nodes[0], nodes[0], 1/value);
-            stmp.write(nodes[1], nodes[1], 1/value);
-            stmp.write(nodes[0], nodes[1], -1/value);
-            stmp.write(nodes[1], nodes[0], -1/value);
-#endif
-
-#ifdef IMPEDANCES_IMPEDANCE_APPROACH
-            stmp.write(offset, nodes[0], 1);
-            stmp.write(nodes[0], offset, 1);
-            stmp.write(offset, nodes[1], -1);
-            stmp.write(nodes[1], offset, -1);
-            stmp.write(offset, offset, -value);
-#endif
-
-#ifdef IMPEDANCES_ADMITTANCE_APPROACH
-            value = 1 / value;
-            stmp.write(offset, nodes[0], value);
-            stmp.write(nodes[0], offset, 1);
-            stmp.write(offset, nodes[1], -value);
-            stmp.write(nodes[1], offset, -1);
-            stmp.write(offset, offset, -1);
-#endif
-#if !defined IMPEDANCES_GMATRIX_APPROACH && !defined IMPEDANCES_IMPEDANCE_APPROACH && !defined IMPEDANCES_ADMITTANCE_APPROACH
-    #error You must define one of IMPEDANCES_IMPEDANCE_APPROACH, IMPEDANCES_ADMITTANCE_APPROACH or IMPEDANCES_GMATRIX_APPROACH
-#endif
+            */
+            //else // G-Matrix
+            //{
+                stmp.write(nodes[0], nodes[0],  1 / value);
+                stmp.write(nodes[1], nodes[1],  1 / value);
+                stmp.write(nodes[0], nodes[1], -1 / value);
+                stmp.write(nodes[1], nodes[0], -1 / value);
+            //}
             break;
-        case ct_capacitor: // use an admittance-based approach for capacitors, this allows the use of 0 for the capacitance
-            value = s * value;
-            stmp.write(offset, nodes[0], value);
-            stmp.write(nodes[0], offset, 1);
+        case ct_inductor: // use an impedance-based approach for inductors, this allows the use of 0 for the inductance
+            stmp.write(offset, nodes[0],  value);
             stmp.write(offset, nodes[1], -value);
+            stmp.write(nodes[0], offset,  1);
             stmp.write(nodes[1], offset, -1);
-            stmp.write(offset, offset, -1);
+            stmp.write(offset,   offset, -1);
+            break;
+        case ct_capacitor:
+            stmp.write(nodes[0], nodes[0],  value);
+            stmp.write(nodes[1], nodes[1],  value);
+            stmp.write(nodes[0], nodes[1], -value);
+            stmp.write(nodes[1], nodes[0], -value);
             break;
         case ct_voltage_source:
             stmp.write(offset, nodes[0], 1);
