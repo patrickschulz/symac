@@ -26,14 +26,17 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
 {
     // insert ground
     resultmap.insert(std::make_pair("0", GiNaC::ex(0)));
-    // parse results and store all in the results map
-    unsigned int row = 0;
-    for(; row < components.number_of_nodes(); ++row) // node voltages
+
+    // voltages
+    for(unsigned int row = 0; row < components.number_of_nodes(); ++row)
     {
         std::string usernode = nmap[row + 1];
         resultmap.insert(std::make_pair(usernode, results(row, 0)));
     }
-    for(const component& c : components) // device currents
+
+    // currents
+    unsigned int row = 0;
+    for(const component& c : components)
     {
         if(c.get_type() == ct_resistor)
         {
@@ -45,13 +48,11 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
         }
         std::string current = c.get_name();
         auto terminals = c.get_terminal_names();
-        for(const auto& terminal : terminals)
+        for(unsigned int row = 0; row < terminals.size(); ++row)
         {
-            resultmap.insert(std::make_pair(current + terminal, results(row, 0)));
-            ++row;
+            resultmap.insert(std::make_pair(current + terminals[row], results(row, 0)));
         }
     }
-    // TODO: fill the result map with the remaining terminal currents
 }
 
 void result::print(const std::vector<command>& print_cmd) const

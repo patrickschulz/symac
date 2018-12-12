@@ -171,9 +171,6 @@ struct symbolic_expression_type : qi::grammar<Iterator, ast::expression<atom_typ
         identifier(idf)
     {
         using qi::char_;
-        using qi::alpha;
-        using qi::alnum;
-        using qi::lit;
 
         expression =
             term
