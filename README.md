@@ -1,4 +1,4 @@
-# Symac - A symbolic AC-Domain spice simulator
+# SymAC - A symbolic AC-Domain spice simulator
 Symac takes a spice netlist (which currently does not entirely conform with regular spice netlists) and calculates the node voltages and device currents in a symbolic manner. 
 This means that instead of numeric results, you will get something like vout = -gm * ro * vin.
 
