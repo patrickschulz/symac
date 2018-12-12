@@ -36,14 +36,14 @@ GiNaC::ex convert_symbol(const std::string& s)
 GiNaC::ex convert_expression(std::string s)
 {
     qi::rule<std::string::iterator, std::string()> identifier = +qi::alnum;
-    symbolic_expression_type symbolic_expression(identifier);
+    symbolic_expression_type<std::string> symbolic_expression(identifier);
 
-    ast::expression expression;
+    ast::expression<std::string> expression;
 
     bool r = phrase_parse(s.begin(), s.end(), symbolic_expression, qi::blank, expression);
     if (r)
     {
-        ast::eval eval(convert_symbol);
+        ast::eval<std::string, GiNaC::ex> eval(convert_symbol);
         return eval(expression);
     }
     else

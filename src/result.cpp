@@ -63,24 +63,24 @@ void result::print(const std::vector<command>& print_cmd) const
         qi::rule<std::string::iterator, std::string()> voltage = "V(" >> +(qi::alnum | qi::char_("-:_!")) >> ")";
         qi::rule<std::string::iterator, std::string()> current = "I(" >> +qi::alnum >> qi::char_(".") >> +qi::alpha >> ")";
         qi::rule<std::string::iterator, std::string()> identifier = voltage | current;
-        symbolic_expression_type symbolic_expression(identifier);
+        symbolic_expression_type<std::string> symbolic_expression(identifier);
 
-        ast::expression expression;
+        ast::expression<std::string> expression;
 
         bool r = phrase_parse(cmd.content.begin(), cmd.content.end(), symbolic_expression, qi::blank, expression);
         if (r)
         {
-            auto f = [](const std::string& s, const std::map<std::string, GiNaC::ex>& resmap)
+            auto f = [](const std::string& s, const std::map<std::string, GiNaC::ex>& resmap) -> bool
             {
                 auto it = resmap.find(s);
                 return it != resmap.end();
             };
             using namespace std::placeholders;
-            ast::checker checker(std::bind(f, _1, resultmap));
+            ast::checker<std::string> checker(std::bind(f, _1, resultmap));
             if(checker(expression))
             {
                 get_quantity_ get_quantity(resultmap);
-                ast::eval eval(get_quantity);
+                ast::eval<std::string, GiNaC::ex> eval(get_quantity);
                 std::cout << eval(expression) << '\n';
             }
             else

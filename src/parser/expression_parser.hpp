@@ -4,103 +4,205 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/variant/recursive_variant.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/foreach.hpp>
 
 #include <ginac/ginac.h>
-
-#include <string>
-
-#include "../symbol.hpp"
 
 #include "parser_common.hpp"
 
 namespace ast
 {
     struct nil {};
-    struct signed_;
-    struct expression;
+    template<typename atom_type> struct signed_;
+    template<typename atom_type> struct expression;
 
-    typedef boost::variant<
-            nil
-          , std::string
-          , boost::recursive_wrapper<signed_>
-          , boost::recursive_wrapper<expression>
-        >
-    operand;
+    template<typename atom_type>
+    using operand = typename boost::variant
+        <
+            nil,
+            atom_type,
+            boost::recursive_wrapper<signed_<atom_type>>,
+            boost::recursive_wrapper<expression<atom_type>>
+        >;
 
+    template<typename atom_type>
     struct signed_
     {
         char sign;
-        operand operand_;
+        operand<atom_type> operand_;
     };
 
+    template<typename atom_type>
     struct operation
     {
         char operator_;
-        operand operand_;
+        operand<atom_type> operand_;
     };
 
+    template<typename atom_type>
     struct expression
     {
-        operand first;
-        std::list<operation> rest;
+        operand<atom_type> first;
+        std::list<operation<atom_type>> rest;
     };
 }
 
-BOOST_FUSION_ADAPT_STRUCT(
-    ast::signed_,
+BOOST_FUSION_ADAPT_TPL_STRUCT(
+    (atom_type),
+    (ast::signed_) (atom_type),
     (char, sign)
-    (ast::operand, operand_)
+    (typename ast::operand<atom_type>, operand_)
 )
-
-BOOST_FUSION_ADAPT_STRUCT(
-    ast::operation,
+BOOST_FUSION_ADAPT_TPL_STRUCT(
+    (atom_type),
+    (ast::operation) (atom_type),
     (char, operator_)
-    (ast::operand, operand_)
+    (typename ast::operand<atom_type>, operand_)
 )
 
-BOOST_FUSION_ADAPT_STRUCT(
-    ast::expression,
-    (ast::operand, first)
-    (std::list<ast::operation>, rest)
+BOOST_FUSION_ADAPT_TPL_STRUCT(
+    (atom_type),
+    (ast::expression) (atom_type),
+    (typename ast::operand<atom_type>, first)
+    (typename std::list<ast::operation<atom_type>>, rest)
 )
 
 namespace ast
 {
+    template<typename atom_type>
     struct checker
     {
-        checker(std::function<bool(const std::string&)> f);
+        checker(std::function<bool(const atom_type&)> f) :
+            checkfun(f)
+        { }
 
-        bool operator()(nil) const;
-        bool operator()(const std::string& s) const;
-        bool operator()(operation const& x, bool lhs) const;
-        bool operator()(signed_ const& x) const;
-        bool operator()(expression const& x) const;
+        bool operator()(nil) const { BOOST_ASSERT(0); return 0; }
 
-        const std::function<bool(const std::string&)> symbolfunc;
+        bool operator()(const atom_type& s) const 
+        {
+            return checkfun(s);
+        }
+
+        bool operator()(operation<atom_type> const& x, bool lhs) const
+        {
+            bool rhs = boost::apply_visitor(*this, x.operand_);
+            return lhs && rhs;
+        }
+
+        bool operator()(signed_<atom_type> const& x) const
+        {
+            bool rhs = boost::apply_visitor(*this, x.operand_);
+            return rhs;
+        }
+
+        bool operator()(expression<atom_type> const& x) const
+        {
+            bool state = boost::apply_visitor(*this, x.first);
+            BOOST_FOREACH(operation<atom_type> const& oper, x.rest)
+            {
+                state = (*this)(oper, state);
+            }
+            return state;
+        }
+
+        const std::function<bool(const atom_type&)> checkfun;
     };
 
+    template<typename atom_type, typename result_type>
     struct eval
     {
-        typedef GiNaC::ex result_type;
+        eval(std::function<result_type(const atom_type&)> f) :
+            symbolfunc(f)
+        { }
 
-        eval(std::function<GiNaC::ex(const std::string&)> f);
-        result_type operator()(nil) const;
-        result_type operator()(const std::string& s) const;
-        result_type operator()(operation const& x, result_type lhs) const;
-        result_type operator()(signed_ const& x) const;
-        result_type operator()(expression const& x) const;
+        result_type operator()(nil) const { BOOST_ASSERT(0); return 0; }
 
-        const std::function<GiNaC::ex(const std::string&)> symbolfunc;
-    };
+        result_type operator()(const atom_type& s) const 
+        {
+            return symbolfunc(s);
+        }
+
+        result_type operator()(operation<atom_type> const& x, result_type lhs) const
+        {
+            result_type rhs = boost::apply_visitor(*this, x.operand_);
+            switch (x.operator_)
+            {
+                case '+': return lhs + rhs;
+                case '-': return lhs - rhs;
+                case '*': return lhs * rhs;
+                case '/': return lhs / rhs;
+            }
+            BOOST_ASSERT(0);
+            return 0;
+        }
+
+        result_type operator()(signed_<atom_type> const& x) const
+        {
+            result_type rhs = boost::apply_visitor(*this, x.operand_);
+            switch (x.sign)
+            {
+                case '-': return -rhs;
+                case '+': return +rhs;
+            }
+            BOOST_ASSERT(0);
+            return 0;
+        }
+
+        result_type operator()(expression<atom_type> const& x) const
+        {
+            result_type state = boost::apply_visitor(*this, x.first);
+            BOOST_FOREACH(operation<atom_type> const& oper, x.rest)
+            {
+                state = (*this)(oper, state);
+            }
+            return state;
+        }
+
+            const std::function<result_type(const atom_type&)> symbolfunc;
+        };
 }
 
-struct symbolic_expression_type : qi::grammar<Iterator, ast::expression(), Skipper_type>
+template<typename atom_type>
+struct symbolic_expression_type : qi::grammar<Iterator, ast::expression<atom_type>(), Skipper_type>
 {
-    symbolic_expression_type(const qi::rule<Iterator, std::string()> idf);
+    symbolic_expression_type(const qi::rule<Iterator, atom_type()> idf) : 
+        symbolic_expression_type::base_type(expression),
+        identifier(idf)
+    {
+        using qi::char_;
+        using qi::alpha;
+        using qi::alnum;
+        using qi::lit;
 
-    qi::rule<Iterator, ast::expression(), Skipper_type> expression, term;
-    qi::rule<Iterator, ast::operand(), Skipper_type> factor;
-    qi::rule<Iterator, std::string()> identifier;
+        expression =
+            term
+            >> *(   
+                    (char_('+') >> term) |
+                    (char_('-') >> term)
+                )
+            >> qi::eoi
+            ;
+
+        term =
+            factor
+            >> *(   
+                    (char_('*') >> factor) |
+                    (char_('/') >> factor)
+                )
+            ;
+
+        factor =
+            identifier
+            |   '(' >> expression >> ')'
+            |   (char_('-') >> factor)
+            |   (char_('+') >> factor)
+            ;
+    }
+
+    qi::rule<Iterator, ast::expression<atom_type>(), Skipper_type> expression, term;
+    qi::rule<Iterator, ast::operand<atom_type>(), Skipper_type> factor;
+    qi::rule<Iterator, atom_type()> identifier;
 };
 
 #endif // EXPRESSION_PARSER_HPP
