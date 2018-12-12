@@ -1,4 +1,4 @@
-- CCVS test
+* CCVS test
 V0 vin 0 Vin
 R1 vin vx Rin
 R2 vout 0 Rout
