@@ -77,11 +77,6 @@ std::string component::get_name() const
     return name;
 }
 
-std::vector<std::string> component::get_terminal_names() const
-{
-    return terminals;
-}
-
 void component::name_prepend(const std::string& prefix)
 {
     name = prefix + name;
@@ -110,17 +105,11 @@ void component::set_type(component_types ct)
         case ct_voltage_source:
         case ct_voltage_controlled_voltage_source:
         case ct_current_controlled_current_source:
-            mna_size = 1;
-            terminals.push_back(".p");
-            break;
         case ct_opamp:
             mna_size = 1;
-            terminals.push_back(".out");
             break;
         case ct_current_controlled_voltage_source:
             mna_size = 2;
-            terminals.push_back(".p");
-            terminals.push_back(".cp");
             break;
         case ct_voltage_controlled_current_source:
         case ct_current_source:
@@ -154,6 +143,14 @@ void component::set_value(const GiNaC::ex& e)
 bool component::operator==(component_types ct) const
 {
     return type == ct;
+}
+
+bool component::operator==(const component& c) const
+{
+    return c.name  == name && 
+           c.type  == type &&
+           c.nodes == nodes &&
+           c.value == value;
 }
 
 std::ostream& operator<<(std::ostream& stream, const component& c)

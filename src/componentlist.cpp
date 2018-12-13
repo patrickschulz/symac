@@ -52,6 +52,18 @@ unsigned int componentlist::number_of_nodes() const
     return nodes.size();
 }
 
+unsigned int componentlist::component_index(const component& c) const
+{
+    unsigned int idx = 0;
+    unsigned int i = 0;
+    while(!(components[i] == c))
+    {
+        idx += components[i].element_size();
+        ++i;
+    }
+    return idx;
+}
+
 unsigned int componentlist::network_size() const
 {
     unsigned int num = 0;

@@ -1,0 +1,4 @@
+V0 vout 0 vout
+L0 vout 0 L
+
+.print I(L0.p)

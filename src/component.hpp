@@ -68,6 +68,7 @@ class component
         friend std::ostream& operator<<(std::ostream& stream, const component& c);
 
         bool operator==(component_types) const;
+        bool operator==(const component&) const;
 
     private:
         component(const std::string& name, component_types type, const std::vector<std::string>& nodes);
@@ -79,7 +80,6 @@ class component
 
         // constant component attributes
         unsigned int mna_size;
-        std::vector<std::string> terminals;
 };
 
 #endif //COMPONENT_HPP

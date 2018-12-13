@@ -6,6 +6,7 @@
 
 #include "component.hpp"
 #include "parser/expression_parser.hpp"
+#include "symbol.hpp"
 
 struct get_quantity_
 {
@@ -35,22 +36,73 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
     }
 
     // currents
-    unsigned int row = 0;
     for(const component& c : components)
     {
-        if(c.get_type() == ct_resistor)
+        switch(c.get_type())
         {
-            GiNaC::ex value = c.get_value();
-            std::vector<std::string> nodes = c.get_nodes();
-            GiNaC::ex voltage = resultmap[nodes[0]] - resultmap[nodes[1]];
-            resultmap.insert(std::make_pair(c.get_name() + ".p",  voltage / value));
-            resultmap.insert(std::make_pair(c.get_name() + ".n", -voltage / value));
-        }
-        std::string current = c.get_name();
-        auto terminals = c.get_terminal_names();
-        for(unsigned int row = 0; row < terminals.size(); ++row)
-        {
-            resultmap.insert(std::make_pair(current + terminals[row], results(row, 0)));
+            case ct_resistor:
+            {
+                GiNaC::ex value = c.get_value();
+                std::vector<std::string> nodes = c.get_nodes();
+                GiNaC::ex voltage = resultmap[nodes[0]] - resultmap[nodes[1]];
+                boost::format fmter = boost::format("%s.%s");
+                resultmap[str(fmter % c.get_name() % "p")] =  voltage / value;
+                resultmap[str(fmter % c.get_name() % "n")] = -voltage / value;
+                break;
+            }
+            case ct_capacitor:
+            {
+                GiNaC::ex value = c.get_value();
+                std::vector<std::string> nodes = c.get_nodes();
+                GiNaC::ex voltage = resultmap[nodes[0]] - resultmap[nodes[1]];
+                boost::format fmter = boost::format("%s.%s");
+                GiNaC::ex s = get_symbol("s");
+                resultmap[str(fmter % c.get_name() % "p")] =  voltage * s * value;
+                resultmap[str(fmter % c.get_name() % "n")] = -voltage * s * value;
+                break;
+            }
+            case ct_voltage_controlled_current_source:
+            {
+                GiNaC::ex value = c.get_value();
+                std::vector<std::string> nodes = c.get_nodes();
+                GiNaC::ex voltage = resultmap[nodes[2]] - resultmap[nodes[3]];
+                boost::format fmter = boost::format("%s.%s");
+                resultmap[str(fmter % c.get_name() % "p")] =  voltage * value;
+                resultmap[str(fmter % c.get_name() % "n")] = -voltage * value;
+                break;
+            }
+            case ct_voltage_source:
+            case ct_inductor:
+            case ct_opamp:
+            case ct_voltage_controlled_voltage_source:
+            case ct_current_controlled_current_source:
+            {
+                unsigned int offset = components.number_of_nodes() + components.component_index(c);
+                boost::format fmter = boost::format("%s.%s");
+                resultmap[str(fmter % c.get_name() % "p")] =  results(offset, 0);
+                resultmap[str(fmter % c.get_name() % "n")] = -results(offset, 0);
+                break;
+            }
+            case ct_current_source:
+            {
+                boost::format fmter = boost::format("%s.%s");
+                resultmap[str(fmter % c.get_name() % "p")] =  c.get_value();
+                resultmap[str(fmter % c.get_name() % "n")] = -c.get_value();
+                break;
+            }
+            case ct_current_controlled_voltage_source:
+            {
+                unsigned int offset = components.number_of_nodes() + components.component_index(c);
+                boost::format fmter = boost::format("%s.%s");
+                resultmap[str(fmter % c.get_name() % "cp")] =  results(offset, 0);
+                resultmap[str(fmter % c.get_name() % "cn")] = -results(offset, 0);
+                resultmap[str(fmter % c.get_name() % "p")] =  results(offset + 1, 0);
+                resultmap[str(fmter % c.get_name() % "n")] = -results(offset + 1, 0);
+                break;
+            }
+            case ct_port:
+                // a port is an auxiliary device and thus has no currents
+                break;
         }
     }
 }

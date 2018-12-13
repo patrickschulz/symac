@@ -1,5 +1,29 @@
-V0 vout 0 vout
-R0 vout 0 Rout
+* voltage source
+* resistor
+V0 vv0 0 V0
+RV0 vv0 0 RV0
+.print I(V0.p)
+.print I(RV0.p)
 
-.print I(R0.p)
-.print I(R0.n)
+* current source
+I0 vi0 0 I0
+RI0 vi0 0 RI0
+.print I(I0.p)
+
+* inductor
+V1 vv1 0 V1
+LV1 vv1 0 LV1
+.print I(LV1.p)
+
+* opamp
+O0 0 vopn vopout
+Vopin vopx 0 vopin
+Ropf vopx vopn Rf
+Ropfb vopout vopn Rfb
+.print I(O0.p)
+
+* vccs
+VG vg 0 vg
+Gm vgout 0 vg 0 gm
+Rm vgout 0 Rm
+.print I(Gm.n)

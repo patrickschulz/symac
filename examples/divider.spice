@@ -3,3 +3,4 @@ R2 vout 0 R2
 V0 vin 0 V0
 
 .print V(vout) / V(vin)
+.print I(V0.n)
