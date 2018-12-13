@@ -73,7 +73,7 @@ end
 
 normalize(ratfun)
 
-print(string.format("%s / (%s + %s)", table.concat(ratfun.num[1], " * "), table.concat(ratfun.den[1], " * "), table.concat(ratfun.den[2], " * ")))
+print(string.format("H(s) = %s / (%s + s * %s)", table.concat(ratfun.num[1], " * "), table.concat(ratfun.den[1], " * "), table.concat(ratfun.den[2], " * ")))
 
-print(string.format("%s^2 / (4 * %s * %s)", table.concat(ratfun.num[1], " * "), table.concat(ratfun.den[1], " * "), table.concat(ratfun.den[2], " * ")))
+print(string.format("integrate(|H(jw)|^2, f, 0, inf) = %s^2 / (4 * %s * %s)", table.concat(ratfun.num[1], " * "), table.concat(ratfun.den[1], " * "), table.concat(ratfun.den[2], " * ")))
 --print(string.format("%s * %s^2 / (4 * %s)", "4 k T / R", table.concat(ratfun.num[1], " * "), table.concat(ratfun.den[2], " * ")))
