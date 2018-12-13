@@ -26,11 +26,10 @@ int main()
     GiNaC::symbol C1("C1");
     GiNaC::symbol C2("C2");
     GiNaC::symbol A0("A0");
-    GiNaC::ex expr = A0 * (1 + s * R1 * C1) / (1 + s * R1 * C1 + s*s * R1 * R2 * C1 * C2);
+    GiNaC::ex expr = A0 * (1 + s * R1 * C1 + s * R2 * C2) / (A0 * (1 + s * R1 * C1 + s*s * R1 * R2 * C1 * C2));
 
     transfer_function tf(expr);
-    std::cout << tf << '\n';
-    std::cout << tf.low_frequency() << '\n';
-    std::cout << tf.high_frequency() << '\n';
+
+    tf.pretty_print(std::cout);
 }
 

@@ -113,6 +113,35 @@ class transfer_function
             return transfer_function(num, den);
         }
 
+        void pretty_print(std::ostream& stream)
+        {
+            std::ostringstream stmp;
+            stmp << numerator;
+            unsigned int numsize = stmp.str().size();
+            stmp.str("");
+            stmp.clear();
+            stmp << denominator;
+            unsigned int densize = stmp.str().size();
+
+            unsigned int numfill;
+            unsigned int denfill;
+            if(numsize > densize)
+            {
+                numfill = 0;
+                denfill = (numsize - densize) / 2;
+            }
+            else
+            {
+                numfill = (densize - numsize) / 2;
+                denfill = 0;
+            }
+            unsigned int offset = 7;
+            unsigned int rulefill = 2;
+            stream << std::string(numfill + offset + rulefill / 2, ' ') << numerator << '\n';
+            stream << "H(s) = " << std::string(std::max(numsize, densize) + rulefill, '-') << '\n';
+            stream << std::string(denfill + offset + rulefill / 2, ' ') << denominator << '\n';
+        }
+
         friend std::ostream& operator<<(std::ostream& stream, const transfer_function& tf);
 
     private:
