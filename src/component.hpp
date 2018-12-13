@@ -45,10 +45,6 @@ class component
         component(const spectre_component_proxy& p);
         
         std::string get_name() const;
-
-        // results
-        std::vector<std::string> get_terminal_names() const;
-
         void name_prepend(const std::string& prefix);
 
         unsigned int element_size() const;
@@ -62,8 +58,6 @@ class component
 
         const GiNaC::ex& get_value() const;
         void set_value(const GiNaC::ex& e);
-
-        std::string to_string() const;
 
         friend std::ostream& operator<<(std::ostream& stream, const component& c);
 
