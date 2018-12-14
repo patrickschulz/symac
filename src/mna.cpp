@@ -45,7 +45,8 @@ static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
             stmp.write(nodes[1], offset, -1);
             stmp.write(offset, offset, -value);
             break;
-        case ct_capacitor: // G-Matrix
+        case ct_conductor: // G-Matrix
+        case ct_capacitor:
             stmp.write(nodes[0], nodes[0],  value);
             stmp.write(nodes[1], nodes[1],  value);
             stmp.write(nodes[0], nodes[1], -value);

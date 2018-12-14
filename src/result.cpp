@@ -51,6 +51,16 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
                 resultmap[str(fmter % c.get_name() % "n")] = -voltage / value;
                 break;
             }
+            case ct_conductor:
+            {
+                GiNaC::ex value = c.get_value();
+                std::vector<std::string> nodes = c.get_nodes();
+                GiNaC::ex voltage = resultmap[nodes[0]] - resultmap[nodes[1]];
+                boost::format fmter = boost::format("%s.%s");
+                resultmap[str(fmter % c.get_name() % "p")] =  voltage * value;
+                resultmap[str(fmter % c.get_name() % "n")] = -voltage * value;
+                break;
+            }
             case ct_capacitor:
             {
                 GiNaC::ex value = c.get_value();

@@ -97,6 +97,7 @@ void component::set_type(component_types ct)
     switch(ct)
     {
         case ct_resistor:
+        case ct_conductor:
         case ct_capacitor:
             mna_size = 0;
             break;
