@@ -52,11 +52,14 @@ class options
                 ("pretty,P"  , "print the results in a pretty way (display transfer functions as fractions) THIS IS PRELIMINARY, CHECK YOUR RESULTS!")
                 ("reslist,N" , "print resulting netlist (after transformation of subcircuits)")
                 ("devices,D" , "print information about the usage of all components")
+                ("mode,m"    , value<solver_mode>()->default_value(solve_ac), "simulation mode")
+                ;
+            options_description unimplemented("Unimplemented options");
+            unimplemented.add_options()
                 ("nodemap"   , "print the nodemap (mapping from user (string-) nodes to internal (integer-) nodes)")
                 ("nosolve,s" , "don't solve the network")
                 ("report,r"  , "create a report")
                 ("matlab"    , value<std::string>(), "export results to MatLab, specify filename")
-                ("mode,m"    , value<solver_mode>()->default_value(solve_ac), "simulation mode")
                 ;
 
             options_description hidden("Hidden options");
@@ -67,10 +70,12 @@ class options
             // put together all options
             options_description all("Allowed options");
             all.add(generic);
+            all.add(unimplemented);
             all.add(hidden);
 
             options_description visible("");
             visible.add(generic);
+            visible.add(unimplemented);
 
             positional_options_description p;
             p.add("netlist", -1);
