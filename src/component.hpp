@@ -7,17 +7,18 @@
 
 enum component_types
 {
-    ct_resistor                          = 1 << 0,
-    ct_capacitor                         = 1 << 1,
-    ct_inductor                          = 1 << 2,
-    ct_voltage_source                    = 1 << 3,
-    ct_current_source                    = 1 << 4,
-    ct_opamp                             = 1 << 5,
-    ct_voltage_controlled_voltage_source = 1 << 6,
-    ct_current_controlled_voltage_source = 1 << 7,
-    ct_voltage_controlled_current_source = 1 << 8,
-    ct_current_controlled_current_source = 1 << 9,
-    ct_port                              = 1 << 10
+    ct_resistor,
+    ct_conductor,
+    ct_capacitor,
+    ct_inductor,
+    ct_voltage_source,
+    ct_current_source,
+    ct_opamp,
+    ct_voltage_controlled_voltage_source,
+    ct_current_controlled_voltage_source,
+    ct_voltage_controlled_current_source,
+    ct_current_controlled_current_source,
+    ct_port,
 };
 
 struct spice_component_proxy

@@ -21,18 +21,6 @@ std::map<component_types, std::string> type_map {
     { ct_port                             , "P"    }
 };
 
-GiNaC::ex convert_symbol(const std::string& s)
-{
-    if(s.size() > 0 && s.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
-    {
-        return std::stod(s);
-    }
-    else
-    {
-        return get_symbol(s);
-    }
-}
-
 GiNaC::ex convert_expression(std::string s)
 {
     qi::rule<std::string::iterator, std::string()> identifier = +qi::alnum;
@@ -43,7 +31,18 @@ GiNaC::ex convert_expression(std::string s)
     bool r = phrase_parse(s.begin(), s.end(), symbolic_expression, qi::blank, expression);
     if (r)
     {
-        ast::eval<std::string, GiNaC::ex> eval(convert_symbol);
+        auto confsym = [](const std::string& s) -> GiNaC::ex
+        {
+            if(s.size() > 0 && s.find_first_not_of("0123456789.-") == std::string::npos) // is the string a numeric?
+            {
+                return std::stod(s);
+            }
+            else
+            {
+                return get_symbol(s);
+            }
+        };
+        ast::eval<std::string, GiNaC::ex> eval(confsym);
         return eval(expression);
     }
     else
