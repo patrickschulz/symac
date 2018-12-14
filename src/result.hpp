@@ -13,7 +13,7 @@ class result
 {
     public:
         result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap);
-        void print(const std::vector<command>& print_cmd) const;
+        void print(const std::vector<command>& print_cmd, bool pretty) const;
 
         void print_all() const;
         void print_voltage(const std::string& voltage) const;

@@ -6,8 +6,6 @@
 #include <iostream>
 #include <vector>
 
-#include "sspace_symbols.hpp"
-
 class product
 {
     public:

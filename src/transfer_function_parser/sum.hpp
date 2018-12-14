@@ -3,7 +3,6 @@
 
 #include <ginac/ginac.h>
 
-#include "sspace_symbols.hpp"
 #include "product.hpp"
 
 class sum

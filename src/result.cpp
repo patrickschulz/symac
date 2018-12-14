@@ -7,6 +7,7 @@
 #include "component.hpp"
 #include "parser/expression_parser.hpp"
 #include "symbol.hpp"
+#include "transfer_function_parser/transfer_function.hpp"
 
 struct get_quantity_
 {
@@ -107,7 +108,7 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
     }
 }
 
-void result::print(const std::vector<command>& print_cmd) const
+void result::print(const std::vector<command>& print_cmd, bool pretty) const
 {
     std::cout << GiNaC::csrc;
     for(command cmd : print_cmd)
@@ -134,7 +135,15 @@ void result::print(const std::vector<command>& print_cmd) const
             {
                 get_quantity_ get_quantity(resultmap);
                 ast::eval<std::string, GiNaC::ex> eval(get_quantity);
-                std::cout << eval(expression) << '\n';
+                if(pretty)
+                {
+                    transfer_function tf(eval(expression));
+                    tf.pretty_print(std::cout, cmd.content + " = ");
+                }
+                else
+                {
+                    std::cout << eval(expression) << '\n';
+                }
             }
             else
             {

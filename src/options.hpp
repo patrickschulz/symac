@@ -49,6 +49,7 @@ class options
                 ("help,h"    , "produce help message")
                 ("version,v" , "show version")
                 ("print,p"   , "print network matrices")
+                ("pretty,P"  , "print the results in a pretty way (display transfer functions as fractions) THIS IS PRELIMINARY, CHECK YOUR RESULTS!")
                 ("reslist,N" , "print resulting netlist (after transformation of subcircuits)")
                 ("devices,D" , "print information about the usage of all components")
                 ("nodemap"   , "print the nodemap (mapping from user (string-) nodes to internal (integer-) nodes)")

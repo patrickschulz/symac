@@ -5,8 +5,10 @@
 #include <iostream>
 #include <vector>
 
-#include "sspace_symbols.hpp"
-#include "util.hpp"
+#include "product.hpp"
+#include "sum.hpp"
+#include "polynom.hpp"
+#include "../symbol.hpp"
 
 product parse_power(const GiNaC::ex& expr)
 {
@@ -81,6 +83,8 @@ class transfer_function
             GiNaC::ex numex = numden[0].expand();
             GiNaC::ex denex = numden[1].expand();
 
+            GiNaC::symbol s = get_symbol("s");
+
             for(int i = numex.ldegree(s); i <= numex.degree(s); ++i)
             {
                 GiNaC::ex expr = numex.coeff(s, i);
@@ -113,14 +117,14 @@ class transfer_function
             return transfer_function(num, den);
         }
 
-        void pretty_print(std::ostream& stream)
+        void pretty_print(std::ostream& stream, const std::string& prefix = std::string())
         {
             std::ostringstream stmp;
-            stmp << numerator;
+            stmp << GiNaC::dflt << numerator;
             unsigned int numsize = stmp.str().size();
             stmp.str("");
             stmp.clear();
-            stmp << denominator;
+            stmp << GiNaC::dflt << denominator;
             unsigned int densize = stmp.str().size();
 
             unsigned int numfill;
@@ -135,11 +139,13 @@ class transfer_function
                 numfill = (densize - numsize) / 2;
                 denfill = 0;
             }
-            unsigned int offset = 7;
-            unsigned int rulefill = 2;
+            unsigned int offset = prefix.size();
+            unsigned int rulefill = 4; // should be even
+            stream << GiNaC::dflt;
             stream << std::string(numfill + offset + rulefill / 2, ' ') << numerator << '\n';
-            stream << "H(s) = " << std::string(std::max(numsize, densize) + rulefill, '-') << '\n';
+            stream << prefix << std::string(std::max(numsize, densize) + rulefill, '-') << '\n';
             stream << std::string(denfill + offset + rulefill / 2, ' ') << denominator << '\n';
+            stream << '\n';
         }
 
         friend std::ostream& operator<<(std::ostream& stream, const transfer_function& tf);

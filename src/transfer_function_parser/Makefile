@@ -8,6 +8,7 @@ BUILDDIR := .build
 
 override BUILDDIR := $(strip $(BUILDDIR))
 SOURCES  := $(wildcard *.$(EXT))
+SOURCES  += ../symbol.cpp
 OBJECTS  := $(patsubst %.$(EXT), $(BUILDDIR)/%.o, $(SOURCES))
 DEPS     := $(patsubst %.$(EXT), $(BUILDDIR)/%.dep, $(SOURCES))
 

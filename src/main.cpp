@@ -34,7 +34,11 @@ int main(int argc, char** argv)
                     commandline_options["mode"].as<solver_mode>(), 
                     commandline_options.count("print")
                 );
-            res.print(nlist.get_print_cmds());
+            res.print
+                (
+                    nlist.get_print_cmds(),
+                    commandline_options.count("pretty")
+                );
         }
         else
         {

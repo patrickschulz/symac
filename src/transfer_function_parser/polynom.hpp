@@ -3,7 +3,6 @@
 
 #include <ginac/ginac.h>
 
-#include "sspace_symbols.hpp"
 #include "sum.hpp"
 
 struct monom
@@ -70,7 +69,7 @@ std::ostream& operator<<(std::ostream& stream, const polynom& p)
                 }
                 else
                 {
-                    stream << s;
+                    stream << "s";
                 }
                 stream << " * ";
             }

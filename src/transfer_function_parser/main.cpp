@@ -1,35 +1,21 @@
 #include <iostream>
 
-#include "sum.hpp"
-#include "product.hpp"
-#include "polynom.hpp"
 #include "transfer_function.hpp"
-
-#include "sspace_symbols.hpp"
-
-void ginacprint(const GiNaC::symbol& sym)
-{
-    std::cerr << sym << '\n';
-}
-
-void ginacprint(const GiNaC::numeric& num)
-{
-    std::cerr << num << '\n';
-}
-
-GiNaC::symbol s = GiNaC::symbol("s");
+#include "../symbol.hpp"
 
 int main()
 {
-    GiNaC::symbol R1("R1");
-    GiNaC::symbol R2("R2");
-    GiNaC::symbol C1("C1");
-    GiNaC::symbol C2("C2");
-    GiNaC::symbol A0("A0");
-    GiNaC::ex expr = A0 * (1 + s * R1 * C1 + s * R2 * C2) / (A0 * (1 + s * R1 * C1 + s*s * R1 * R2 * C1 * C2));
+    GiNaC::symbol s = get_symbol("s");
+    GiNaC::symbol gm1("gm1");
+    GiNaC::symbol gm2("gm2");
+    GiNaC::symbol rout1("rout1");
+    GiNaC::symbol rout2("rout2");
+    GiNaC::symbol Cl("Cl");
+    GiNaC::symbol vin("vin");
+    GiNaC::ex expr = (-gm1 * rout1 * vin - vin * s * gm1 * rout1 * rout2 * Cl) / (1 + s * (Cl * rout1 + Cl * rout2 + gm2 * rout2 * Cl * rout1));
 
     transfer_function tf(expr);
 
-    tf.pretty_print(std::cout);
+    tf.pretty_print(std::cout, "V(vs) = ");
 }
 
