@@ -42,7 +42,7 @@ static stamp get_conductance_stamp(const GiNaC::ex& value, unsigned int offset, 
     stmp.write(nodes[1], nodes[1],  value);
     stmp.write(nodes[0], nodes[1], -value);
     stmp.write(nodes[1], nodes[0], -value);
-    /*
+    /* Admittance-aproach
     value = 1 / value;
     stmp.write(offset, nodes[0], value);
     stmp.write(nodes[0], offset, 1);
