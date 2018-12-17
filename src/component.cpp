@@ -23,7 +23,7 @@ std::map<component_types, std::string> type_map {
 
 GiNaC::ex convert_expression(std::string s)
 {
-    qi::rule<std::string::iterator, std::string()> identifier = +qi::alnum;
+    qi::rule<Iterator, std::string()> identifier = +qi::alnum;
     symbolic_expression_type<std::string> symbolic_expression(identifier);
 
     ast::expression<std::string> expression;

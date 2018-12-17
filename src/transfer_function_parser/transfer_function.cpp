@@ -79,7 +79,7 @@ transfer_function::transfer_function(const GiNaC::ex& e)
     for(int i = numex.ldegree(s); i <= numex.degree(s); ++i)
     {
         GiNaC::ex expr = numex.coeff(s, i);
-        sum S = parse_sum(expr);
+        sum S = parse_sum(expr.expand());
         numerator.add_sum(S, i);
     }
     for(int i = denex.ldegree(s); i <= denex.degree(s); ++i)
@@ -88,6 +88,8 @@ transfer_function::transfer_function(const GiNaC::ex& e)
         sum S = parse_sum(expr);
         denominator.add_sum(S, i);
     }
+
+    unit = get_symbol("1");
 }
 
 transfer_function::transfer_function(const polynom& num, const polynom& den) :
@@ -108,15 +110,23 @@ transfer_function transfer_function::high_frequency() const
     return transfer_function(num, den);
 }
 
-void transfer_function::pretty_print(std::ostream& stream, const std::string& prefix) const
+unsigned int get_output_size(const GiNaC::ex& e)
 {
     std::ostringstream stmp;
-    stmp << GiNaC::dflt << numerator;
-    unsigned int numsize = stmp.str().size();
-    stmp.str("");
-    stmp.clear();
-    stmp << GiNaC::dflt << denominator;
-    unsigned int densize = stmp.str().size();
+    stmp << GiNaC::dflt << e;
+    return stmp.str().size();
+}
+unsigned int get_output_size(const polynom& p)
+{
+    std::ostringstream stmp;
+    stmp << GiNaC::dflt << p;
+    return stmp.str().size();
+}
+
+void transfer_function::pretty_print(std::ostream& stream, const std::string& prefix) const
+{
+    unsigned int numsize = get_output_size(numerator);
+    unsigned int densize = get_output_size(denominator);
 
     unsigned int numfill;
     unsigned int denfill;
@@ -130,12 +140,15 @@ void transfer_function::pretty_print(std::ostream& stream, const std::string& pr
         numfill = (densize - numsize) / 2;
         denfill = 0;
     }
-    unsigned int offset = prefix.size();
-    unsigned int rulefill = 4; // should be even
+    unsigned int offset = prefix.size() + get_output_size(unit) + 3; // +3 for the " * " after the unit part
+    unsigned int rulefill = 2;
     stream << GiNaC::dflt;
-    stream << std::string(numfill + offset + rulefill / 2, ' ') << numerator << '\n';
-    stream << prefix << std::string(std::max(numsize, densize) + rulefill, '-') << '\n';
-    stream << std::string(denfill + offset + rulefill / 2, ' ') << denominator << '\n';
+    // print numerator
+    stream << std::string(numfill + offset + rulefill, ' ') << numerator << '\n';
+    // print prefix, unit part and fraction rule
+    stream << prefix << unit << " * " << std::string(std::max(numsize, densize) + 2 * rulefill, '-') << '\n';
+    // print denominator
+    stream << std::string(denfill + offset + rulefill, ' ') << denominator << '\n';
     stream << '\n';
 }
 

@@ -9,21 +9,6 @@
 #include "symbol.hpp"
 #include "transfer_function_parser/transfer_function.hpp"
 
-struct get_quantity_
-{
-    get_quantity_(const std::map<std::string, GiNaC::ex>& m) :
-        resultmap(m)
-    { }
-
-    GiNaC::ex operator()(const std::string& s)
-    {
-        auto it = resultmap.find(s);
-        return it->second;
-    }
-
-    const std::map<std::string, GiNaC::ex> resultmap;
-};
-
 result::result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap)
 {
     // insert ground
@@ -118,52 +103,73 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
     }
 }
 
-void result::print(const std::vector<command>& print_cmd, bool pretty) const
+bool check_expression(const ast::expression<std::string>& expression, const std::map<std::string, GiNaC::ex>& resultmap)
 {
-    std::cout << GiNaC::csrc;
-    for(command cmd : print_cmd)
+    auto f = [](const std::string& s, const std::map<std::string, GiNaC::ex>& resmap) -> bool
     {
-        // create the expression parser
-        qi::rule<std::string::iterator, std::string()> voltage = "V(" >> +(qi::alnum | qi::char_("-:_!")) >> ")";
-        qi::rule<std::string::iterator, std::string()> current = "I(" >> +qi::alnum >> qi::char_(".") >> +qi::alpha >> ")";
-        qi::rule<std::string::iterator, std::string()> identifier = voltage | current;
-        symbolic_expression_type<std::string> symbolic_expression(identifier);
+        auto it = resmap.find(s);
+        return it != resmap.end();
+    };
+    using namespace std::placeholders;
+    ast::checker<std::string> checker(std::bind(f, _1, resultmap));
+    return checker(expression);
+}
 
-        ast::expression<std::string> expression;
+GiNaC::ex evaluate_expression(const ast::expression<std::string>& expression, const std::map<std::string, GiNaC::ex>& resultmap)
+{
+    auto f = [](const std::string& s, const std::map<std::string, GiNaC::ex>& resmap) -> GiNaC::ex
+    {
+        auto it = resmap.find(s);
+        return it->second;
+    };
+    using namespace std::placeholders;
+    ast::eval<std::string, GiNaC::ex> eval(std::bind(f, _1, resultmap));
+    return eval(expression);
+}
 
-        bool r = phrase_parse(cmd.content.begin(), cmd.content.end(), symbolic_expression, qi::blank, expression);
-        if (r)
+void print_command(command cmd, const symbolic_expression_type<std::string>& symbolic_expression, const std::map<std::string, GiNaC::ex>& resultmap, bool pretty)
+{
+    ast::expression<std::string> expression;
+
+    bool r = phrase_parse(cmd.content.begin(), cmd.content.end(), symbolic_expression, qi::blank, expression);
+    if (r)
+    {
+        if(check_expression(expression, resultmap))
         {
-            auto f = [](const std::string& s, const std::map<std::string, GiNaC::ex>& resmap) -> bool
+            GiNaC::ex res = evaluate_expression(expression, resultmap);
+            if(pretty)
             {
-                auto it = resmap.find(s);
-                return it != resmap.end();
-            };
-            using namespace std::placeholders;
-            ast::checker<std::string> checker(std::bind(f, _1, resultmap));
-            if(checker(expression))
-            {
-                get_quantity_ get_quantity(resultmap);
-                ast::eval<std::string, GiNaC::ex> eval(get_quantity);
-                if(pretty)
-                {
-                    transfer_function tf(eval(expression));
-                    tf.pretty_print(std::cout, cmd.content + " = ");
-                }
-                else
-                {
-                    std::cout << eval(expression) << '\n';
-                }
+                transfer_function tf(res);
+                tf.pretty_print(std::cout, cmd.content + " = ");
             }
             else
             {
-                std::cerr << "expression " << '"' <<  cmd.content << '"' << " contains unknown symbols\n";
+                std::cout << res << '\n';
             }
         }
         else
         {
-            std::cerr << "could not parse expression " << '"' << cmd.content << '"' << '\n';
+            std::cerr << "expression " << '"' <<  cmd.content << '"' << " contains unknown symbols\n";
         }
+    }
+    else
+    {
+        std::cerr << "could not parse expression " << '"' << cmd.content << '"' << '\n';
+    }
+}
+
+void result::print(const std::vector<command>& print_cmd, bool pretty) const
+{
+    // create the expression parser
+    qi::rule<Iterator, std::string()> voltage = "V(" >> +(qi::alnum | qi::char_("-:_!")) >> ")";
+    qi::rule<Iterator, std::string()> current = "I(" >> +qi::alnum >> qi::char_(".") >> +qi::alpha >> ")";
+    qi::rule<Iterator, std::string()> identifier = voltage | current;
+    symbolic_expression_type<std::string> symbolic_expression(identifier);
+
+    std::cout << GiNaC::csrc; // set output format
+    for(const command& cmd : print_cmd)
+    {
+        print_command(cmd, symbolic_expression, resultmap, pretty);
     }
 }
 

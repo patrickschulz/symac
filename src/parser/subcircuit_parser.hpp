@@ -52,10 +52,8 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::vector<std::string>, terminals)
 )
 
-struct subcircuit_instance_parser_type : public qi::grammar<std::string::iterator, Skipper_type, subcircuit_instance()>
+struct subcircuit_instance_parser_type : public qi::grammar<Iterator, Skipper_type, subcircuit_instance()>
 {
-    typedef std::string::iterator Iterator;
-
     subcircuit_instance_parser_type() : subcircuit_instance_parser_type::base_type(main, "subcircuit_instance")
     {
         using qi::alnum;
