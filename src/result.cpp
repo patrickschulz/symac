@@ -7,7 +7,7 @@
 #include "component.hpp"
 #include "parser/expression_parser.hpp"
 #include "symbol.hpp"
-#include "transfer_function_parser/transfer_function.hpp"
+#include "transfer_function/transfer_function.hpp"
 
 result::result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap)
 {
