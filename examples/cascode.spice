@@ -1,0 +1,13 @@
+Gm1 0 vs vin 0 gm1
+Rout1 vs 0 rout1
+Gm2 vs vout vbias vs gm2
+Rout2 vout vs rout2
+
+* capacitances
+Cl vout 0 Cl
+Cs vs 0 Cs
+
+Vbias vbias 0 0
+Vin vin 0 vin
+
+.print V(vout) / V(vin)
