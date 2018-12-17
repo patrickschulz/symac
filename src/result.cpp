@@ -137,14 +137,14 @@ void print_command(command cmd, const symbolic_expression_type<std::string>& sym
         if(check_expression(expression, resultmap))
         {
             GiNaC::ex res = evaluate_expression(expression, resultmap);
+            transfer_function tf(res);
             if(pretty)
             {
-                transfer_function tf(res);
                 tf.pretty_print(std::cout, cmd.content + " = ");
             }
             else
             {
-                std::cout << res << '\n';
+                std::cout << tf << '\n';
             }
         }
         else

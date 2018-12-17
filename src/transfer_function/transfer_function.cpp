@@ -76,8 +76,6 @@ transfer_function::transfer_function(const GiNaC::ex& e)
 
     GiNaC::symbol s = get_symbol("s");
 
-    std::cout << numex.unit(s) << '\n';
-
     for(int i = numex.ldegree(s); i <= numex.degree(s); ++i)
     {
         GiNaC::ex expr = numex.coeff(s, i);
