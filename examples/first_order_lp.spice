@@ -2,4 +2,4 @@ V0 vin 0 vin
 R0 vin vout R
 C0 vout 0 C
 
-.print V(vout)
+.print V(vout) / V(vin)
