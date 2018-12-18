@@ -5,8 +5,8 @@ Gm s d g s gm
 Ro d s ro
 .end
 
-V0 vinx 0 vin
-R0 vinx vin Rs
-X0 mosfet vin 0 vout
+V0 vin 0 vin
+R0 vin vinx Rs
+X0 mosfet vinx 0 vout
 
-.print V(vout)
+.print V(vout) / V(vin)

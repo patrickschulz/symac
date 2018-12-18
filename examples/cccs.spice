@@ -1,8 +1,9 @@
-* CCVS test
+* CCCS test
 V0 vin 0 Vin
 R1 vin vx Rin
 R2 vout 0 Rout
 H0 0 vout vx 0 gain
 
-.print V(vx)
+.print I(V0.n)
+.print I(H0.p)
 .print V(vout)

@@ -77,6 +77,9 @@ transfer_function::transfer_function(const GiNaC::ex& e) :
 
     GiNaC::symbol s = get_symbol("s");
 
+    prefix = parse_sum(numex.unit(s) * numex.content(s));
+
+    numex = numex.primpart(s);
     for(int i = numex.ldegree(s); i <= numex.degree(s); ++i)
     {
         GiNaC::ex expr = numex.coeff(s, i);
@@ -89,8 +92,6 @@ transfer_function::transfer_function(const GiNaC::ex& e) :
         sum S = parse_sum(expr);
         denominator.add_sum(S, i);
     }
-
-    unit = 1;
 }
 
 transfer_function::transfer_function(const polynom& num, const polynom& den) :
@@ -123,15 +124,22 @@ unsigned int get_output_size(const polynom& p)
     stmp << GiNaC::dflt << p;
     return stmp.str().size();
 }
+unsigned int get_output_size(const sum& s)
+{
+    std::ostringstream stmp;
+    stmp << GiNaC::dflt << s;
+    return stmp.str().size();
+}
 
 GiNaC::ex transfer_function::to_ginac(const GiNaC::symbol& s) const
 {
     GiNaC::ex num = numerator.to_ginac(s);
     GiNaC::ex den = denominator.to_ginac(s);
-    return num / den;
+    GiNaC::ex pre = prefix.to_ginac();
+    return pre* num / den;
 }
 
-void transfer_function::pretty_print(std::ostream& stream, const std::string& prefix) const
+void transfer_function::pretty_print(std::ostream& stream, const std::string& strpre) const
 {
     unsigned int numsize = get_output_size(numerator);
     unsigned int densize = get_output_size(denominator);
@@ -148,13 +156,13 @@ void transfer_function::pretty_print(std::ostream& stream, const std::string& pr
         numfill = (densize - numsize) / 2;
         denfill = 0;
     }
-    unsigned int offset = prefix.size() + get_output_size(unit) + 3; // +3 for the " * " after the unit part
+    unsigned int offset = strpre.size() + get_output_size(prefix) + 3; // +3 for the " * " after the prefix part
     unsigned int rulefill = 2;
     stream << GiNaC::dflt;
     // print numerator
     stream << std::string(numfill + offset + rulefill, ' ') << numerator << '\n';
-    // print prefix, unit part and fraction rule
-    stream << prefix << unit << " * " << std::string(std::max(numsize, densize) + 2 * rulefill, '-') << '\n';
+    // print strpre, prefix part and fraction rule
+    stream << strpre << prefix << " * " << std::string(std::max(numsize, densize) + 2 * rulefill, '-') << '\n';
     // print denominator
     stream << std::string(denfill + offset + rulefill, ' ') << denominator << '\n';
     stream << '\n';

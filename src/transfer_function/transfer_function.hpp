@@ -29,7 +29,7 @@ class transfer_function
         friend std::ostream& operator<<(std::ostream& stream, const transfer_function& tf);
 
     private:
-        GiNaC::ex unit;
+        sum prefix;
         polynom numerator;
         polynom denominator;
 };
