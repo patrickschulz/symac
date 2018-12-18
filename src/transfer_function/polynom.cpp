@@ -1,5 +1,11 @@
 #include "polynom.hpp"
 
+polynom::polynom(const std::string& var) :
+    variable(var)
+{
+
+}
+
 void polynom::set_monom(const monom& m, unsigned int degree)
 {
     monoms.resize(degree + 1);
@@ -25,7 +31,7 @@ monom polynom::get_monom(unsigned int degree) const
 
 polynom polynom::select_monoms(unsigned int degree) const
 {
-    polynom pol;
+    polynom pol(variable);
     pol.set_monom(get_monom(degree), degree);
     return pol;
 }
@@ -37,7 +43,7 @@ GiNaC::ex polynom::to_ginac(const GiNaC::symbol& var) const
     {
         if(monoms[i].valid)
         {
-            res = GiNaC::pow(var, i) * monoms[i].sum_.to_ginac();
+            res = res + GiNaC::pow(var, i) * monoms[i].sum_.to_ginac();
         }
     }
     return res;
@@ -51,13 +57,10 @@ std::ostream& operator<<(std::ostream& stream, const polynom& p)
         {
             if(i > 0)
             {
+                stream << p.variable;
                 if(i > 1)
                 {
-                    stream << "s^" << i;
-                }
-                else
-                {
-                    stream << "s";
+                    stream << "^" << i;
                 }
                 stream << " * ";
             }

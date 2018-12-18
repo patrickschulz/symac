@@ -18,6 +18,8 @@ struct monom
 class polynom
 {
     public:
+        polynom(const std::string& var);
+
         void set_monom(const monom& m, unsigned int degree);
 
         void add_sum(const sum& s, unsigned int degree);
@@ -33,6 +35,7 @@ class polynom
         friend std::ostream& operator<<(std::ostream& stream, const polynom& p);
 
     private:
+        std::string variable;
         std::vector<monom> monoms;
 };
 

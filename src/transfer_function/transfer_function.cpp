@@ -68,7 +68,8 @@ sum parse_sum(const GiNaC::ex& expr)
     return S;
 }
 
-transfer_function::transfer_function(const GiNaC::ex& e)
+transfer_function::transfer_function(const GiNaC::ex& e) :
+    numerator("s"), denominator("s")
 {
     GiNaC::ex numden = e.numer_denom();
     GiNaC::ex numex = numden[0].expand();
