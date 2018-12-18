@@ -1,35 +1,43 @@
 #include "sum.hpp"
 
+void sum::add_sum(const sum& s)
+{
+    for(const product& p : s.products)
+    {
+        add_product(p);
+    }
+}
+
 void sum::add_product(const product& p)
 {
-    vec.push_back(p);
+    products.push_back(p);
 }
 
 GiNaC::ex sum::to_ginac() const
 {
     GiNaC::ex res;
-    for(const auto& e : vec)
+    for(const auto& e : products)
     {
-        res = res + e;
+        res = res + e.to_ginac();
     }
     return res;
 }
 
 std::ostream& operator<<(std::ostream& stream, const sum& s)
 {
-    if(s.vec.size() > 1)
+    if(s.products.size() > 1)
     {
         stream << '(';
     }
-    for(unsigned int i = 0; i < s.vec.size(); ++i)
+    for(unsigned int i = 0; i < s.products.size(); ++i)
     {
-        stream << s.vec[i];
-        if(i != s.vec.size() - 1)
+        stream << s.products[i];
+        if(i != s.products.size() - 1)
         {
             stream << " + ";
         }
     }
-    if(s.vec.size() > 1)
+    if(s.products.size() > 1)
     {
         stream << ')';
     }

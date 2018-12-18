@@ -123,6 +123,13 @@ unsigned int get_output_size(const polynom& p)
     return stmp.str().size();
 }
 
+GiNaC::ex transfer_function::to_ginac(const GiNaC::symbol& s) const
+{
+    GiNaC::ex num = numerator.to_ginac(s);
+    GiNaC::ex den = denominator.to_ginac(s);
+    return num / den;
+}
+
 void transfer_function::pretty_print(std::ostream& stream, const std::string& prefix) const
 {
     unsigned int numsize = get_output_size(numerator);

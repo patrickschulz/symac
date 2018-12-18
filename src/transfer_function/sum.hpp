@@ -9,6 +9,7 @@
 class sum
 {
     public:
+        void add_sum(const sum& s);
         void add_product(const product& p);
 
         GiNaC::ex to_ginac() const;
@@ -16,7 +17,7 @@ class sum
         friend std::ostream& operator<<(std::ostream& stream, const sum& s);
 
     private:
-        std::vector<product> vec;
+        std::vector<product> products;
 };
 
 #endif // SUM_HPP

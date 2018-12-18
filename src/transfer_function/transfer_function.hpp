@@ -22,6 +22,8 @@ class transfer_function
         transfer_function low_frequency() const;
         transfer_function high_frequency() const;
 
+        GiNaC::ex to_ginac(const GiNaC::symbol&) const;
+
         void pretty_print(std::ostream& stream, const std::string& prefix = std::string()) const;
 
         friend std::ostream& operator<<(std::ostream& stream, const transfer_function& tf);

@@ -2,25 +2,25 @@
 
 void polynom::set_monom(const monom& m, unsigned int degree)
 {
-    vec.resize(degree + 1);
-    vec[degree] = m;
+    monoms.resize(degree + 1);
+    monoms[degree] = m;
 }
 
 void polynom::add_sum(const sum& s, unsigned int degree)
 {
-    vec.resize(degree + 1);
-    vec[degree].sums.push_back(s);
-    vec[degree].valid = true;
+    monoms.resize(degree + 1);
+    monoms[degree].sum_.add_sum(s);
+    monoms[degree].valid = true;
 }
 
 unsigned int polynom::degree() const
 {
-    return vec.size() - 1;
+    return monoms.size() - 1;
 }
 
 monom polynom::get_monom(unsigned int degree) const
 {
-    return vec[degree];
+    return monoms[degree];
 }
 
 polynom polynom::select_monoms(unsigned int degree) const
@@ -33,11 +33,11 @@ polynom polynom::select_monoms(unsigned int degree) const
 GiNaC::ex polynom::to_ginac(const GiNaC::symbol& var) const
 {
     GiNaC::ex res;
-    for(unsigned int i = 0; i < vec.size(); ++i)
+    for(unsigned int i = 0; i < monoms.size(); ++i)
     {
-        if(vec[i].valid)
+        if(monoms[i].valid)
         {
-            res = var^i * vec[i].to_ginac();
+            res = GiNaC::pow(var, i) * monoms[i].sum_.to_ginac();
         }
     }
     return res;
@@ -45,9 +45,9 @@ GiNaC::ex polynom::to_ginac(const GiNaC::symbol& var) const
 
 std::ostream& operator<<(std::ostream& stream, const polynom& p)
 {
-    for(unsigned int i = 0; i < p.vec.size(); ++i)
+    for(unsigned int i = 0; i < p.monoms.size(); ++i)
     {
-        if(p.vec[i].valid)
+        if(p.monoms[i].valid)
         {
             if(i > 0)
             {
@@ -61,23 +61,8 @@ std::ostream& operator<<(std::ostream& stream, const polynom& p)
                 }
                 stream << " * ";
             }
-            if(p.vec[i].sums.size() > 1)
-            {
-                stream << '(';
-            }
-            for(unsigned int j = 0; j < p.vec[i].sums.size(); ++j)
-            {
-                stream << p.vec[i].sums[j];
-                if(j != p.vec[i].sums.size() - 1)
-                {
-                    stream << " + ";
-                }
-            }
-            if(p.vec[i].sums.size() > 1)
-            {
-                stream << ')';
-            }
-            if(i != p.vec.size() - 1)
+            stream << p.monoms[i].sum_;
+            if(i != p.monoms.size() - 1)
             {
                 stream << " + ";
             }

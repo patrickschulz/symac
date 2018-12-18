@@ -144,7 +144,7 @@ void print_command(command cmd, const symbolic_expression_type<std::string>& sym
             }
             else
             {
-                std::cout << tf << '\n';
+                std::cout << tf.to_ginac(get_symbol("s")) << '\n';
             }
         }
         else

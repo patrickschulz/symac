@@ -11,7 +11,7 @@ struct monom
     monom() : valid(false)
     { }
 
-    std::vector<sum> sums;
+    sum sum_;
     bool valid;
 };
 
@@ -33,7 +33,7 @@ class polynom
         friend std::ostream& operator<<(std::ostream& stream, const polynom& p);
 
     private:
-        std::vector<monom> vec;
+        std::vector<monom> monoms;
 };
 
 #endif // POLYNOM_HPP
