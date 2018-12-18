@@ -32,6 +32,16 @@ void product::add_factor(const GiNaC::ex& expr)
     }
 }
 
+GiNaC::ex product::to_ginac() const
+{
+    GiNaC::ex res = prefix;
+    for(const auto& e: elements)
+    {
+        res = res * e;
+    }
+    return res;
+}
+
 std::ostream& operator<<(std::ostream& stream, const product& p)
 {
     if(p.prefix != 1 || p.elements.size() == 0)

@@ -28,6 +28,8 @@ class polynom
 
         polynom select_monoms(unsigned int degree) const;
 
+        GiNaC::ex to_ginac(const GiNaC::symbol&) const;
+
         friend std::ostream& operator<<(std::ostream& stream, const polynom& p);
 
     private:

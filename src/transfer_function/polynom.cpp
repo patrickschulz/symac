@@ -30,6 +30,19 @@ polynom polynom::select_monoms(unsigned int degree) const
     return pol;
 }
 
+GiNaC::ex polynom::to_ginac(const GiNaC::symbol& var) const
+{
+    GiNaC::ex res;
+    for(unsigned int i = 0; i < vec.size(); ++i)
+    {
+        if(vec[i].valid)
+        {
+            res = var^i * vec[i].to_ginac();
+        }
+    }
+    return res;
+}
+
 std::ostream& operator<<(std::ostream& stream, const polynom& p)
 {
     for(unsigned int i = 0; i < p.vec.size(); ++i)

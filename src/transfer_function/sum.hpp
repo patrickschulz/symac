@@ -11,6 +11,8 @@ class sum
     public:
         void add_product(const product& p);
 
+        GiNaC::ex to_ginac() const;
+
         friend std::ostream& operator<<(std::ostream& stream, const sum& s);
 
     private:

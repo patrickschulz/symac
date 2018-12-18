@@ -15,6 +15,8 @@ class product
         void add_factor(const GiNaC::numeric& num);
         void add_factor(const GiNaC::ex& expr);
 
+        GiNaC::ex to_ginac() const;
+
         friend std::ostream& operator<<(std::ostream& stream, const product& p);
         friend product operator*(const product& left, const product& right);
 
