@@ -46,6 +46,17 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
                 resultmap[str(fmter % c.get_name() % "n")] = -voltage * value;
                 break;
             }
+            case ct_inductor:
+            {
+                GiNaC::ex value = c.get_value();
+                std::vector<std::string> nodes = c.get_nodes();
+                GiNaC::ex voltage = resultmap[nodes[0]] - resultmap[nodes[1]];
+                boost::format fmter = boost::format("%s.%s");
+                GiNaC::ex s = get_symbol("s");
+                resultmap[str(fmter % c.get_name() % "p")] =  voltage / s / value;
+                resultmap[str(fmter % c.get_name() % "n")] = -voltage / s / value;
+                break;
+            }
             case ct_capacitor:
             {
                 GiNaC::ex value = c.get_value();
@@ -68,7 +79,6 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
                 break;
             }
             case ct_voltage_source:
-            case ct_inductor:
             case ct_opamp:
             case ct_voltage_controlled_voltage_source:
             case ct_current_controlled_current_source:
@@ -166,7 +176,7 @@ void result::print(const std::vector<command>& print_cmd, bool pretty) const
     qi::rule<Iterator, std::string()> identifier = voltage | current;
     symbolic_expression_type<std::string> symbolic_expression(identifier);
 
-    std::cout << GiNaC::csrc; // set output format
+    std::cout << GiNaC::dflt; // set output format
     for(const command& cmd : print_cmd)
     {
         print_command(cmd, symbolic_expression, resultmap, pretty);

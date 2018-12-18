@@ -12,22 +12,22 @@
 
 static stamp get_impedance_stamp(const GiNaC::ex& value, unsigned int offset, const std::vector<unsigned int>& nodes)
 {
+    // suppress warning
+    (void) offset;
+
     stamp stmp;
-    if(value.is_zero()) // Impedance approach
-    {
-        stmp.write(offset, nodes[0], 1);
-        stmp.write(nodes[0], offset, 1);
-        stmp.write(offset, nodes[1], -1);
-        stmp.write(nodes[1], offset, -1);
-        stmp.write(offset, offset, -value);
-    }
-    else // G-Matrix
-    {
-        stmp.write(nodes[0], nodes[0],  1 / value);
-        stmp.write(nodes[1], nodes[1],  1 / value);
-        stmp.write(nodes[0], nodes[1], -1 / value);
-        stmp.write(nodes[1], nodes[0], -1 / value);
-    }
+    // G-Matrix
+    stmp.write(nodes[0], nodes[0],  1 / value);
+    stmp.write(nodes[1], nodes[1],  1 / value);
+    stmp.write(nodes[0], nodes[1], -1 / value);
+    stmp.write(nodes[1], nodes[0], -1 / value);
+    /* Impedance approach
+    stmp.write(offset, nodes[0], 1);
+    stmp.write(nodes[0], offset, 1);
+    stmp.write(offset, nodes[1], -1);
+    stmp.write(nodes[1], offset, -1);
+    stmp.write(offset, offset, -value);
+    */
     return stmp;
 }
 
@@ -43,7 +43,6 @@ static stamp get_conductance_stamp(const GiNaC::ex& value, unsigned int offset, 
     stmp.write(nodes[0], nodes[1], -value);
     stmp.write(nodes[1], nodes[0], -value);
     /* Admittance-aproach
-    value = 1 / value;
     stmp.write(offset, nodes[0], value);
     stmp.write(nodes[0], offset, 1);
     stmp.write(offset, nodes[1], -value);
