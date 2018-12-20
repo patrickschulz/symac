@@ -8,7 +8,10 @@ polynom::polynom(const std::string& var) :
 
 void polynom::set_monom(const monom& m, unsigned int degree)
 {
-    monoms.resize(degree + 1);
+    if(degree > this->degree())
+    {
+        monoms.resize(degree + 1);
+    }
     monoms[degree] = m;
 }
 

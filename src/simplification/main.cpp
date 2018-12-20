@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 
+#include "../symbol.hpp"
 #include "simplification.hpp"
 
 template<typename T>
@@ -31,6 +32,8 @@ int main()
     GiNaC::symbol Cl("Cl");
     GiNaC::symbol Cs("Cs");
 
+    GiNaC::symbol s = get_symbol("s");
+
     std::map<GiNaC::symbol, int, GiNaC::ex_is_less> weightmap
     {
         { R1, 1 },
@@ -47,21 +50,10 @@ int main()
         { Cs, 0 }
     };
 
-    std::vector<GiNaC::ex> expressions
-    {
-        { R1 * C1 + R2 * C2 },
-        { R1 * C1 + gm * rout * R1 * C2 },
-        { rout1 * Cl + rout1 * Cs + rout2 * Cl + gm2 * rout2 * rout1 * Cl }
-    };
-
-    for(const auto& expr : expressions)
-    {
-        sum s = parse_sum(expr);
-
-        auto weights = calculate_weights(s, weightmap);
-        auto indices = calculate_indices_to_keep(weights);
-        sum ns = create_new_expression(s, indices);
-
-        std::cout << s << " -----> " << ns << '\n';
-    }
+    //transfer_function tf(gm1 * rout1 * gm2 * rout2 + gm1 * rout1 / (1 + s * (rout1 * Cl + rout2 * Cl + gm2 * rout2 * rout1 * Cl)));
+    GiNaC::ex expr = (gm1 * rout1 * gm2 * rout2 + gm1 * rout1) / (1 + s * rout1 * Cl + s * rout2 * Cl + s * gm2 * rout2 * rout1 * Cl);
+    transfer_function tf(expr);
+    tf.pretty_print(std::cout);
+    transfer_function simple_tf = simplify(tf, weightmap);
+    simple_tf.pretty_print(std::cout);
 }

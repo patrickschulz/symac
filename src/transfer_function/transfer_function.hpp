@@ -15,12 +15,20 @@ sum parse_sum(const GiNaC::ex& expr);
 class transfer_function
 {
     public:
+        transfer_function();
         transfer_function(const GiNaC::ex& e);
 
         transfer_function(const polynom& num, const polynom& den);
 
         transfer_function low_frequency() const;
         transfer_function high_frequency() const;
+
+        void set_prefix(const sum& s);
+        void set_numerator(const polynom& num);
+        void set_denominator(const polynom& den);
+        sum get_prefix() const;
+        polynom get_numerator() const;
+        polynom get_denominator() const;
 
         GiNaC::ex to_ginac(const GiNaC::symbol&) const;
 

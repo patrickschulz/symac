@@ -68,6 +68,10 @@ sum parse_sum(const GiNaC::ex& expr)
     return S;
 }
 
+transfer_function::transfer_function() :
+    numerator("s"), denominator("s")
+{ }
+
 transfer_function::transfer_function(const GiNaC::ex& e) :
     numerator("s"), denominator("s")
 {
@@ -131,6 +135,37 @@ unsigned int get_output_size(const sum& s)
     return stmp.str().size();
 }
 
+void transfer_function::set_prefix(const sum& s)
+{
+    prefix = s;
+}
+
+void transfer_function::set_numerator(const polynom& num)
+{
+    numerator = num;
+}
+
+void transfer_function::set_denominator(const polynom& den)
+{
+
+    denominator = den;
+}
+
+sum transfer_function::get_prefix() const
+{
+    return prefix;
+}
+
+polynom transfer_function::get_numerator() const
+{
+    return numerator;
+}
+
+polynom transfer_function::get_denominator() const
+{
+    return denominator;
+}
+
 GiNaC::ex transfer_function::to_ginac(const GiNaC::symbol& s) const
 {
     GiNaC::ex num = numerator.to_ginac(s);
@@ -170,6 +205,6 @@ void transfer_function::pretty_print(std::ostream& stream, const std::string& st
 
 std::ostream& operator<<(std::ostream& stream, const transfer_function& tf)
 {
-    stream << '(' << tf.numerator << ')' << " / " << '(' << tf.denominator << ')';
+    stream << tf.prefix << " * " << '(' << tf.numerator << ')' << " / " << '(' << tf.denominator << ')';
     return stream;
 }
