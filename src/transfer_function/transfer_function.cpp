@@ -176,30 +176,75 @@ GiNaC::ex transfer_function::to_ginac(const GiNaC::symbol& s) const
 
 void transfer_function::pretty_print(std::ostream& stream, const std::string& strpre) const
 {
-    unsigned int numsize = get_output_size(numerator);
-    unsigned int densize = get_output_size(denominator);
-
-    unsigned int numfill;
-    unsigned int denfill;
-    if(numsize > densize)
+    if(denominator.to_ginac(get_symbol("s")).is_equal(GiNaC::ex(1)))
     {
-        numfill = 0;
-        denfill = (numsize - densize) / 2;
+        if(numerator.to_ginac(get_symbol("s")).is_equal(GiNaC::ex(1)))
+        {
+            stream << strpre << prefix << '\n';
+        }
+        else
+        {
+            stream << strpre << prefix << " * " << numerator << '\n';
+        }
     }
     else
     {
-        numfill = (densize - numsize) / 2;
-        denfill = 0;
+        if(numerator.to_ginac(get_symbol("s")).is_equal(GiNaC::ex(1)))
+        {
+            unsigned int numsize = get_output_size(prefix);
+            unsigned int densize = get_output_size(denominator);
+
+            unsigned int numfill;
+            unsigned int denfill;
+            if(numsize > densize)
+            {
+                numfill = 0;
+                denfill = (numsize - densize) / 2;
+            }
+            else
+            {
+                numfill = (densize - numsize) / 2;
+                denfill = 0;
+            }
+            unsigned int offset = strpre.size();
+            unsigned int rulefill = 2;
+            stream << GiNaC::dflt;
+            // print numerator
+            stream << std::string(numfill + offset + rulefill, ' ') << prefix << '\n';
+            // print strpre and fraction rule
+            stream << strpre << std::string(std::max(numsize, densize) + 2 * rulefill, '-') << '\n';
+            // print denominator
+            stream << std::string(denfill + offset + rulefill, ' ') << denominator << '\n';
+        }
+        else
+        {
+            unsigned int numsize = get_output_size(numerator);
+            unsigned int densize = get_output_size(denominator);
+            unsigned int presize = get_output_size(prefix);
+
+            unsigned int numfill;
+            unsigned int denfill;
+            if(numsize > densize)
+            {
+                numfill = 0;
+                denfill = (numsize - densize) / 2;
+            }
+            else
+            {
+                numfill = (densize - numsize) / 2;
+                denfill = 0;
+            }
+            unsigned int offset = strpre.size() + presize + 3; // +3 for the " * " after the prefix part
+            unsigned int rulefill = 2;
+            stream << GiNaC::dflt;
+            // print numerator
+            stream << std::string(numfill + offset + rulefill, ' ') << numerator << '\n';
+            // print strpre, prefix part and fraction rule
+            stream << strpre << prefix << " * " << std::string(std::max(numsize, densize) + 2 * rulefill, '-') << '\n';
+            // print denominator
+            stream << std::string(denfill + offset + rulefill, ' ') << denominator << '\n';
+        }
     }
-    unsigned int offset = strpre.size() + get_output_size(prefix) + 3; // +3 for the " * " after the prefix part
-    unsigned int rulefill = 2;
-    stream << GiNaC::dflt;
-    // print numerator
-    stream << std::string(numfill + offset + rulefill, ' ') << numerator << '\n';
-    // print strpre, prefix part and fraction rule
-    stream << strpre << prefix << " * " << std::string(std::max(numsize, densize) + 2 * rulefill, '-') << '\n';
-    // print denominator
-    stream << std::string(denfill + offset + rulefill, ' ') << denominator << '\n';
     stream << '\n';
 }
 
