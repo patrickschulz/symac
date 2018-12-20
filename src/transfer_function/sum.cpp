@@ -23,6 +23,16 @@ GiNaC::ex sum::to_ginac() const
     return res;
 }
 
+std::vector<product>::const_iterator sum::begin() const
+{
+    return products.begin();
+}
+
+std::vector<product>::const_iterator sum::end() const
+{
+    return products.end();
+}
+
 std::ostream& operator<<(std::ostream& stream, const sum& s)
 {
     if(s.products.size() > 1)

@@ -42,6 +42,21 @@ GiNaC::ex product::to_ginac() const
     return res;
 }
 
+GiNaC::numeric product::get_prefix() const
+{
+    return prefix;
+}
+
+std::vector<GiNaC::symbol>::const_iterator product::begin() const
+{
+    return elements.begin();
+}
+
+std::vector<GiNaC::symbol>::const_iterator product::end() const
+{
+    return elements.end();
+}
+
 std::ostream& operator<<(std::ostream& stream, const product& p)
 {
     if(p.prefix != 1 || p.elements.size() == 0)

@@ -17,6 +17,10 @@ class product
 
         GiNaC::ex to_ginac() const;
 
+        GiNaC::numeric get_prefix() const;
+        std::vector<GiNaC::symbol>::const_iterator begin() const;
+        std::vector<GiNaC::symbol>::const_iterator end() const;
+
         friend std::ostream& operator<<(std::ostream& stream, const product& p);
         friend product operator*(const product& left, const product& right);
 

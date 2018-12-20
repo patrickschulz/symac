@@ -16,6 +16,9 @@ class sum
 
         friend std::ostream& operator<<(std::ostream& stream, const sum& s);
 
+        std::vector<product>::const_iterator begin() const;
+        std::vector<product>::const_iterator end() const;
+
     private:
         std::vector<product> products;
 };
