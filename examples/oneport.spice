@@ -1,3 +1,6 @@
 R0 v1 0 R0
 
 P0 v1 0
+
+.print Z(1, 1)
+.print Y(1, 1)

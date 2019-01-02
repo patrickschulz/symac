@@ -5,3 +5,8 @@ G2 0 v2 v1 0 y21
 
 P1 v1 0
 P2 v2 0
+
+.print Y(1, 1)
+.print Y(1, 2)
+.print Y(2, 1)
+.print Y(2, 2)
