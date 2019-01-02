@@ -38,17 +38,17 @@ int main()
 
     auto weightmap = compute_weightmap(inequalities);
 
-    /*
-    GiNaC::ex expr = (gm1 * rout1 * gm2 * rout2 + gm1 * rout1) / (1 + s * rout1 * Cl + s * rout2 * Cl + s * gm2 * rout2 * rout1 * Cl);
+    GiNaC::ex expr = (gm1 * rout1 * gm2 * rout2 + gm1 * rout1) / (1 + s * rout1 * Cl + s * rout2 * Cl + s * gm2 * rout2 * rout1 * Cl + s*s * rout1 * rout2 * Cs * Cl);
     transfer_function tf(expr);
     tf.pretty_print(std::cout);
     transfer_function simple_tf = simplify(tf, weightmap);
     simple_tf.pretty_print(std::cout);
-    */
 
+    /*
     GiNaC::ex expr = (R1 * R2) / (R1 + R2);
     transfer_function tf(expr);
     tf.pretty_print(std::cout);
     transfer_function simple_tf = simplify(tf, weightmap);
     simple_tf.pretty_print(std::cout);
+    */
 }

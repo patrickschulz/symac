@@ -55,6 +55,11 @@ std::vector<int> compute_parallel_computing_order(const Graph&g, const std::list
             time[e] = maxdist + 1;
         }
     }
+    int mm = *std::max_element(time.begin(), time.end());
+    for(auto& t : time)
+    {
+        t = mm - t;
+    }
     return time;
 }
 
@@ -98,19 +103,6 @@ std::vector<edge> get_edge_array(const std::vector<GiNaC::symbol>& vertices, con
 
 std::map<GiNaC::symbol, int, GiNaC::ex_is_less> compute_weightmap(const std::vector<inequality>& inequalities)
 {
-    GiNaC::symbol R1 = get_symbol("R1");
-    GiNaC::symbol R2 = get_symbol("R2");
-    GiNaC::symbol C1 = get_symbol("C1");
-    GiNaC::symbol C2 = get_symbol("C2");
-    GiNaC::symbol gm = get_symbol("gm");
-    GiNaC::symbol rout = get_symbol("rout");
-    GiNaC::symbol gm1 = get_symbol("gm1");
-    GiNaC::symbol gm2 = get_symbol("gm2");
-    GiNaC::symbol rout1 = get_symbol("rout1");
-    GiNaC::symbol rout2 = get_symbol("rout2");
-    GiNaC::symbol Cl = get_symbol("Cl");
-    GiNaC::symbol Cs = get_symbol("Cs");
-
     std::vector<GiNaC::symbol> vertices = get_all_vertices(inequalities);
     // writing out the edges in the graph
     std::vector<edge> edge_array = get_edge_array(vertices, inequalities);
@@ -121,26 +113,12 @@ std::map<GiNaC::symbol, int, GiNaC::ex_is_less> compute_weightmap(const std::vec
     std::list<Vertex> make_order = compute_make_order(g);
     std::vector<int> time = compute_parallel_computing_order(g, make_order);
 
+    std::map<GiNaC::symbol, int, GiNaC::ex_is_less> weightmap;
     for(auto it = boost::vertices(g).first; it != boost::vertices(g).second; ++it)
     {
-        std::cout << "weight(" << vertices[*it] << ") = " << time[*it] << '\n';
+        weightmap[vertices[*it]] = time[*it];
     }
 
-    std::map<GiNaC::symbol, int, GiNaC::ex_is_less> weightmap
-    {
-        { R1, 1 },
-        { R2, 0 },
-        { C1, 1 },
-        { C2, 0 },
-        { gm, 1 },
-        { rout, 1 },
-        { gm1, 1 },
-        { rout1, 1 },
-        { gm2, 1 },
-        { rout2, 1 },
-        { Cl, 0 },
-        { Cs, 0 }
-    };
     return weightmap;
 }
 

@@ -31,7 +31,6 @@ int main(int argc, char** argv)
             solver S(nlist.get_components());
             result res = S.solve
                 (
-                    commandline_options["mode"].as<solver_mode>(), 
                     commandline_options.count("print")
                 );
             res.print

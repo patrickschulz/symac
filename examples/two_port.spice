@@ -5,3 +5,8 @@ F2 v2cn 0 v1cp v1cn z21
 
 P1 v1 0
 P2 v2 0
+
+.print Z(1, 1)
+.print Z(1, 2)
+.print Z(2, 1)
+.print Z(2, 2)

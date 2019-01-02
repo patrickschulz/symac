@@ -113,6 +113,11 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
     }
 }
 
+void result::add(const std::string& key, const GiNaC::ex& res)
+{
+    resultmap.insert(std::make_pair(key, res));
+}
+
 bool check_expression(const ast::expression<std::string>& expression, const std::map<std::string, GiNaC::ex>& resultmap)
 {
     auto f = [](const std::string& s, const std::map<std::string, GiNaC::ex>& resmap) -> bool
@@ -173,7 +178,8 @@ void result::print(const std::vector<command>& print_cmd, bool pretty) const
     // create the expression parser
     qi::rule<Iterator, std::string()> voltage = "V(" >> +(qi::alnum | qi::char_("-:_!")) >> ")";
     qi::rule<Iterator, std::string()> current = "I(" >> +qi::alnum >> qi::char_(".") >> +qi::alpha >> ")";
-    qi::rule<Iterator, std::string()> identifier = voltage | current;
+    qi::rule<Iterator, std::string(), Skipper_type> portval = "Z(" >> +qi::digit >> qi::char_(",") >> +qi::digit >> ")";
+    qi::rule<Iterator, std::string(), Skipper_type> identifier = voltage | current | portval;
     symbolic_expression_type<std::string> symbolic_expression(identifier);
 
     std::cout << GiNaC::dflt; // set output format

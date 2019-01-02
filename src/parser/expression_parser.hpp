@@ -166,7 +166,7 @@ namespace ast
 template<typename atom_type>
 struct symbolic_expression_type : qi::grammar<Iterator, ast::expression<atom_type>(), Skipper_type>
 {
-    symbolic_expression_type(const qi::rule<Iterator, atom_type()> idf) : 
+    symbolic_expression_type(const qi::rule<Iterator, atom_type(), Skipper_type> idf) : 
         symbolic_expression_type::base_type(expression),
         identifier(idf)
     {
@@ -199,7 +199,7 @@ struct symbolic_expression_type : qi::grammar<Iterator, ast::expression<atom_typ
 
     qi::rule<Iterator, ast::expression<atom_type>(), Skipper_type> expression, term;
     qi::rule<Iterator, ast::operand<atom_type>(), Skipper_type> factor;
-    qi::rule<Iterator, atom_type()> identifier;
+    qi::rule<Iterator, atom_type(), Skipper_type> identifier;
 };
 
 #endif // EXPRESSION_PARSER_HPP
