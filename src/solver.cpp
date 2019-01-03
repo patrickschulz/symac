@@ -6,8 +6,6 @@
 #include "symbol.hpp"
 #include "util.hpp"
 
-const std::string PORTDUMMY = "PORT";
-
 solver::solver(componentlist& components) :
     components(components)
 {
@@ -68,7 +66,7 @@ GiNaC::ex get_nport_numerator(port_mode mode, unsigned int i, unsigned int j, co
     std::vector<component> ports = components.get_components_by_type(ct_port);
     if(j == i)
     {
-        return get_symbol(PORTDUMMY);
+        return ports[i].get_value();
     }
     else
     {
@@ -114,7 +112,6 @@ GiNaC::matrix solve_nport(port_mode mode, const componentlist& components, nodem
         // active ports
         component p = ports[i];
         p.set_type(active_port);
-        p.set_value(get_symbol(PORTDUMMY));
         components_tmp.add_component(p);
         // inactive ports
         for(unsigned int j = 0; j < ports.size(); ++j)
