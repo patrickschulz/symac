@@ -1,16 +1,13 @@
 TARGET   := ./symac
-#CXXFLAGS := -g -Wextra -Wall -Wno-long-long -pedantic-errors -Werror -Wfatal-errors -std=c++17
-CXXFLAGS := -g -Wextra -Wall -Wno-long-long -pedantic-errors -std=c++17
+CXXFLAGS := -g -Wextra -Wall -Wno-long-long -pedantic-errors -Werror -Wfatal-errors -std=c++17
 CXX      := g++
 INCLUDES := 
-LIBS     := -lginac -lcln -lboost_program_options
+LIBS     :=
 EXT      := cpp
 BUILDDIR := .build
 
 override BUILDDIR := $(strip $(BUILDDIR))
 SOURCES  := $(wildcard *.$(EXT))
-SOURCES  += $(wildcard parser/*.$(EXT))
-SOURCES  += $(wildcard transfer_function/*.$(EXT))
 OBJECTS  := $(patsubst %.$(EXT), $(BUILDDIR)/%.o, $(SOURCES))
 DEPS     := $(patsubst %.$(EXT), $(BUILDDIR)/%.dep, $(SOURCES))
 

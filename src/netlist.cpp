@@ -121,7 +121,8 @@ void netlist::read(const std::string& filename)
     }
     else
     {
-        std::cout << "parse failed. Remaining unparsed: " << std::string(iter, str.end()) << '\n';
+        std::cout << "parse failed\n";
+        //std::cout << "Remaining unparsed: " << std::string(iter, str.end()) << '\n';
     }
 
     valid = true;
