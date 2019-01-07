@@ -1,0 +1,11 @@
+E0 voutx 0 vin 0 2 * G
+Rin vin 0 Z0
+Rout voutx vout Z0
+
+P1 vin 0
+P2 vout 0
+
+.print S(1, 1)
+.print S(1, 2)
+.print S(2, 1)
+.print S(2, 2)
