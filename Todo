@@ -1,9 +1,10 @@
 [ ] Support n-port parameters (Z, Y, S, ABCD, ...)
  -[x] Enable Z- and Y-Matrix simulations
- -[ ] Enable S-Matrix simulations
+ -[x] Enable S-Matrix simulations
  -[ ] Enable ABCD-, G-, H-, etc. Matrix simulations
- -[ ] Provide a generic interface in the results so that no specific simulation needs to be chosen by the user
-[ ] Enable the result browser to print currents for ALL devices (this could be done by some 'get_current' function for each device, with the actual node values (since these are all known))
+ -[x] Provide a generic interface in the results so that no specific simulation needs to be chosen by the user
+ -[ ] Make it possible to use ports also as sources. This enables the simultaneous use of netlists for "regular" simulations and n-port simulations
+[x] Enable the result browser to print currents for ALL devices (this could be done by some 'get_current' function for each device, with the actual node values (since these are all known))
 [ ] Fully support spectre netlists
 [ ] Implement Noise simulations
 [ ] Integrate simplification from Jan, improve
