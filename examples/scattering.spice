@@ -1,0 +1,9 @@
+R1 v1 v2 Zl
+
+P1 v1 0
+P2 v2 0
+
+.print S(1, 1)
+.print S(2, 1)
+.print S(1, 2)
+.print S(2, 2)

@@ -178,7 +178,7 @@ void result::print(const std::vector<command>& print_cmd, bool pretty) const
     // create the expression parser
     qi::rule<Iterator, std::string()> voltage = "V(" >> +(qi::alnum | qi::char_("-:_!")) >> ")";
     qi::rule<Iterator, std::string()> current = "I(" >> +qi::alnum >> qi::char_(".") >> +qi::alpha >> ")";
-    qi::rule<Iterator, std::string(), Skipper_type> portval = qi::char_("ZY") >> "(" >> +qi::digit >> qi::char_(",") >> +qi::digit >> ")";
+    qi::rule<Iterator, std::string(), Skipper_type> portval = qi::char_("ZYS") >> "(" >> +qi::digit >> qi::char_(",") >> +qi::digit >> ")";
     qi::rule<Iterator, std::string(), Skipper_type> identifier = voltage | current | portval;
     symbolic_expression_type<std::string> symbolic_expression(identifier);
 
