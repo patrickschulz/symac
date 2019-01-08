@@ -113,7 +113,7 @@ void component::set_type(component_types ct)
             break;
         case ct_voltage_controlled_current_source:
         case ct_current_source:
-        case ct_port: // TODO
+        case ct_port:
             mna_size = 0;
             break;
     }
