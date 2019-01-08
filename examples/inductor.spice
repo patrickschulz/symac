@@ -1,5 +1,5 @@
 V0 vout 0 vout
 L0 vout 0 L
 
-.print I(V0.p)
+.print I(V0.n)
 .print I(L0.p)

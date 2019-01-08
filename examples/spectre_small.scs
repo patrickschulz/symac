@@ -1,8 +1,5 @@
 simulator lang=spectre
+V0 (net1 0) vsource V0
 R0 (net1 0) resistor R0
 
-simulator lang = spice
-R1 net1 0 R1
-V0 net1 0 vin
-
-.print I(V0.p)
+.print I(VV0.n) / V(net1)

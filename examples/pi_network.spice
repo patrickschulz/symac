@@ -1,7 +1,0 @@
-R1 v1 0 R1
-R2 v2 0 R2
-R3 v1 v2 R3
-
-V1 v1 0 v1
-V2 v2 0 0
-.print V(v1)

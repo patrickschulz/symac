@@ -1,8 +1,11 @@
 simulator lang=spectre
+R0 (in out) resistor R0
 
-R0 in out R0
-G0 1 2 3 4 gm
-O0 1 2 3
+simulator lang=spice
+V0 in 0 Vin
+C0 out 0 Cl
 
 * comment with several words
 // spectre-type comment
+
+.print V(out)
