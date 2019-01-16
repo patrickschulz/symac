@@ -1,83 +1,89 @@
 #include "simplification.hpp"
 
-/*
-static bool is_simplify_line(const std::string& line)
+transfer_function simplify(const transfer_function& tf, const std::map<GiNaC::symbol, int, GiNaC::ex_is_less>& weightmap)
 {
-    if(line.find(">>") != std::string::npos)
-    {   
-        return true;
-    }
-    else
+    transfer_function simple_tf;
+
+    std::vector<polynom> polys {
+        tf.get_numerator(),
+        tf.get_denominator(),
+    };
+    for(polynom& p : polys)
     {
-        return false;
+        unsigned int degree = p.degree();
+        for(unsigned int i = 0; i <= degree; ++i)
+        {
+            monom m = p.get_monom(i);
+            if(m.valid) 
+            {
+                auto weights = calculate_weights(m.sum_, weightmap);
+                auto indices = calculate_indices_to_keep(weights);
+                sum s = create_new_expression(m.sum_, indices);
+                m.sum_ = s;
+            }
+            p.set_monom(m, i);
+        }
     }
+    // simplify prefix
+    auto weights = calculate_weights(tf.get_prefix(), weightmap);
+    auto indices = calculate_indices_to_keep(weights);
+    sum prefix = create_new_expression(tf.get_prefix(), indices);
+
+    simple_tf.set_numerator(polys[0]);
+    simple_tf.set_denominator(polys[1]);
+    simple_tf.set_prefix(prefix);
+
+    return simple_tf;
 }
 
-static bool is_level(const std::string& line)
+std::vector<weight_type> calculate_weights(const sum& s, const std::map<GiNaC::symbol, int, GiNaC::ex_is_less>& weightmap)
 {
-    if(line.find("level") != std::string::npos)
+    std::vector<weight_type> weights;
+    for(const product& p : s)
     {
-        return true;
+        weight_type weight = 0;
+        for(const GiNaC::symbol& sym : p)
+        {
+            auto it = weightmap.find(sym);
+            weight += it->second;
+        }
+        weights.emplace_back(weight);
     }
-    else
-    {
-        return false;
-    }
+    return weights;
 }
 
-//simplification
-void save_simpl_line(const std::string& line)
+std::vector<index_type> calculate_indices_to_keep(const std::vector<weight_type>& weights)
 {
-    simplify_lines.push_back(line);
-}
-void set_simplification()
-{
-    for (unsigned int i = 0; i < simplify_lines.size(); i++)
+    int maxweight = -1;
+    std::vector<index_type> indices;
+    for(unsigned int index = 0; index < weights.size(); ++index)
     {
-        std::string line = simplify_lines[i];
-        std::stringstream stream (line);
-        std::string first;
-        std::string second;
-        stream >> first;// s = R1
-        stream >> second;// s = >>
-        stream >> second;// s = R2
-        simpl_commands.insert(std::make_pair(first,second)); 
+        int weight = weights[index];
+        if(weight > maxweight)
+        {
+            indices.clear();
+            indices.push_back(index);
+            maxweight = weight;
+        }
+        else if(weight == maxweight)
+        {
+            indices.push_back(index);
+        }
     }
+    return indices;
 }
-std::map<std::string, unsigned int > get_simplifications()
+
+sum create_new_expression(const sum& s, const std::vector<index_type>& indices)
 {
-    return simpl_map;
-}
-bool is_simplification()
-{
-    return simplification;
-}
-void change_simpl_map(std::string greater, std::string smaller)
-{
-    auto it_first = simpl_map.find(greater);
-    auto it_second= simpl_map.find(smaller);
-    unsigned int val_second= it_second -> second;
-    unsigned int val_first = val_second + 1;
-    it_first -> second = val_first;
-}
-void set_simpl_level(const std::string& line)
-{
-    std::stringstream stream(line);
-    std::string s;
-    stream >> s ;// command "Simplify-Level"
-    stream >> simpl_level;
-}
-std::string get_simpl_level()
-{
-    return simpl_level;
-}
-std::vector<unsigned int> get_simpl_vector()
-{
-    std::vector<unsigned int> ret;
-    for (auto it = simpl_map.begin(); it != simpl_map.end(); ++it)
+    sum newsum;
+    index_type index = 0;
+    for(const product& p : s)
     {
-        ret.push_back(it -> second);
+        if(std::find(indices.begin(), indices.end(), index) != indices.end())
+        {
+            newsum.add_product(p);
+        }
+        ++index;
     }
-    return ret;
+    return newsum;
 }
-*/

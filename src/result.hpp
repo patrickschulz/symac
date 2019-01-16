@@ -16,7 +16,7 @@ class result
 
         void add(const std::string& key, const GiNaC::ex& res);
 
-        void print(const std::vector<command>& print_cmd, bool pretty) const;
+        void print(const std::vector<command>& print_cmd, bool pretty, bool simpl) const;
 
     private:
         std::map<std::string, GiNaC::ex> resultmap;

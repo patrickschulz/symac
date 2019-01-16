@@ -25,6 +25,8 @@ struct netlist_parser_type : public qi::grammar<Iterator, Skipper_type, std::vec
     qi::rule<Iterator, Skipper_type, netlist_parser_local> switch_rule;
     qi::symbols<char, netlist_parser_local> switch_map;
     qi::rule<Iterator, Skipper_type, std::vector<netlist_attribute_type>()> main;
+
+    qi::rule<Iterator, Skipper_type> simplify;
 };
 
 extern netlist_parser_type netlist_parser;

@@ -36,7 +36,8 @@ int main(int argc, char** argv)
             res.print
                 (
                     nlist.get_print_cmds(),
-                    commandline_options.count("pretty")
+                    commandline_options.count("pretty"),
+                    commandline_options.count("simplify")
                 );
         }
         else

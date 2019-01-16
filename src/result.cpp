@@ -8,6 +8,8 @@
 #include "parser/expression_parser.hpp"
 #include "symbol.hpp"
 #include "transfer_function/transfer_function.hpp"
+#include "simplification.hpp"
+#include "weightmap.hpp"
 
 result::result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap)
 {
@@ -142,7 +144,7 @@ GiNaC::ex evaluate_expression(const ast::expression<std::string>& expression, co
     return eval(expression);
 }
 
-void print_command(command cmd, const symbolic_expression_type<std::string>& symbolic_expression, const std::map<std::string, GiNaC::ex>& resultmap, bool pretty)
+void print_command(command cmd, const symbolic_expression_type<std::string>& symbolic_expression, const std::map<std::string, GiNaC::ex>& resultmap, bool pretty, bool simpl)
 {
     ast::expression<std::string> expression;
 
@@ -153,6 +155,17 @@ void print_command(command cmd, const symbolic_expression_type<std::string>& sym
         {
             GiNaC::ex res = evaluate_expression(expression, resultmap);
             transfer_function tf(res);
+            if(simpl)
+            {
+                GiNaC::symbol R1 = get_symbol("R1");
+                GiNaC::symbol R2 = get_symbol("R2");
+                std::vector<inequality> inequalities {
+                    { R1, R2, ">>" }
+                };
+                auto weightmap = compute_weightmap(inequalities);
+
+                tf = simplify(tf, weightmap);
+            }
             if(pretty)
             {
                 tf.pretty_print(std::cout, cmd.content + " = ");
@@ -173,7 +186,7 @@ void print_command(command cmd, const symbolic_expression_type<std::string>& sym
     }
 }
 
-void result::print(const std::vector<command>& print_cmd, bool pretty) const
+void result::print(const std::vector<command>& print_cmd, bool pretty, bool simpl) const
 {
     // create the expression parser
     qi::rule<Iterator, std::string()> voltage = "V(" >> +(qi::alnum | qi::char_("-:_!")) >> ")";
@@ -185,7 +198,7 @@ void result::print(const std::vector<command>& print_cmd, bool pretty) const
     std::cout << GiNaC::dflt; // set output format
     for(const command& cmd : print_cmd)
     {
-        print_command(cmd, symbolic_expression, resultmap, pretty);
+        print_command(cmd, symbolic_expression, resultmap, pretty, simpl);
     }
 }
 

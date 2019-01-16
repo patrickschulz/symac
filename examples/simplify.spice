@@ -1,0 +1,7 @@
+V0 vin 0 vin
+R1 vin vout R1
+R2 vout 0 R2
+
+.simplify R1 >> R2
+
+.print V(vout)

@@ -52,6 +52,7 @@ class options
                 ("pretty,P"  , "print the results in a pretty way (display transfer functions as fractions) THIS IS PRELIMINARY, CHECK YOUR RESULTS!")
                 ("reslist,N" , "print resulting netlist (after transformation of subcircuits)")
                 ("devices,D" , "print information about the usage of all components")
+                ("simplify,S", "simplify all results")
                 ;
             options_description unimplemented("Unimplemented options");
             unimplemented.add_options()
