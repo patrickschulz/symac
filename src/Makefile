@@ -11,6 +11,7 @@ override BUILDDIR := $(strip $(BUILDDIR))
 SOURCES  := $(wildcard *.$(EXT))
 SOURCES  += $(wildcard parser/*.$(EXT))
 SOURCES  += $(wildcard transfer_function/*.$(EXT))
+SOURCES  += $(wildcard simplification/*.$(EXT))
 OBJECTS  := $(patsubst %.$(EXT), $(BUILDDIR)/%.o, $(SOURCES))
 DEPS     := $(patsubst %.$(EXT), $(BUILDDIR)/%.dep, $(SOURCES))
 

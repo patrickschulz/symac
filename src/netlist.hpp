@@ -6,7 +6,7 @@
 
 #include "componentlist.hpp"
 #include "command.hpp"
-#include "simplification.hpp"
+#include "simplification/simplification.hpp"
 
 class netlist
 {

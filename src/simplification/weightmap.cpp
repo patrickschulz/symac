@@ -1,31 +1,10 @@
-#ifndef WEIGHTMAP_HPP
-#define WEIGHTMAP_HPP
-
 #include <iostream>
 #include <algorithm>
-#include <vector>
 #include <tuple>
 #include <set>
 
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/topological_sort.hpp>
-#include <boost/graph/depth_first_search.hpp>
-
-#include <ginac/ginac.h>
-
-#include "symbol.hpp"
-
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS> Graph;
-typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
-typedef std::pair<int,int> edge;
-typedef std::string vertex_type;
-
-struct inequality
-{
-    GiNaC::symbol lhs;
-    GiNaC::symbol rhs;
-    std::string operation;
-};
+#include "../symbol.hpp"
+#include "weightmap.hpp"
 
 std::list<Vertex> compute_make_order(const Graph& g)
 {
@@ -101,7 +80,7 @@ std::vector<edge> get_edge_array(const std::vector<GiNaC::symbol>& vertices, con
     return edge_array;
 }
 
-std::map<GiNaC::symbol, int, GiNaC::ex_is_less> compute_weightmap(const std::vector<inequality>& inequalities)
+weightmap_t compute_weightmap(const std::vector<inequality>& inequalities)
 {
     std::vector<GiNaC::symbol> vertices = get_all_vertices(inequalities);
     // writing out the edges in the graph
@@ -113,7 +92,7 @@ std::map<GiNaC::symbol, int, GiNaC::ex_is_less> compute_weightmap(const std::vec
     std::list<Vertex> make_order = compute_make_order(g);
     std::vector<int> time = compute_parallel_computing_order(g, make_order);
 
-    std::map<GiNaC::symbol, int, GiNaC::ex_is_less> weightmap;
+    weightmap_t weightmap;
     for(auto it = boost::vertices(g).first; it != boost::vertices(g).second; ++it)
     {
         weightmap[vertices[*it]] = time[*it];
@@ -121,5 +100,3 @@ std::map<GiNaC::symbol, int, GiNaC::ex_is_less> compute_weightmap(const std::vec
 
     return weightmap;
 }
-
-#endif // WEIGHTMAP_HPP

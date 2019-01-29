@@ -5,6 +5,7 @@
 #include "options.hpp"
 #include "solver.hpp"
 #include "result.hpp"
+#include "symbol.hpp"
 
 int main(int argc, char** argv)
 {
@@ -33,6 +34,13 @@ int main(int argc, char** argv)
                 (
                     commandline_options.count("print")
                 );
+            GiNaC::symbol R1 = get_symbol("R1");
+            GiNaC::symbol R2 = get_symbol("R2");
+            std::vector<inequality> inequalities {
+                { R1, R2, ">>" }
+            };
+            auto weightmap = compute_weightmap(inequalities);
+            res.set_weightmap(weightmap);
             res.print
                 (
                     nlist.get_print_cmds(),

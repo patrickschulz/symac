@@ -13,15 +13,15 @@ transfer_function simplify(const transfer_function& tf, const std::map<GiNaC::sy
         unsigned int degree = p.degree();
         for(unsigned int i = 0; i <= degree; ++i)
         {
-            monom m = p.get_monom(i);
-            if(m.valid) 
+            if(p.exists(i)) 
             {
+                monom m = p.get_monom(i);
                 auto weights = calculate_weights(m.sum_, weightmap);
                 auto indices = calculate_indices_to_keep(weights);
                 sum s = create_new_expression(m.sum_, indices);
                 m.sum_ = s;
+                p.set_monom(m, i);
             }
-            p.set_monom(m, i);
         }
     }
     // simplify prefix

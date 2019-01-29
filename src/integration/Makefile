@@ -1,8 +1,9 @@
 TARGET   := ./symac
+#CXXFLAGS := -g -Wextra -Wall -Wno-long-long -pedantic-errors -Werror -Wfatal-errors -std=c++17
 CXXFLAGS := -g -Wextra -Wall -Wno-long-long -pedantic-errors -std=c++17
 CXX      := g++
 INCLUDES := 
-LIBS     := -lginac -lcln 
+LIBS     := -lginac -lcln
 EXT      := cpp
 BUILDDIR := .build
 

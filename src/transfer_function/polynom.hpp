@@ -2,17 +2,13 @@
 #define POLYNOM_HPP
 
 #include <ginac/ginac.h>
-#include <vector>
+#include <map>
 
 #include "sum.hpp"
 
 struct monom
 {
-    monom() : valid(false)
-    { }
-
     sum sum_;
-    bool valid;
 };
 
 class polynom
@@ -25,6 +21,7 @@ class polynom
         void add_sum(const sum& s, unsigned int degree);
 
         unsigned int degree() const;
+        bool exists(unsigned int degree) const;
 
         monom get_monom(unsigned int degree) const;
 
@@ -36,7 +33,7 @@ class polynom
 
     private:
         std::string variable;
-        std::vector<monom> monoms;
+        std::map<unsigned int, monom> monoms;
 };
 
 #endif // POLYNOM_HPP

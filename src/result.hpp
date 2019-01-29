@@ -8,6 +8,7 @@
 #include "componentlist.hpp"
 #include "nodemap.hpp"
 #include "command.hpp"
+#include "simplification/weightmap.hpp"
 
 class result
 {
@@ -18,8 +19,11 @@ class result
 
         void print(const std::vector<command>& print_cmd, bool pretty, bool simpl) const;
 
+        void set_weightmap(const weightmap_t& weightmap);
+
     private:
         std::map<std::string, GiNaC::ex> resultmap;
+        weightmap_t weightmap;
 };
 
 #endif // RESULT_HPP
