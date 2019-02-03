@@ -87,15 +87,10 @@ struct port_identifier_type : qi::symbols<char, component_types>
     }
 } port_identifier;
 
-template<typename A, typename B, typename C, typename D>
-void handler(A& a, B& b, C& c, D& d)
-{
-
-}
-
 component_parser_type::component_parser_type() : component_parser_type::base_type(main, "component")
 {
     using qi::attr;
+    using qi::lit;
     using qi::alnum;
     using qi::char_;
     using qi::repeat;
@@ -105,8 +100,7 @@ component_parser_type::component_parser_type() : component_parser_type::base_typ
 
     name = +alnum;
     terminal = +(alnum | char_("-:_!"));
-    value    = +(char_ - eol);
-    //value    = +alnum;
+    value    = +alnum | (lit('{') >> +(char_ - lit('}')) >> lit('}'));
     terminals = repeat(_r1)[terminal];
 
     two_terminal_device   = two_terminal_identifier   >> no_skip[name] >> terminals(2) >> value;
