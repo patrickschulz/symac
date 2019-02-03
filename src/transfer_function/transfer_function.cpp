@@ -166,6 +166,20 @@ polynom transfer_function::get_denominator() const
     return denominator;
 }
 
+GiNaC::ex transfer_function::integrate() const
+{
+    polynom num = get_numerator();
+    polynom den = get_denominator();
+    sum prefix = get_prefix();
+    sum part1 = num.get_monom(0);
+    sum part2 = den.get_monom(0);
+    sum part3 = den.get_monom(1);
+
+    GiNaC::ex out = prefix.to_ginac() * part1.to_ginac() / (4 * part2.to_ginac() * part3.to_ginac());
+
+    return out;
+}
+
 GiNaC::ex transfer_function::to_ginac(const GiNaC::symbol& s) const
 {
     GiNaC::ex num = numerator.to_ginac(s);
