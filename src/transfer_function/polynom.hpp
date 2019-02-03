@@ -6,24 +6,19 @@
 
 #include "sum.hpp"
 
-struct monom
-{
-    sum sum_;
-};
-
 class polynom
 {
     public:
         polynom(const std::string& var);
 
-        void set_monom(const monom& m, unsigned int degree);
+        void set_monom(const sum& m, unsigned int degree);
 
         void add_sum(const sum& s, unsigned int degree);
 
         unsigned int degree() const;
         bool exists(unsigned int degree) const;
 
-        monom get_monom(unsigned int degree) const;
+        sum get_monom(unsigned int degree) const;
 
         polynom select_monoms(unsigned int degree) const;
 
@@ -33,7 +28,7 @@ class polynom
 
     private:
         std::string variable;
-        std::map<unsigned int, monom> monoms;
+        std::map<unsigned int, sum> monoms;
 };
 
 #endif // POLYNOM_HPP

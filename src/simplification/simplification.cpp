@@ -15,11 +15,11 @@ transfer_function simplify(const transfer_function& tf, const std::map<GiNaC::sy
         {
             if(p.exists(i)) 
             {
-                monom m = p.get_monom(i);
-                auto weights = calculate_weights(m.sum_, weightmap);
+                sum m = p.get_monom(i);
+                auto weights = calculate_weights(m, weightmap);
                 auto indices = calculate_indices_to_keep(weights);
-                sum s = create_new_expression(m.sum_, indices);
-                m.sum_ = s;
+                sum s = create_new_expression(m, indices);
+                m = s;
                 p.set_monom(m, i);
             }
         }

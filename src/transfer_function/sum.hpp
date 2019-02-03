@@ -14,10 +14,10 @@ class sum
 
         GiNaC::ex to_ginac() const;
 
-        friend std::ostream& operator<<(std::ostream& stream, const sum& s);
-
         std::vector<product>::const_iterator begin() const;
         std::vector<product>::const_iterator end() const;
+
+        friend std::ostream& operator<<(std::ostream& stream, const sum& s);
 
     private:
         std::vector<product> products;

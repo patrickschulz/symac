@@ -42,7 +42,7 @@ netlist_parser_type::netlist_parser_type() :
 
     main = -(
                 omit[switch_rule[bp::ref(local) = _1]] |  // simulator language
-                omit[simplify] |                          // simplification statements
+                simplify |                          // simplification statements
                 lazy(*bp::ref(local))                     // circuit elements
             ) % qi::eol 
         >> qi::eoi

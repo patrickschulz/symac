@@ -8,14 +8,14 @@ polynom::polynom(const std::string& var) :
 
 }
 
-void polynom::set_monom(const monom& m, unsigned int degree)
+void polynom::set_monom(const sum& m, unsigned int degree)
 {
     monoms[degree] = m;
 }
 
 void polynom::add_sum(const sum& s, unsigned int degree)
 {
-    monoms[degree].sum_.add_sum(s);
+    monoms[degree].add_sum(s);
 }
 
 unsigned int polynom::degree() const
@@ -29,7 +29,7 @@ bool polynom::exists(unsigned int degree) const
     return cit != monoms.end();
 }
 
-monom polynom::get_monom(unsigned int degree) const
+sum polynom::get_monom(unsigned int degree) const
 {
     auto cit = monoms.find(degree);
     return cit->second;
@@ -45,11 +45,11 @@ polynom polynom::select_monoms(unsigned int degree) const
 GiNaC::ex polynom::to_ginac(const GiNaC::symbol& var) const
 {
     GiNaC::ex res;
-    for(unsigned int i = 0; i < monoms.size(); ++i)
+    for(unsigned int i = 0; i <= degree(); ++i)
     {
-        if(monoms.find(i) != monoms.end())
+        if(exists(i))
         {
-            res = res + GiNaC::pow(var, i) * get_monom(i).sum_.to_ginac();
+            res = res + GiNaC::pow(var, i) * get_monom(i).to_ginac();
         }
     }
     return res;
@@ -57,9 +57,9 @@ GiNaC::ex polynom::to_ginac(const GiNaC::symbol& var) const
 
 std::ostream& operator<<(std::ostream& stream, const polynom& p)
 {
-    for(unsigned int i = 0; i < p.monoms.size(); ++i)
+    for(unsigned int i = 0; i <= p.degree(); ++i)
     {
-        if(p.monoms.find(i) != p.monoms.end())
+        if(p.exists(i))
         {
             if(i > 0)
             {
@@ -70,8 +70,8 @@ std::ostream& operator<<(std::ostream& stream, const polynom& p)
                 }
                 stream << " * ";
             }
-            stream << p.get_monom(i).sum_;
-            if(i != p.monoms.size() - 1)
+            stream << p.get_monom(i);
+            if(i != p.degree())
             {
                 stream << " + ";
             }
