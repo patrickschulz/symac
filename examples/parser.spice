@@ -1,11 +1,6 @@
-simulator lang=spectre
-R0 (in out) resistor R0
-
-simulator lang=spice
 V0 in 0 Vin
-C0 out 0 Cl
+V0 in 0 Vin
 
-* comment with several words
-// spectre-type comment
+R1 in out R1
 
-.print V(out)
+.print V(vout)

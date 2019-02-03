@@ -1,0 +1,6 @@
+MP1 vbias vout vdd
+MN1 vin vout vss
+
+Vdd vdd 0 vdd
+Vss vss 0 0
+Vin vin 0 vin
