@@ -1,3 +1,7 @@
+[ ] Improve the parser: (this is actually critical for some other todo points, too, so focus on this)
+ [ ] Add error reporting (!)
+ [ ] Add spectre netlists
+ [ ] Add parameters to devices and subcircuits
 [ ] Support n-port parameters (Z, Y, S, ABCD, ...)
  -[x] Enable Z- and Y-Matrix simulations
  -[x] Enable S-Matrix simulations
@@ -5,9 +9,9 @@
  -[x] Provide a generic interface in the results so that no specific simulation needs to be chosen by the user
  -[ ] Make it possible to use ports also as sources. This enables the simultaneous use of netlists for "regular" simulations and n-port simulations
 [x] Enable the result browser to print currents for ALL devices (this could be done by some 'get_current' function for each device, with the actual node values (since these are all known))
-[ ] Fully support spectre netlists
 [ ] Implement Noise simulations
 [x] Integrate simplification from Jan, improve
 [ ] Enhance readability of output, similar perhaps to sympy. Also improve (and implement correctly) the latex report, because this provides the best output.
 [ ] Add a utility to generate matlab/octave files in order to postprocess the results.
 [ ] plot tool to show (qualitively) how the result behaves with regard to frequency/component values/...
+[ ] Add a linearization feature
