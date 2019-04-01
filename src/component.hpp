@@ -18,6 +18,7 @@ enum component_types
     ct_current_controlled_voltage_source,
     ct_voltage_controlled_current_source,
     ct_current_controlled_current_source,
+    ct_mosfet,
     ct_port,
 };
 
@@ -27,6 +28,7 @@ struct spice_component_proxy
     std::string name;
     std::vector<std::string> nodes;
     std::string value;
+    std::string parameters;
 };
 struct spectre_component_proxy
 {
@@ -45,6 +47,7 @@ class component
         component(const spice_component_proxy& p);
         component(const spectre_component_proxy& p);
         
+        void set_name(const std::string&);
         std::string get_name() const;
         void name_prepend(const std::string& prefix);
 
@@ -76,5 +79,8 @@ class component
         // constant component attributes
         unsigned int mna_size;
 };
+
+// a small signal model can be made up of several components, therefore a vector of components is the return type
+std::vector<component> get_small_signal_model(const component& c);
 
 #endif //COMPONENT_HPP

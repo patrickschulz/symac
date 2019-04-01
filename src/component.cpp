@@ -18,6 +18,7 @@ std::map<component_types, std::string> type_map {
     { ct_current_controlled_voltage_source, "F"    },
     { ct_voltage_controlled_current_source, "G"    },
     { ct_current_controlled_current_source, "H"    },
+    { ct_mosfet                           , "M"    },
     { ct_port                             , "P"    }
 };
 
@@ -55,6 +56,7 @@ GiNaC::ex convert_expression(std::string s)
 component::component(const spice_component_proxy& p) :
     component(p.name, p.type, p.nodes)
 {
+    std::cout << '"' << p.parameters << '"' << '\n';
     value = convert_expression(p.value);
 }
 
@@ -69,6 +71,11 @@ component::component(const std::string& name, component_types ct, const std::vec
 {   
     set_type(ct);
     this->name.insert(0, type_map[type]);
+}
+
+void component::set_name(const std::string& s)
+{
+    name = s;
 }
 
 std::string component::get_name() const
@@ -99,6 +106,7 @@ void component::set_type(component_types ct)
         case ct_resistor:
         case ct_conductor:
         case ct_capacitor:
+        case ct_mosfet: // dummy value, since a mosfet (a nonlinear device) should never make it into the mna algorithm
             mna_size = 0;
             break;
         case ct_inductor:
@@ -162,6 +170,42 @@ std::ostream& operator<<(std::ostream& stream, const component& c)
     }
     stream << c.value;
     return stream;
+}
+
+std::vector<component> get_small_signal_model(const component& c)
+{
+    std::vector<component> ssm;
+    switch(c.get_type())
+    {
+        case ct_mosfet:
+        {
+            auto nodes = c.get_nodes();
+            component gm = component();
+            gm.set_name(c.get_name() + "gm");
+            gm.set_type(ct_voltage_controlled_current_source);
+            gm.set_value(get_symbol("gm"));
+            gm.set_nodes({ nodes[2], nodes[1], nodes[0], nodes[2] });
+            component rout = component();
+            rout.set_name(c.get_name() + "rout");
+            rout.set_type(ct_resistor);
+            rout.set_value(get_symbol("rds"));
+            rout.set_nodes({ nodes[1], nodes[2] });
+            ssm.push_back(gm);
+            ssm.push_back(rout);
+            break;
+        }
+        case ct_voltage_source:
+        {
+            component s = c;
+            s.set_value(0);
+            ssm.push_back(s);
+            break;
+        }
+        case ct_resistor:
+            ssm.push_back(c);
+            break;
+    }
+    return ssm;
 }
 
 // vim: nowrap
