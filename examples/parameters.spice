@@ -1,0 +1,6 @@
+R0 vx 0 R0 noise=yes width=13
+R1 vx 0 R1
+
+V0 vx 0 vin
+
+.print I(V0.n)
