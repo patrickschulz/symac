@@ -56,7 +56,7 @@ GiNaC::ex convert_expression(std::string s)
 component::component(const spice_component_proxy& p) :
     component(p.name, p.type, p.nodes)
 {
-    std::cout << '"' << p.parameters << '"' << '\n';
+    //std::cout << '"' << p.parameters << '"' << '\n';
     value = convert_expression(p.value);
 }
 
@@ -91,6 +91,35 @@ void component::name_prepend(const std::string& prefix)
 unsigned int component::element_size() const
 {
     return mna_size;
+}
+
+bool component::is_noisy() const
+{
+    switch(type)
+    {
+        case ct_resistor:
+        case ct_conductor:
+            return true;
+        case ct_capacitor:
+        case ct_inductor:
+        case ct_voltage_source:
+        case ct_voltage_controlled_voltage_source:
+        case ct_current_controlled_current_source:
+        case ct_current_controlled_voltage_source:
+        case ct_voltage_controlled_current_source:
+        case ct_current_source:
+        case ct_port:
+        case ct_opamp:
+        case ct_mosfet: // dummy value, since a mosfet (a nonlinear device) should never make it into the mna algorithm
+            return false;
+    }
+}
+
+GiNaC::ex component::get_noise() const
+{
+    GiNaC::ex boltzmann = get_symbol("k");
+    GiNaC::ex temperature = get_symbol("T");
+    return 4 * boltzmann * temperature / value;
 }
 
 component_types component::get_type() const

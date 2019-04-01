@@ -53,6 +53,9 @@ class component
 
         unsigned int element_size() const;
 
+        bool is_noisy() const;
+        GiNaC::ex get_noise() const;
+
         // getter and setter
         component_types get_type() const;
         void set_type(component_types ct);

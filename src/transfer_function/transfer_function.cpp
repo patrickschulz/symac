@@ -168,6 +168,11 @@ polynom transfer_function::get_denominator() const
     return denominator;
 }
 
+GiNaC::ex transfer_function::gain() const
+{
+    return prefix.to_ginac();
+}
+
 std::vector<GiNaC::ex> transfer_function::zeros() const
 {
     const GiNaC::symbol s = get_symbol("s");
@@ -179,9 +184,9 @@ std::vector<GiNaC::ex> transfer_function::zeros() const
 std::vector<GiNaC::ex> transfer_function::poles() const
 {
     const GiNaC::symbol s = get_symbol("s");
-    polynom den = get_numerator();
+    polynom den = get_denominator();
     GiNaC::ex denex = den.to_ginac(s);
-    return {};
+    return { 1 / denex.coeff(s, 1) };
 }
 
 GiNaC::ex transfer_function::integrate() const

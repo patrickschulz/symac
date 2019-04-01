@@ -5,10 +5,12 @@
 #include "mna.hpp"
 #include "symbol.hpp"
 #include "util.hpp"
+#include "transfer_function/transfer_function.hpp"
+#include "noise.hpp"
 
 const std::string portdummynode("DUMMYPORTNODE");
 
-solver::solver(componentlist& components) :
+solver::solver(const componentlist& components) :
     components(components)
 {
 }
@@ -269,6 +271,34 @@ result solver::solve(bool print)
                 std::string key = str(fmter % M.second % (i + 1) % (j + 1));
                 results.add(key, nmatrix(i, j));
             }
+        }
+    }
+
+    // noise simulation
+    GiNaC::ex totalintegratednoise;
+    for(const component& c : components)
+    {
+        if(c.is_noisy())
+        {
+            GiNaC::ex boltzmann = get_symbol("k");
+            GiNaC::ex temperature = get_symbol("T");
+            GiNaC::ex noise = c.get_noise();
+            componentlist components_tmp(components);
+
+            component source = c;
+            source.set_type(ct_current_source);
+            source.set_value(noise);
+            components_tmp.add_component(source);
+
+            /* solve network and calculate parameters */
+            GiNaC::matrix res = solve_network(components_tmp, nmap, print);
+
+            unsigned int node = nmap["vx"];
+            GiNaC::ex value = res(node - 1, 0);
+            transfer_function NTF = value / noise;
+            totalintegratednoise += integrate_NTF_sabs(NTF) * noise;
+            std::cout << "NTF: " << NTF << '\n';
+            std::cout << "noise: " << totalintegratednoise << '\n';
         }
     }
 
