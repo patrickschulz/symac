@@ -30,6 +30,9 @@ class transfer_function
         polynom get_numerator() const;
         polynom get_denominator() const;
 
+        std::vector<GiNaC::ex> zeros() const;
+        std::vector<GiNaC::ex> poles() const;
+
         GiNaC::ex integrate() const;
 
         GiNaC::ex to_ginac(const GiNaC::symbol&) const;

@@ -1,5 +1,7 @@
 #include "product.hpp"
 
+#include "pretty.hpp"
+
 #include <iostream>
 
 product::product() :
@@ -66,7 +68,7 @@ std::ostream& operator<<(std::ostream& stream, const product& p)
             stream << p.prefix;
             if(p.elements.size() > 0)
             {
-                stream << " * ";
+                stream << ' ' << multsign << ' ';
             }
         }
         else
@@ -79,7 +81,7 @@ std::ostream& operator<<(std::ostream& stream, const product& p)
         stream << p.elements[i];
         if(i != p.elements.size() - 1)
         {
-            stream << " * ";
+            stream << ' ' << multsign << ' ';
         }
     }
     return stream;

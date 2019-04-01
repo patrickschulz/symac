@@ -1,5 +1,7 @@
 #include "polynom.hpp"
 
+#include "pretty.hpp"
+
 #include <algorithm>
 
 polynom::polynom(const std::string& var) :
@@ -68,7 +70,7 @@ std::ostream& operator<<(std::ostream& stream, const polynom& p)
                 {
                     stream << "^" << i;
                 }
-                stream << " * ";
+                stream << ' ' << multsign << ' ';
             }
             stream << p.get_monom(i);
             if(i != p.degree())

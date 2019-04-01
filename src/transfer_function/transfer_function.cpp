@@ -1,5 +1,7 @@
 #include "transfer_function.hpp"
 
+#include "pretty.hpp"
+
 #include <vector>
 
 #include "../symbol.hpp"
@@ -166,6 +168,22 @@ polynom transfer_function::get_denominator() const
     return denominator;
 }
 
+std::vector<GiNaC::ex> transfer_function::zeros() const
+{
+    const GiNaC::symbol s = get_symbol("s");
+    polynom num = get_numerator();
+    GiNaC::ex numex = num.to_ginac(s);
+    return {};
+}
+
+std::vector<GiNaC::ex> transfer_function::poles() const
+{
+    const GiNaC::symbol s = get_symbol("s");
+    polynom den = get_numerator();
+    GiNaC::ex denex = den.to_ginac(s);
+    return {};
+}
+
 GiNaC::ex transfer_function::integrate() const
 {
     polynom num = get_numerator();
@@ -185,7 +203,7 @@ GiNaC::ex transfer_function::to_ginac(const GiNaC::symbol& s) const
     GiNaC::ex num = numerator.to_ginac(s);
     GiNaC::ex den = denominator.to_ginac(s);
     GiNaC::ex pre = prefix.to_ginac();
-    return pre* num / den;
+    return pre * num / den;
 }
 
 void transfer_function::pretty_print(std::ostream& stream, const std::string& strpre) const
@@ -198,7 +216,7 @@ void transfer_function::pretty_print(std::ostream& stream, const std::string& st
         }
         else
         {
-            stream << strpre << prefix << " * " << numerator << '\n';
+            stream << strpre << prefix << ' ' << multsign << ' ' << numerator << '\n';
         }
     }
     else
@@ -254,7 +272,7 @@ void transfer_function::pretty_print(std::ostream& stream, const std::string& st
             // print numerator
             stream << std::string(numfill + offset + rulefill, ' ') << numerator << '\n';
             // print strpre, prefix part and fraction rule
-            stream << strpre << prefix << " * " << std::string(std::max(numsize, densize) + 2 * rulefill, '-') << '\n';
+            stream << strpre << prefix << ' ' << multsign << ' ' << std::string(std::max(numsize, densize) + 2 * rulefill, '-') << '\n';
             // print denominator
             stream << std::string(denfill + offset + rulefill, ' ') << denominator << '\n';
         }
@@ -264,6 +282,6 @@ void transfer_function::pretty_print(std::ostream& stream, const std::string& st
 
 std::ostream& operator<<(std::ostream& stream, const transfer_function& tf)
 {
-    stream << tf.prefix << " * " << '(' << tf.numerator << ')' << " / " << '(' << tf.denominator << ')';
+    stream << tf.prefix << ' ' << multsign << ' ' << '(' << tf.numerator << ')' << " / " << '(' << tf.denominator << ')';
     return stream;
 }
