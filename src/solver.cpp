@@ -297,8 +297,7 @@ result solver::solve(bool print)
             GiNaC::ex value = res(node - 1, 0);
             transfer_function NTF = value / noise;
             totalintegratednoise += integrate_NTF_sabs(NTF) * noise;
-            std::cout << "NTF: " << NTF << '\n';
-            std::cout << "noise: " << totalintegratednoise << '\n';
+            std::cout << totalintegratednoise << '\n';
         }
     }
 
