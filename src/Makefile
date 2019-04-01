@@ -1,6 +1,6 @@
 TARGET   := ./symac
 #CXXFLAGS := -g -Wextra -Wall -Wno-long-long -pedantic-errors -Werror -Wfatal-errors -std=c++17
-CXXFLAGS := -g -Wextra -Wall -Wno-long-long -pedantic-errors -std=c++17
+CXXFLAGS := -g -Wextra -Wall -pedantic-errors -std=c++17
 CXX      := g++
 INCLUDES := 
 LIBS     := -lginac -lcln -lboost_program_options
