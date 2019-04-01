@@ -8,9 +8,14 @@
 #include "command.hpp"
 #include "simplification/simplification.hpp"
 
+// TODO: temporarily
+#include "symbol.hpp"
+
 class netlist
 {
     public:
+        netlist(bool linearize = false);
+
         void read(const std::string& filename);
         
         component component_read_in(const std::string& line);
@@ -32,12 +37,30 @@ class netlist
             return simplifications;
         }
 
+        std::vector<inequality> get_inequalities() const
+        {
+            GiNaC::symbol R1 = get_symbol("R1");
+            GiNaC::symbol R2 = get_symbol("R2");
+            std::vector<inequality> inequalities {
+                { R1, R2, ">>" }
+            };
+            return inequalities;
+        }
+
+        bool does_linearize() const
+        {
+            return linearize;
+        }
+
         operator bool();
 
     private:
         componentlist components;
         std::vector<command> commands;
         std::vector<simplification> simplifications;
+        std::vector<inequality> inequalities;
+
+        bool linearize;
 
         bool valid;
 };

@@ -7,6 +7,12 @@
 #include "symbol.hpp"
 #include "parser/netlist_parser.hpp"
 
+netlist::netlist(bool linearize) :
+    linearize(linearize)
+{
+
+}
+
 void netlist::add_component(const component& c)
 {
     components.add_component(c);
@@ -61,7 +67,22 @@ struct netlist_processor_type : public boost::static_visitor<>
 
     void operator() (const component& c) const
     {
-        nlist.add_component(c);
+        if(false) // show components (verbose)
+        {
+            std::cout << "processing component: " << c << '\n';
+        }
+        if(nlist.does_linearize())
+        {
+            auto ssm = get_small_signal_model(c);
+            for(auto& s : ssm)
+            {
+                nlist.add_component(s);
+            }
+        }
+        else
+        {
+            nlist.add_component(c);
+        }
     }
 
     void operator() (const command& c) const
