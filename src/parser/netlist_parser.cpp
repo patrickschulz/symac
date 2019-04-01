@@ -41,8 +41,8 @@ netlist_parser_type::netlist_parser_type() :
     simplify = lit(".simplify") >> +qi::alnum >> lit(">>") >> +qi::alnum;
 
     main = -(
-                omit[switch_rule[bp::ref(local) = _1]] |  // simulator language
-                simplify |                          // simplification statements
+                omit[switch_rule[bp::ref(local) = _1]] | // simulator language
+                simplify                               | // simplification statements
                 lazy(*bp::ref(local))                     // circuit elements
             ) % qi::eol 
         >> qi::eoi

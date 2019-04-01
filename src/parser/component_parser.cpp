@@ -60,6 +60,7 @@ struct three_terminal_identifier_type : qi::symbols<char, component_types>
     {
         add
             ("O", ct_opamp)
+            ("M", ct_mosfet)
         ;
     }
 } three_terminal_identifier;
@@ -87,10 +88,31 @@ struct port_identifier_type : qi::symbols<char, component_types>
     }
 } port_identifier;
 
+struct spice_identifier_type : qi::symbols<char, component_types>
+{
+    spice_identifier_type()
+    {
+        add
+            ("R", ct_resistor)
+            ("C", ct_capacitor)
+            ("L", ct_inductor)
+            ("V", ct_voltage_source)
+            ("I", ct_current_source)
+            ("O", ct_opamp)
+            ("E", ct_voltage_controlled_voltage_source)
+            ("F", ct_current_controlled_voltage_source)
+            ("G", ct_voltage_controlled_current_source)
+            ("H", ct_current_controlled_current_source)
+            ("P", ct_port)
+        ;
+    }
+} spice_identifier;
+
 component_parser_type::component_parser_type() : component_parser_type::base_type(main, "component")
 {
     using qi::attr;
     using qi::lit;
+    using qi::alpha;
     using qi::alnum;
     using qi::char_;
     using qi::repeat;
@@ -101,9 +123,16 @@ component_parser_type::component_parser_type() : component_parser_type::base_typ
     name = +alnum;
     terminal = +(alnum | char_("-:_!"));
     value    = +alnum | (lit('{') >> +(char_ - lit('}')) >> lit('}'));
+    parameters = +alpha >> lit("=") >> +alnum;
     terminals = repeat(_r1)[terminal];
 
-    two_terminal_device   = two_terminal_identifier   >> no_skip[name] >> terminals(2) >> value;
+    /*
+    terminals = +terminal;
+    two_terminal_device = spice_identifier >> no_skip[name] >> terminals >> value;
+    main = two_terminal_device;
+    */
+
+    two_terminal_device   = two_terminal_identifier   >> no_skip[name] >> terminals(2) >> value >> *parameters;
     three_terminal_device = three_terminal_identifier >> no_skip[name] >> terminals(3) >> attr("OPDUMMY");
     four_terminal_device  = four_terminal_identifier  >> no_skip[name] >> terminals(4) >> value;
     port                  = port_identifier           >> no_skip[name] >> terminals(2) >> attr("PORTDUMMY");
@@ -121,7 +150,7 @@ component_parser_type::component_parser_type() : component_parser_type::base_typ
     terminals.name("terminals");
     value.name("value");
 
-    qi::on_error<qi::fail>(two_terminal_device, report_error(qi::_1, qi::_2, qi::_3, qi::_4));
+    //qi::on_error<qi::fail>(two_terminal_device, report_error(qi::_1, qi::_2, qi::_3, qi::_4));
 }
 
 component_parser_type component_parser;

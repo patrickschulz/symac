@@ -16,6 +16,7 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::string, name)
     (std::vector<std::string>, nodes)
     (std::string, value)
+    (std::string, parameters)
 )
 BOOST_FUSION_ADAPT_STRUCT(
     spectre_component_proxy,
