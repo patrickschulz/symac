@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 
+#include "weightmap.hpp"
 #include "../transfer_function/transfer_function.hpp"
 
 class simplification
