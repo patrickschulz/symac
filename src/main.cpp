@@ -14,7 +14,8 @@ int main(int argc, char** argv)
     if(commandline_options.count("netlist"))
     {
         std::string filename = commandline_options["netlist"].as<std::string>();
-        netlist nlist;
+        bool linearize = commandline_options.count("linearize");
+        netlist nlist(linearize);
         nlist.read(filename);
         if(nlist)
         {
@@ -29,24 +30,22 @@ int main(int argc, char** argv)
                 std::cout << "------------------\n";
             }
 
-            solver S(nlist.get_components());
-            result res = S.solve
-                (
-                    commandline_options.count("print")
-                );
-            GiNaC::symbol R1 = get_symbol("R1");
-            GiNaC::symbol R2 = get_symbol("R2");
-            std::vector<inequality> inequalities {
-                { R1, R2, ">>" }
-            };
-            auto weightmap = compute_weightmap(inequalities);
-            res.set_weightmap(weightmap);
-            res.print
-                (
-                    nlist.get_print_cmds(),
-                    commandline_options.count("pretty"),
-                    commandline_options.count("simplify")
-                );
+            if(!commandline_options.count("nosolve"))
+            {
+                solver S(nlist.get_components());
+                result res = S.solve
+                    (
+                     commandline_options.count("print")
+                    );
+                auto weightmap = compute_weightmap(nlist.get_inequalities());
+                res.set_weightmap(weightmap);
+                res.print
+                    (
+                     nlist.get_print_cmds(),
+                     commandline_options.count("pretty"),
+                     commandline_options.count("simplify")
+                    );
+            }
         }
         else
         {
