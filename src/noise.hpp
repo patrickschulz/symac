@@ -10,7 +10,7 @@ GiNaC::ex integrate_NTF_sabs(const transfer_function& tf)
     GiNaC::ex gain = tf.gain();
     std::vector<GiNaC::ex> poles = tf.poles();
     // solution for one-pole systems
-    return gain * gain * poles[0] / 4;
+    return gain * gain * abs(poles[0]) / 4;
 }
 
 #endif // NOISE_HPP

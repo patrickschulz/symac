@@ -12,7 +12,7 @@ product::product(int i) :
     prefix(GiNaC::numeric(i))
 { }
 
-void product::add_factor(const GiNaC::symbol& sym)
+void product::add_factor(const GiNaC::possymbol& sym)
 {
     elements.push_back(sym);
 }
@@ -30,7 +30,7 @@ void product::add_factor(const GiNaC::ex& expr)
     }
     else
     {
-        add_factor(GiNaC::ex_to<GiNaC::symbol>(expr));
+        add_factor(GiNaC::ex_to<GiNaC::possymbol>(expr));
     }
 }
 
@@ -49,12 +49,12 @@ GiNaC::numeric product::get_prefix() const
     return prefix;
 }
 
-std::vector<GiNaC::symbol>::const_iterator product::begin() const
+std::vector<GiNaC::possymbol>::const_iterator product::begin() const
 {
     return elements.begin();
 }
 
-std::vector<GiNaC::symbol>::const_iterator product::end() const
+std::vector<GiNaC::possymbol>::const_iterator product::end() const
 {
     return elements.end();
 }

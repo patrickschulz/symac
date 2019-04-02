@@ -39,8 +39,8 @@ class netlist
 
         std::vector<inequality> get_inequalities() const
         {
-            GiNaC::symbol R1 = get_symbol("R1");
-            GiNaC::symbol R2 = get_symbol("R2");
+            GiNaC::possymbol R1 = get_symbol("R1");
+            GiNaC::possymbol R2 = get_symbol("R2");
             std::vector<inequality> inequalities {
                 { R1, R2, ">>" }
             };

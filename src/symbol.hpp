@@ -3,6 +3,6 @@
 
 #include <ginac/ginac.h>
 
-const GiNaC::symbol& get_symbol(const std::string& str);
+const GiNaC::possymbol& get_symbol(const std::string& str);
 
 #endif // SYMBOL_HPP

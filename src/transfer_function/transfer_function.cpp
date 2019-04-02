@@ -170,12 +170,15 @@ polynom transfer_function::get_denominator() const
 
 GiNaC::ex transfer_function::gain() const
 {
-    return prefix.to_ginac();
+    const GiNaC::possymbol s = get_symbol("s");
+    GiNaC::ex denex = get_denominator().to_ginac(s);
+    GiNaC::ex d0 = denex.coeff(s, 0);
+    return prefix.to_ginac() / d0;
 }
 
 std::vector<GiNaC::ex> transfer_function::zeros() const
 {
-    const GiNaC::symbol s = get_symbol("s");
+    const GiNaC::possymbol s = get_symbol("s");
     polynom num = get_numerator();
     GiNaC::ex numex = num.to_ginac(s);
     return {};
@@ -183,10 +186,35 @@ std::vector<GiNaC::ex> transfer_function::zeros() const
 
 std::vector<GiNaC::ex> transfer_function::poles() const
 {
-    const GiNaC::symbol s = get_symbol("s");
-    polynom den = get_denominator();
-    GiNaC::ex denex = den.to_ginac(s);
-    return { 1 / denex.coeff(s, 1) };
+    const GiNaC::possymbol s = get_symbol("s");
+    GiNaC::ex denex = get_denominator().to_ginac(s);
+    std::vector<GiNaC::ex> poles;
+    switch(denex.degree(s))
+    {
+        case 1:
+            {
+                GiNaC::ex a = denex.coeff(s, 1);
+                GiNaC::ex b = denex.coeff(s, 0);
+                poles.push_back(-b / a);
+                break;
+            }
+        case 2:
+            {
+                GiNaC::ex a = denex.coeff(s, 2);
+                GiNaC::ex b = denex.coeff(s, 1);
+                GiNaC::ex c = denex.coeff(s, 0);
+                poles.push_back((-b + sqrt(b * b - 4 * a * c)) / (2 * a));
+                poles.push_back((-b - sqrt(b * b - 4 * a * c)) / (2 * a));
+                break;
+            }
+        case 3: // not implemented
+            break;
+        case 4: // not implemented
+            break;
+        default: // no closed solution for more than four poles
+            break;
+    }
+    return poles;
 }
 
 GiNaC::ex transfer_function::integrate() const
@@ -203,7 +231,7 @@ GiNaC::ex transfer_function::integrate() const
     return out;
 }
 
-GiNaC::ex transfer_function::to_ginac(const GiNaC::symbol& s) const
+GiNaC::ex transfer_function::to_ginac(const GiNaC::possymbol& s) const
 {
     GiNaC::ex num = numerator.to_ginac(s);
     GiNaC::ex den = denominator.to_ginac(s);

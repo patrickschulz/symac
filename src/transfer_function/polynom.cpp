@@ -44,7 +44,7 @@ polynom polynom::select_monoms(unsigned int degree) const
     return pol;
 }
 
-GiNaC::ex polynom::to_ginac(const GiNaC::symbol& var) const
+GiNaC::ex polynom::to_ginac(const GiNaC::possymbol& var) const
 {
     GiNaC::ex res;
     for(unsigned int i = 0; i <= degree(); ++i)

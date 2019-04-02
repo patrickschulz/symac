@@ -91,7 +91,7 @@ GiNaC::ex get_nport_numerator(port_mode mode, unsigned int i, unsigned int j, co
             unsigned int inodep = nmap[p.get_nodes()[0]];
 
             GiNaC::ex vj, ij;
-            GiNaC::symbol Z0 = get_symbol("Z0");
+            GiNaC::possymbol Z0 = get_symbol("Z0");
 
             if(j == i)
             {
@@ -131,7 +131,7 @@ GiNaC::ex get_nport_denominator(port_mode mode, unsigned int i, unsigned int j, 
             component p = ports[i];
             unsigned int inodep = nmap[p.get_nodes()[0]];
             unsigned int inoden = nmap[portdummynode];
-            GiNaC::symbol Z0 = get_symbol("Z0");
+            GiNaC::possymbol Z0 = get_symbol("Z0");
 
             // get voltage
             GiNaC::ex vi = res(inodep - 1, 0);
@@ -275,16 +275,14 @@ result solver::solve(bool print)
     }
 
     // noise simulation
-    GiNaC::ex totalintegratednoise;
+    GiNaC::ex totalintegratednoise = 0;
     for(const component& c : components)
     {
         if(c.is_noisy())
         {
-            GiNaC::ex boltzmann = get_symbol("k");
-            GiNaC::ex temperature = get_symbol("T");
-            GiNaC::ex noise = c.get_noise();
             componentlist components_tmp(components);
 
+            GiNaC::ex noise = c.get_noise();
             component source = c;
             source.set_type(ct_current_source);
             source.set_value(noise);
@@ -297,9 +295,9 @@ result solver::solve(bool print)
             GiNaC::ex value = res(node - 1, 0);
             transfer_function NTF = value / noise;
             totalintegratednoise += integrate_NTF_sabs(NTF) * noise;
-            std::cout << totalintegratednoise << '\n';
         }
     }
+    std::cout << collect_common_factors(totalintegratednoise) << '\n';
 
     return results;
 }
