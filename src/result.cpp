@@ -2,19 +2,16 @@
 
 #include <iostream>
 #include <map>
+#include <algorithm>
 #include <boost/format.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "component.hpp"
 #include "parser/expression_parser.hpp"
 #include "symbol.hpp"
 #include "transfer_function/transfer_function.hpp"
 #include "simplification/simplification.hpp"
-
-struct quantity
-{
-    std::string function;
-    std::string symbol;
-};
 
 BOOST_FUSION_ADAPT_STRUCT(
     quantity,
@@ -25,13 +22,13 @@ BOOST_FUSION_ADAPT_STRUCT(
 result::result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap)
 {
     // insert ground
-    resultmap.insert(std::make_pair("0", GiNaC::ex(0)));
+    add("V", "0", 0);
 
     // voltages
     for(unsigned int row = 0; row < components.number_of_nodes(); ++row)
     {
         std::string usernode = nmap[row + 1];
-        resultmap.insert(std::make_pair(usernode, results(row, 0)));
+        add("V", usernode, results(row, 0));
     }
 
     // currents
@@ -43,52 +40,52 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
             {
                 GiNaC::ex value = c.get_value();
                 std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = resultmap[nodes[0]] - resultmap[nodes[1]];
+                GiNaC::ex voltage = resultmap.get("V", nodes[0]) - resultmap.get("V", nodes[1]);
                 boost::format fmter = boost::format("%s.%s");
-                resultmap[str(fmter % c.get_name() % "p")] =  voltage / value;
-                resultmap[str(fmter % c.get_name() % "n")] = -voltage / value;
+                resultmap.add("I", str(fmter % c.get_name() % "p"),  voltage / value);
+                resultmap.add("I", str(fmter % c.get_name() % "n"), -voltage / value);
                 break;
             }
             case ct_conductor:
             {
                 GiNaC::ex value = c.get_value();
                 std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = resultmap[nodes[0]] - resultmap[nodes[1]];
+                GiNaC::ex voltage = resultmap.get("V", nodes[0]) - resultmap.get("V", nodes[1]);
                 boost::format fmter = boost::format("%s.%s");
-                resultmap[str(fmter % c.get_name() % "p")] =  voltage * value;
-                resultmap[str(fmter % c.get_name() % "n")] = -voltage * value;
+                resultmap.add("I", str(fmter % c.get_name() % "p"),  voltage * value);
+                resultmap.add("I", str(fmter % c.get_name() % "n"), -voltage * value);
                 break;
             }
             case ct_inductor:
             {
                 GiNaC::ex value = c.get_value();
                 std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = resultmap[nodes[0]] - resultmap[nodes[1]];
+                GiNaC::ex voltage = resultmap.get("V", nodes[0]) - resultmap.get("V", nodes[1]);
                 boost::format fmter = boost::format("%s.%s");
                 GiNaC::ex s = get_symbol("s");
-                resultmap[str(fmter % c.get_name() % "p")] =  voltage / s / value;
-                resultmap[str(fmter % c.get_name() % "n")] = -voltage / s / value;
+                resultmap.add("I", str(fmter % c.get_name() % "p"),  voltage / s / value);
+                resultmap.add("I", str(fmter % c.get_name() % "n"), -voltage / s / value);
                 break;
             }
             case ct_capacitor:
             {
                 GiNaC::ex value = c.get_value();
                 std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = resultmap[nodes[0]] - resultmap[nodes[1]];
+                GiNaC::ex voltage = resultmap.get("V", nodes[0]) - resultmap.get("V", nodes[1]);
                 boost::format fmter = boost::format("%s.%s");
                 GiNaC::ex s = get_symbol("s");
-                resultmap[str(fmter % c.get_name() % "p")] =  voltage * s * value;
-                resultmap[str(fmter % c.get_name() % "n")] = -voltage * s * value;
+                resultmap.add("I", str(fmter % c.get_name() % "p"),  voltage * s * value);
+                resultmap.add("I", str(fmter % c.get_name() % "n"), -voltage * s * value);
                 break;
             }
             case ct_voltage_controlled_current_source:
             {
                 GiNaC::ex value = c.get_value();
                 std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = resultmap[nodes[2]] - resultmap[nodes[3]];
+                GiNaC::ex voltage = resultmap.get("V", nodes[2]) - resultmap.get("V", nodes[3]);
                 boost::format fmter = boost::format("%s.%s");
-                resultmap[str(fmter % c.get_name() % "p")] =  voltage * value;
-                resultmap[str(fmter % c.get_name() % "n")] = -voltage * value;
+                resultmap.add("I", str(fmter % c.get_name() % "p"),  voltage * value);
+                resultmap.add("I", str(fmter % c.get_name() % "n"), -voltage * value);
                 break;
             }
             case ct_voltage_source:
@@ -98,64 +95,80 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
             {
                 unsigned int offset = components.number_of_nodes() + components.component_index(c);
                 boost::format fmter = boost::format("%s.%s");
-                resultmap[str(fmter % c.get_name() % "p")] =  results(offset, 0);
-                resultmap[str(fmter % c.get_name() % "n")] = -results(offset, 0);
+                resultmap.add("I", str(fmter % c.get_name() % "p"),  results(offset, 0));
+                resultmap.add("I", str(fmter % c.get_name() % "n"), -results(offset, 0));
                 break;
             }
             case ct_current_source:
             {
                 boost::format fmter = boost::format("%s.%s");
-                resultmap[str(fmter % c.get_name() % "p")] =  c.get_value();
-                resultmap[str(fmter % c.get_name() % "n")] = -c.get_value();
+                resultmap.add("I", str(fmter % c.get_name() % "p"),  c.get_value());
+                resultmap.add("I", str(fmter % c.get_name() % "n"), -c.get_value());
                 break;
             }
             case ct_current_controlled_voltage_source:
             {
                 unsigned int offset = components.number_of_nodes() + components.component_index(c);
                 boost::format fmter = boost::format("%s.%s");
-                resultmap[str(fmter % c.get_name() % "cp")] =  results(offset, 0);
-                resultmap[str(fmter % c.get_name() % "cn")] = -results(offset, 0);
-                resultmap[str(fmter % c.get_name() % "p")] =  results(offset + 1, 0);
-                resultmap[str(fmter % c.get_name() % "n")] = -results(offset + 1, 0);
+                resultmap.add("I", str(fmter % c.get_name() % "cp"),  results(offset, 0));
+                resultmap.add("I", str(fmter % c.get_name() % "cn"), -results(offset, 0));
+                resultmap.add("I", str(fmter % c.get_name() % "p"),  results(offset + 1, 0));
+                resultmap.add("I", str(fmter % c.get_name() % "n"), -results(offset + 1, 0));
                 break;
             }
             case ct_port:
-                // a port is an auxiliary device and thus has no currents
+            case ct_mosfet:
+                // auxiliary devices which have no currents
                 break;
         }
     }
 }
 
-void result::add(const std::string& key, const GiNaC::ex& res)
+std::vector<std::string> chop_arguments(const quantity& q)
 {
-    resultmap.insert(std::make_pair(key, res));
+    std::vector<std::string> arguments;
+    boost::char_separator<char> sep(",");
+    typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+    tokenizer tok(q.symbol, sep);
+    std::copy(tok.begin(), tok.end(), std::back_inserter(arguments));
+    // strip whitespace
+    std::for_each(arguments.begin(), arguments.end(), std::bind(boost::trim<std::string>, std::placeholders::_1, std::locale()));
+    return arguments;
 }
 
-bool check_expression(const ast::expression<quantity>& expression, const std::map<std::string, GiNaC::ex>& resultmap)
+std::string concat_arguments(const std::vector<std::string>& arguments)
 {
-    auto f = [](const quantity& s, const std::map<std::string, GiNaC::ex>& resmap) -> bool
+    std::string res;
+    for(const auto& s : arguments)
     {
-        auto it = resmap.find(s.symbol);
-        return it != resmap.end();
+        res += s;
+    }
+    return res;
+}
+
+bool check_expression(const ast::expression<quantity>& expression, const resultmap_t& resultmap)
+{
+    auto f = [](const quantity& q, const resultmap_t& resmap) -> bool
+    {
+        return resmap.exists(q.function, q.symbol);
     };
     using namespace std::placeholders;
     ast::checker<quantity> checker(std::bind(f, _1, resultmap));
     return checker(expression);
 }
 
-GiNaC::ex evaluate_expression(const ast::expression<quantity>& expression, const std::map<std::string, GiNaC::ex>& resultmap)
+GiNaC::ex evaluate_expression(const ast::expression<quantity>& expression, const resultmap_t& resultmap)
 {
-    auto f = [](const quantity& s, const std::map<std::string, GiNaC::ex>& resmap) -> GiNaC::ex
+    auto f = [](const quantity& q, const resultmap_t& resmap) -> GiNaC::ex
     {
-        auto it = resmap.find(s.symbol);
-        return it->second;
+        return resmap.get(q.function, q.symbol);
     };
     using namespace std::placeholders;
     ast::eval<quantity, GiNaC::ex> eval(std::bind(f, _1, resultmap));
     return eval(expression);
 }
 
-void print_command(command cmd, const symbolic_expression_type<quantity>& symbolic_expression, const std::map<std::string, GiNaC::ex>& resultmap, const weightmap_t& weightmap, bool pretty, bool simpl)
+void print_command(command cmd, const symbolic_expression_type<quantity>& symbolic_expression, const resultmap_t& resultmap, const weightmap_t& weightmap, bool pretty, bool simpl)
 {
     ast::expression<quantity> expression;
 
@@ -193,15 +206,8 @@ void print_command(command cmd, const symbolic_expression_type<quantity>& symbol
 void result::print(const std::vector<command>& print_cmd, bool pretty, bool simpl) const
 {
     // create the expression parser
-    /*
-    qi::rule<Iterator, std::string()> voltage = "V(" >> +(qi::alnum | qi::char_("-:_!")) >> ")";
-    qi::rule<Iterator, std::string()> current = "I(" >> +qi::alnum >> qi::char_(".") >> +qi::alpha >> ")";
-    qi::rule<Iterator, std::string(), Skipper_type> portval = qi::char_("ZYS") >> "(" >> +qi::digit >> qi::char_(",") >> +qi::digit >> ")";
-    qi::rule<Iterator, std::string()> voltagenoise = "VN(" >> +(qi::alnum | qi::char_("-:_!")) >> ")";
-    qi::rule<Iterator, std::string(), Skipper_type> identifier = voltage | current | portval | voltagenoise;
-    */
     qi::rule<Iterator, std::string()> function = +qi::alpha;
-    qi::rule<Iterator, std::string()> symbol = +(qi::alnum | qi::char_(" ,"));
+    qi::rule<Iterator, std::string()> symbol = +(qi::alnum | qi::char_(" ,."));
     qi::rule<Iterator, quantity(), Skipper_type> identifier = function >> "(" >> symbol >> ")";
     symbolic_expression_type<quantity> symbolic_expression(identifier);
 

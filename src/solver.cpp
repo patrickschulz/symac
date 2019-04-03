@@ -269,7 +269,7 @@ result solver::solve(bool print)
             for(unsigned int j = 0; j < number_of_ports; ++j)
             {
                 std::string key = str(fmter % M.second % (i + 1) % (j + 1));
-                results.add(key, nmatrix(i, j));
+                results.add(M.second, key, nmatrix(i, j));
             }
         }
     }
@@ -291,13 +291,22 @@ result solver::solve(bool print)
             /* solve network and calculate parameters */
             GiNaC::matrix res = solve_network(components_tmp, nmap, print);
 
+            for(unsigned int node = 0; node < components_tmp.number_of_nodes(); ++node)
+            {
+                GiNaC::ex value = res(node, 0);
+                transfer_function NTF = value / noise;
+                //std::cout << NTF << '\n';
+            }
+
+            /*
             unsigned int node = nmap["vx"];
             GiNaC::ex value = res(node - 1, 0);
             transfer_function NTF = value / noise;
             totalintegratednoise += integrate_NTF_sabs(NTF) * noise;
+            */
         }
     }
-    std::cout << collect_common_factors(totalintegratednoise) << '\n';
+    //std::cout << collect_common_factors(totalintegratednoise) << '\n';
 
     return results;
 }

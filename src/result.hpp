@@ -10,19 +10,54 @@
 #include "command.hpp"
 #include "simplification/weightmap.hpp"
 
+struct quantity
+{
+    std::string function;
+    std::string symbol;
+};
+
+class resultmap_t
+{
+    public:
+        void add(const std::string& domain, const std::string& key, const GiNaC::ex& res)
+        {
+            container.insert(std::make_pair(domain + "$" + key, res));
+        }
+
+        bool exists(const std::string& domain, const std::string& key) const
+        {
+            auto it = container.find(domain + "$" + key);
+            return it != container.end();
+        }
+
+        GiNaC::ex get(const std::string& domain, const std::string& key) const
+        {
+            auto it = container.find(domain + "$" + key);
+            return it->second;
+        }
+
+    private:
+        std::map<std::string, GiNaC::ex> container;
+};
+
 class result
 {
     public:
         result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap);
 
-        void add(const std::string& key, const GiNaC::ex& res);
+        void add(const std::string& domain, const std::string& key, const GiNaC::ex& res)
+        {
+            resultmap.add(domain, key, res);
+        }
+        //bool exists(const std::string& domain, const std::string& key);
+        //GiNaC::ex get(const std::string& domain, const std::string& key);
 
         void print(const std::vector<command>& print_cmd, bool pretty, bool simpl) const;
 
         void set_weightmap(const weightmap_t& weightmap);
 
     private:
-        std::map<std::string, GiNaC::ex> resultmap;
+        resultmap_t resultmap;
         weightmap_t weightmap;
 };
 
