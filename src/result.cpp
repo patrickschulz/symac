@@ -10,6 +10,18 @@
 #include "transfer_function/transfer_function.hpp"
 #include "simplification/simplification.hpp"
 
+struct quantity
+{
+    std::string function;
+    std::string symbol;
+};
+
+BOOST_FUSION_ADAPT_STRUCT(
+    quantity,
+    (std::string, function)
+    (std::string, symbol)
+)
+
 result::result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap)
 {
     // insert ground
@@ -119,33 +131,33 @@ void result::add(const std::string& key, const GiNaC::ex& res)
     resultmap.insert(std::make_pair(key, res));
 }
 
-bool check_expression(const ast::expression<std::string>& expression, const std::map<std::string, GiNaC::ex>& resultmap)
+bool check_expression(const ast::expression<quantity>& expression, const std::map<std::string, GiNaC::ex>& resultmap)
 {
-    auto f = [](const std::string& s, const std::map<std::string, GiNaC::ex>& resmap) -> bool
+    auto f = [](const quantity& s, const std::map<std::string, GiNaC::ex>& resmap) -> bool
     {
-        auto it = resmap.find(s);
+        auto it = resmap.find(s.symbol);
         return it != resmap.end();
     };
     using namespace std::placeholders;
-    ast::checker<std::string> checker(std::bind(f, _1, resultmap));
+    ast::checker<quantity> checker(std::bind(f, _1, resultmap));
     return checker(expression);
 }
 
-GiNaC::ex evaluate_expression(const ast::expression<std::string>& expression, const std::map<std::string, GiNaC::ex>& resultmap)
+GiNaC::ex evaluate_expression(const ast::expression<quantity>& expression, const std::map<std::string, GiNaC::ex>& resultmap)
 {
-    auto f = [](const std::string& s, const std::map<std::string, GiNaC::ex>& resmap) -> GiNaC::ex
+    auto f = [](const quantity& s, const std::map<std::string, GiNaC::ex>& resmap) -> GiNaC::ex
     {
-        auto it = resmap.find(s);
+        auto it = resmap.find(s.symbol);
         return it->second;
     };
     using namespace std::placeholders;
-    ast::eval<std::string, GiNaC::ex> eval(std::bind(f, _1, resultmap));
+    ast::eval<quantity, GiNaC::ex> eval(std::bind(f, _1, resultmap));
     return eval(expression);
 }
 
-void print_command(command cmd, const symbolic_expression_type<std::string>& symbolic_expression, const std::map<std::string, GiNaC::ex>& resultmap, const weightmap_t& weightmap, bool pretty, bool simpl)
+void print_command(command cmd, const symbolic_expression_type<quantity>& symbolic_expression, const std::map<std::string, GiNaC::ex>& resultmap, const weightmap_t& weightmap, bool pretty, bool simpl)
 {
-    ast::expression<std::string> expression;
+    ast::expression<quantity> expression;
 
     bool r = phrase_parse(cmd.content.begin(), cmd.content.end(), symbolic_expression, qi::blank, expression);
     if (r)
@@ -181,12 +193,17 @@ void print_command(command cmd, const symbolic_expression_type<std::string>& sym
 void result::print(const std::vector<command>& print_cmd, bool pretty, bool simpl) const
 {
     // create the expression parser
+    /*
     qi::rule<Iterator, std::string()> voltage = "V(" >> +(qi::alnum | qi::char_("-:_!")) >> ")";
     qi::rule<Iterator, std::string()> current = "I(" >> +qi::alnum >> qi::char_(".") >> +qi::alpha >> ")";
     qi::rule<Iterator, std::string(), Skipper_type> portval = qi::char_("ZYS") >> "(" >> +qi::digit >> qi::char_(",") >> +qi::digit >> ")";
     qi::rule<Iterator, std::string()> voltagenoise = "VN(" >> +(qi::alnum | qi::char_("-:_!")) >> ")";
     qi::rule<Iterator, std::string(), Skipper_type> identifier = voltage | current | portval | voltagenoise;
-    symbolic_expression_type<std::string> symbolic_expression(identifier);
+    */
+    qi::rule<Iterator, std::string()> function = +qi::alpha;
+    qi::rule<Iterator, std::string()> symbol = +(qi::alnum | qi::char_(" ,"));
+    qi::rule<Iterator, quantity(), Skipper_type> identifier = function >> "(" >> symbol >> ")";
+    symbolic_expression_type<quantity> symbolic_expression(identifier);
 
     std::cout << GiNaC::dflt; // set output format
     for(const command& cmd : print_cmd)
