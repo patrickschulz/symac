@@ -150,7 +150,14 @@ bool check_expression(const ast::expression<quantity>& expression, const resultm
 {
     auto f = [](const quantity& q, const resultmap_t& resmap) -> bool
     {
-        return resmap.exists(q.function, q.symbol);
+        std::string key = q.symbol;
+        if(q.function == "Z" || q.function == "Y" || q.function == "S")
+        {
+            std::vector<std::string> args = chop_arguments(q);
+            key.clear();
+            key = args[0] + "," + args[1];
+        }
+        return resmap.exists(q.function, key);
     };
     using namespace std::placeholders;
     ast::checker<quantity> checker(std::bind(f, _1, resultmap));
@@ -161,7 +168,14 @@ GiNaC::ex evaluate_expression(const ast::expression<quantity>& expression, const
 {
     auto f = [](const quantity& q, const resultmap_t& resmap) -> GiNaC::ex
     {
-        return resmap.get(q.function, q.symbol);
+        std::string key = q.symbol;
+        if(q.function == "Z" || q.function == "Y" || q.function == "S")
+        {
+            std::vector<std::string> args = chop_arguments(q);
+            key.clear();
+            key = args[0] + "," + args[1];
+        }
+        return resmap.get(q.function, key);
     };
     using namespace std::placeholders;
     ast::eval<quantity, GiNaC::ex> eval(std::bind(f, _1, resultmap));

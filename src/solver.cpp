@@ -262,13 +262,13 @@ result solver::solve(bool print)
     {
         GiNaC::matrix nmatrix = solve_nport(M.first, components, nmap, print);
 
-        boost::format fmter = boost::format("%s%d,%d");
+        boost::format fmter = boost::format("%d,%d");
         unsigned int number_of_ports = components.number_of_components(ct_port);
         for(unsigned int i = 0; i < number_of_ports; ++i)
         {
             for(unsigned int j = 0; j < number_of_ports; ++j)
             {
-                std::string key = str(fmter % M.second % (i + 1) % (j + 1));
+                std::string key = str(fmter % (i + 1) % (j + 1));
                 results.add(M.second, key, nmatrix(i, j));
             }
         }
