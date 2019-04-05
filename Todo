@@ -13,7 +13,10 @@
 [ ] Implement Noise simulations
  [x] Add basic noise function for components
  [x] Add integration of the NTFs (at least for one-pole systems)
- [ ] Rewrite the access function mechanism of the result browser, since regular and noise voltages need to be distinguished
+ [x] Rewrite the access function mechanism of the result browser, since regular and noise voltages need to be distinguished
+ [ ] Add output of noise transfer functions
+ [ ] Add non-integrated voltage noise
+ [ ] Add noise parameters to devices (currently only resistors have noise)
 [x] Integrate simplification from Jan, improve
 [ ] Enhance readability of output, similar perhaps to sympy. Also improve (and implement correctly) the latex report, because this provides the best output.
 [ ] Add a utility to generate matlab/octave files in order to postprocess the results.
