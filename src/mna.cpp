@@ -134,11 +134,11 @@ static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
         case ct_resistor:
             return get_impedance_stamp(value, offset, nodes);
         case ct_inductor:
-            return get_impedance_stamp(value * get_symbol("s"), offset, nodes);
+            return get_impedance_stamp(value * get_complex_symbol("s"), offset, nodes);
         case ct_conductor:
             return get_conductance_stamp(value, offset, nodes);
         case ct_capacitor:
-            return get_conductance_stamp(value * get_symbol("s"), offset, nodes);
+            return get_conductance_stamp(value * get_complex_symbol("s"), offset, nodes);
         case ct_voltage_source:
             return get_voltage_source_stamp(offset, nodes);
         case ct_opamp:

@@ -36,7 +36,7 @@ class transfer_function
 
         GiNaC::ex integrate() const;
 
-        GiNaC::ex to_ginac(const GiNaC::possymbol&) const;
+        GiNaC::ex to_ginac(const GiNaC::symbol&) const;
 
         void pretty_print(std::ostream& stream, const std::string& prefix = std::string()) const;
 

@@ -2,4 +2,6 @@ R0 vx 0 R0
 R1 vx 0 R1
 C0 vx 0 C0
 
-.print VN(vx)
+.print VNI(vx)
+.print NTF(R0, vx)
+.print NTF(R1, vx)

@@ -32,4 +32,17 @@ GiNaC::ex integrate_NTF_sabs(const transfer_function& tf)
     return res;
 }
 
+GiNaC::ex integrate_NTF_sabs(const GiNaC::ex& e)
+{
+    return integrate_NTF_sabs(transfer_function(e));
+}
+
+GiNaC::ex squared_abs(const GiNaC::ex& e)
+{
+    GiNaC::symbol s = get_complex_symbol("s");
+    GiNaC::possymbol w = get_symbol("w");
+    GiNaC::ex tmp = e.subs(s == GiNaC::I * w);
+    return GiNaC::pow(tmp.real_part(), 2) + GiNaC::pow(tmp.imag_part(), 2);
+}
+
 #endif // NOISE_HPP

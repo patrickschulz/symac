@@ -81,7 +81,7 @@ transfer_function::transfer_function(const GiNaC::ex& e) :
     GiNaC::ex numex = numden[0].expand();
     GiNaC::ex denex = numden[1].expand();
 
-    GiNaC::symbol s = get_symbol("s");
+    GiNaC::symbol s = get_complex_symbol("s");
 
     prefix = parse_sum(numex.unit(s) * numex.content(s));
 
@@ -170,7 +170,7 @@ polynom transfer_function::get_denominator() const
 
 GiNaC::ex transfer_function::gain() const
 {
-    const GiNaC::possymbol s = get_symbol("s");
+    const GiNaC::symbol s = get_complex_symbol("s");
     GiNaC::ex denex = get_denominator().to_ginac(s);
     GiNaC::ex d0 = denex.coeff(s, 0);
     return prefix.to_ginac() / d0;
@@ -178,7 +178,7 @@ GiNaC::ex transfer_function::gain() const
 
 std::vector<GiNaC::ex> transfer_function::zeros() const
 {
-    const GiNaC::possymbol s = get_symbol("s");
+    const GiNaC::symbol s = get_complex_symbol("s");
     polynom num = get_numerator();
     GiNaC::ex numex = num.to_ginac(s);
     return {};
@@ -186,7 +186,7 @@ std::vector<GiNaC::ex> transfer_function::zeros() const
 
 std::vector<GiNaC::ex> transfer_function::poles() const
 {
-    const GiNaC::possymbol s = get_symbol("s");
+    const GiNaC::symbol s = get_complex_symbol("s");
     GiNaC::ex denex = get_denominator().to_ginac(s);
     std::vector<GiNaC::ex> poles;
     switch(denex.degree(s))
@@ -231,7 +231,7 @@ GiNaC::ex transfer_function::integrate() const
     return out;
 }
 
-GiNaC::ex transfer_function::to_ginac(const GiNaC::possymbol& s) const
+GiNaC::ex transfer_function::to_ginac(const GiNaC::symbol& s) const
 {
     GiNaC::ex num = numerator.to_ginac(s);
     GiNaC::ex den = denominator.to_ginac(s);
@@ -241,9 +241,9 @@ GiNaC::ex transfer_function::to_ginac(const GiNaC::possymbol& s) const
 
 void transfer_function::pretty_print(std::ostream& stream, const std::string& strpre) const
 {
-    if(denominator.to_ginac(get_symbol("s")).is_equal(GiNaC::ex(1)))
+    if(denominator.to_ginac(get_complex_symbol("s")).is_equal(GiNaC::ex(1)))
     {
-        if(numerator.to_ginac(get_symbol("s")).is_equal(GiNaC::ex(1)))
+        if(numerator.to_ginac(get_complex_symbol("s")).is_equal(GiNaC::ex(1)))
         {
             stream << strpre << prefix << '\n';
         }
@@ -254,7 +254,7 @@ void transfer_function::pretty_print(std::ostream& stream, const std::string& st
     }
     else
     {
-        if(numerator.to_ginac(get_symbol("s")).is_equal(GiNaC::ex(1)))
+        if(numerator.to_ginac(get_complex_symbol("s")).is_equal(GiNaC::ex(1)))
         {
             unsigned int numsize = get_output_size(prefix);
             unsigned int densize = get_output_size(denominator);

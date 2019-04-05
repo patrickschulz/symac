@@ -277,6 +277,7 @@ result solver::solve(bool print)
     // noise simulation
     for(unsigned int node = 0; node < components.number_of_nodes(); ++node)
     {
+        GiNaC::ex totalnoise = 0;
         GiNaC::ex totalintegratednoise = 0;
         for(const component& c : components)
         {
@@ -294,11 +295,18 @@ result solver::solve(bool print)
                 GiNaC::matrix res = solve_network(components_tmp, nmap, print);
 
                 GiNaC::ex value = res(node, 0);
-                transfer_function NTF = value / noise;
+                GiNaC::ex NTF = value / noise;
+                totalnoise += squared_abs(NTF) * noise;
                 totalintegratednoise += integrate_NTF_sabs(NTF) * noise;
+
+                // add NTF
+                boost::format fmter = boost::format("%s,%s");
+                std::string key = str(fmter % c.get_name() % nmap[node + 1]);
+                results.add("NTF", key, NTF);
             }
         }
-        results.add("VN", nmap[node + 1], totalintegratednoise);
+        results.add("VN", nmap[node + 1], totalnoise);
+        results.add("VNI", nmap[node + 1], totalintegratednoise);
     }
 
     return results;

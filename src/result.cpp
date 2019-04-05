@@ -62,7 +62,7 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
                 std::vector<std::string> nodes = c.get_nodes();
                 GiNaC::ex voltage = resultmap.get("V", nodes[0]) - resultmap.get("V", nodes[1]);
                 boost::format fmter = boost::format("%s.%s");
-                GiNaC::ex s = get_symbol("s");
+                GiNaC::ex s = get_complex_symbol("s");
                 resultmap.add("I", str(fmter % c.get_name() % "p"),  voltage / s / value);
                 resultmap.add("I", str(fmter % c.get_name() % "n"), -voltage / s / value);
                 break;
@@ -73,7 +73,7 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
                 std::vector<std::string> nodes = c.get_nodes();
                 GiNaC::ex voltage = resultmap.get("V", nodes[0]) - resultmap.get("V", nodes[1]);
                 boost::format fmter = boost::format("%s.%s");
-                GiNaC::ex s = get_symbol("s");
+                GiNaC::ex s = get_complex_symbol("s");
                 resultmap.add("I", str(fmter % c.get_name() % "p"),  voltage * s * value);
                 resultmap.add("I", str(fmter % c.get_name() % "n"), -voltage * s * value);
                 break;
@@ -151,7 +151,7 @@ bool check_expression(const ast::expression<quantity>& expression, const resultm
     auto f = [](const quantity& q, const resultmap_t& resmap) -> bool
     {
         std::string key = q.symbol;
-        if(q.function == "Z" || q.function == "Y" || q.function == "S")
+        if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF")
         {
             std::vector<std::string> args = chop_arguments(q);
             key.clear();
@@ -169,7 +169,7 @@ GiNaC::ex evaluate_expression(const ast::expression<quantity>& expression, const
     auto f = [](const quantity& q, const resultmap_t& resmap) -> GiNaC::ex
     {
         std::string key = q.symbol;
-        if(q.function == "Z" || q.function == "Y" || q.function == "S")
+        if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF")
         {
             std::vector<std::string> args = chop_arguments(q);
             key.clear();
@@ -203,7 +203,7 @@ void print_command(command cmd, const symbolic_expression_type<quantity>& symbol
             }
             else
             {
-                std::cout << tf.to_ginac(get_symbol("s")) << '\n';
+                std::cout << tf.to_ginac(get_complex_symbol("s")) << '\n';
             }
         }
         else
