@@ -21,6 +21,9 @@
  [x] Add non-integrated voltage noise
  [ ] Add noise parameters to devices (currently only resistors have noise)
 
+[ ] While checking output expressions, check for any errors (wrong noise results or similar). For this, the error mechanisms of printing commands needs to be changed so that every quantity holds
+    their own error messages.
+
 [x] Integrate simplification from Jan, improve
 
 [ ] Enhance readability of output, similar perhaps to sympy. Also improve (and implement correctly) the latex report, because this provides the best output.
