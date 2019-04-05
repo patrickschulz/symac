@@ -275,38 +275,31 @@ result solver::solve(bool print)
     }
 
     // noise simulation
-    GiNaC::ex totalintegratednoise = 0;
-    for(const component& c : components)
+    for(unsigned int node = 0; node < components.number_of_nodes(); ++node)
     {
-        if(c.is_noisy())
+        GiNaC::ex totalintegratednoise = 0;
+        for(const component& c : components)
         {
-            componentlist components_tmp(components);
-
-            GiNaC::ex noise = c.get_noise();
-            component source = c;
-            source.set_type(ct_current_source);
-            source.set_value(noise);
-            components_tmp.add_component(source);
-
-            /* solve network and calculate parameters */
-            GiNaC::matrix res = solve_network(components_tmp, nmap, print);
-
-            for(unsigned int node = 0; node < components_tmp.number_of_nodes(); ++node)
+            if(c.is_noisy())
             {
+                componentlist components_tmp(components);
+
+                GiNaC::ex noise = c.get_noise();
+                component source = c;
+                source.set_type(ct_current_source);
+                source.set_value(noise);
+                components_tmp.add_component(source);
+
+                /* solve network and calculate parameters */
+                GiNaC::matrix res = solve_network(components_tmp, nmap, print);
+
                 GiNaC::ex value = res(node, 0);
                 transfer_function NTF = value / noise;
-                //std::cout << NTF << '\n';
+                totalintegratednoise += integrate_NTF_sabs(NTF) * noise;
             }
-
-            /*
-            unsigned int node = nmap["vx"];
-            GiNaC::ex value = res(node - 1, 0);
-            transfer_function NTF = value / noise;
-            totalintegratednoise += integrate_NTF_sabs(NTF) * noise;
-            */
         }
+        results.add("VN", nmap[node + 1], totalintegratednoise);
     }
-    //std::cout << collect_common_factors(totalintegratednoise) << '\n';
 
     return results;
 }
