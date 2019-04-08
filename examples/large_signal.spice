@@ -10,5 +10,6 @@
 R0 vdd vout RL
 M0 vin vout 0
 V0 vdd 0 vdd 
+Vin vin 0 vin ac=1
 
-.print I(R0.p)
+.print V(vout) / V(vin)

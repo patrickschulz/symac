@@ -1,5 +1,7 @@
 #include "component_parser.hpp"
 
+#include "parameter_parser.hpp"
+
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_object.hpp>
@@ -123,16 +125,10 @@ component_parser_type::component_parser_type() : component_parser_type::base_typ
     name = +alnum;
     terminal = +(alnum | char_("-:_!"));
     value    = +alnum | (lit('{') >> +(char_ - lit('}')) >> lit('}'));
-    parameters = +alpha >> lit("=") >> +alnum;
+    parameters = *parameter_parser;
     terminals = repeat(_r1)[terminal];
 
-    /*
-    terminals = +terminal;
-    two_terminal_device = spice_identifier >> no_skip[name] >> terminals >> value;
-    main = two_terminal_device;
-    */
-
-    two_terminal_device   = two_terminal_identifier   >> no_skip[name] >> terminals(2) >> value >> *parameters;
+    two_terminal_device   = two_terminal_identifier   >> no_skip[name] >> terminals(2) >> value >> parameters;
     three_terminal_device = three_terminal_identifier >> no_skip[name] >> terminals(3) >> attr("OPDUMMY");
     four_terminal_device  = four_terminal_identifier  >> no_skip[name] >> terminals(4) >> value;
     port                  = port_identifier           >> no_skip[name] >> terminals(2) >> attr("PORTDUMMY");

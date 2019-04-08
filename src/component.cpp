@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <map>
+#include <algorithm>
 
 #include "symbol.hpp"
 #include "parser/expression_parser.hpp"
@@ -56,8 +57,8 @@ GiNaC::ex convert_expression(std::string s)
 component::component(const spice_component_proxy& p) :
     component(p.name, p.type, p.nodes)
 {
-    //std::cout << '"' << p.parameters << '"' << '\n';
     value = convert_expression(p.value);
+    parameters = p.parameters;
 }
 
 component::component(const spectre_component_proxy& p) :
@@ -95,11 +96,13 @@ unsigned int component::element_size() const
 
 bool component::is_noisy() const
 {
+    bool ret;
     switch(type)
     {
         case ct_resistor:
         case ct_conductor:
-            return true;
+            ret = true;
+            break;
         case ct_capacitor:
         case ct_inductor:
         case ct_voltage_source:
@@ -111,8 +114,10 @@ bool component::is_noisy() const
         case ct_port:
         case ct_opamp:
         case ct_mosfet: // dummy value, since a mosfet (a nonlinear device) should never make it into the mna algorithm
-            return false;
+            ret = false;
+            break;
     }
+    return ret;
 }
 
 GiNaC::ex component::get_noise() const
@@ -177,6 +182,18 @@ void component::set_value(const GiNaC::ex& e)
     value = e;
 }
 
+std::string component::get_parameter(const std::string& key) const
+{
+    for(const auto& param : parameters)
+    {
+        if(param.key == key)
+        {
+            return param.value;
+        }
+    }
+    return "";
+}
+
 bool component::operator==(component_types ct) const
 {
     return type == ct;
@@ -226,15 +243,21 @@ std::vector<component> get_small_signal_model(const component& c)
         case ct_voltage_source:
         {
             component s = c;
-            s.set_value(0);
+            if(c.get_parameter("ac") != "1")
+            {
+                s.set_value(0);
+            }
             ssm.push_back(s);
             break;
         }
         case ct_resistor:
             ssm.push_back(c);
             break;
+        default:
+            break;
     }
     return ssm;
+
 }
 
 // vim: nowrap

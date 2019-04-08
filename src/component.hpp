@@ -22,13 +22,19 @@ enum component_types
     ct_port,
 };
 
+struct parameter_t
+{
+    std::string key;
+    std::string value;
+};
+
 struct spice_component_proxy
 {
     component_types type;
     std::string name;
     std::vector<std::string> nodes;
     std::string value;
-    std::string parameters;
+    std::vector<parameter_t> parameters;
 };
 struct spectre_component_proxy
 {
@@ -66,6 +72,8 @@ class component
         const GiNaC::ex& get_value() const;
         void set_value(const GiNaC::ex& e);
 
+        std::string get_parameter(const std::string& key) const;
+
         friend std::ostream& operator<<(std::ostream& stream, const component& c);
 
         bool operator==(component_types) const;
@@ -78,6 +86,7 @@ class component
         component_types type;
         std::vector<std::string> nodes;
         GiNaC::ex value;
+        std::vector<parameter_t> parameters;
 
         // constant component attributes
         unsigned int mna_size;
