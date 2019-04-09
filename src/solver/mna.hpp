@@ -4,7 +4,7 @@
 #include <vector>
 #include <ginac/ginac.h>
 
-#include "component.hpp"
+#include "../component.hpp"
 
 class componentlist;
 class nodemap;

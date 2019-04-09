@@ -67,22 +67,7 @@ struct netlist_processor_type : public boost::static_visitor<>
 
     void operator() (const component& c) const
     {
-        if(false) // show components (verbose)
-        {
-            std::cout << "processing component: " << c << '\n';
-        }
-        if(nlist.does_linearize())
-        {
-            auto ssm = get_small_signal_model(c);
-            for(auto& s : ssm)
-            {
-                nlist.add_component(s);
-            }
-        }
-        else
-        {
-            nlist.add_component(c);
-        }
+        nlist.add_component(c);
     }
 
     void operator() (const command& c) const

@@ -1,10 +1,10 @@
-#include "component.hpp"
-#include "config.hpp"
-
 #include "mna.hpp"
-#include "stamp.hpp"
-#include "nodemap.hpp"
-#include "componentlist.hpp"
+
+#include "../component.hpp"
+#include "../config.hpp"
+#include "../stamp.hpp"
+#include "../nodemap.hpp"
+#include "../componentlist.hpp"
 
 #include <string>
 #include <vector>

@@ -4,8 +4,6 @@
 #include <cstdlib>
 #include <boost/program_options.hpp>
 
-#include "solver.hpp"
-
 void print_usage(const boost::program_options::options_description& opt)
 {
     std::cout << "Usage: symac [OPTION] netlist\n"
