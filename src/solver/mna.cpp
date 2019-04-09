@@ -1,7 +1,6 @@
 #include "mna.hpp"
 
 #include "../component.hpp"
-#include "../config.hpp"
 #include "../stamp.hpp"
 #include "../nodemap.hpp"
 #include "../componentlist.hpp"
