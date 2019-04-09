@@ -4,6 +4,7 @@
 #include "../symbol.hpp"
 
 #include <string>
+#include <boost/format.hpp>
 
 const std::string portdummynode("DUMMYPORTNODE");
 
@@ -174,7 +175,7 @@ void insert_inactive_port(componentlist& components_tmp, port_mode mode, unsigne
     components_tmp.add_component(p);
 }
 
-GiNaC::matrix solve_nport(port_mode mode, const componentlist& components, nodemap& nmap, bool print)
+GiNaC::matrix solve_nport_single(port_mode mode, const componentlist& components, nodemap& nmap, bool print)
 {
     std::vector<component> ports = components.get_components_by_type(ct_port);
 
@@ -205,4 +206,28 @@ GiNaC::matrix solve_nport(port_mode mode, const componentlist& components, nodem
         }
     }
     return port_matrix;
+}
+
+void solve_nport(const componentlist& components, nodemap& nmap, result& results)
+{
+    std::vector<std::pair<port_mode, std::string>> matrix_container {
+        { zport, "Z" },
+        { yport, "Y" },
+        { sport, "S" }
+    };
+    for(auto& M : matrix_container)
+    {
+        GiNaC::matrix nmatrix = solve_nport_single(M.first, components, nmap, false);
+
+        boost::format fmter = boost::format("%d,%d");
+        unsigned int number_of_ports = components.number_of_components(ct_port);
+        for(unsigned int i = 0; i < number_of_ports; ++i)
+        {
+            for(unsigned int j = 0; j < number_of_ports; ++j)
+            {
+                std::string key = str(fmter % (i + 1) % (j + 1));
+                results.add(M.second, key, nmatrix(i, j));
+            }
+        }
+    }
 }
