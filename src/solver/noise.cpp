@@ -44,17 +44,32 @@ GiNaC::ex squared_abs(const GiNaC::ex& e)
     return GiNaC::pow(tmp.real_part(), 2) + GiNaC::pow(tmp.imag_part(), 2);
 }
 
+componentlist remove_sources(const componentlist& components)
+{
+    componentlist working;
+    for(const component& c : components)
+    {
+        if(c.get_type() != ct_voltage_source && c.get_type() != ct_current_source)
+        {
+            working.add_component(c);
+        }
+    }
+    return working;
+}
+
 void solve_noise(const componentlist& components, nodemap& nmap, result& results)
 {
+    componentlist working = remove_sources(components);
+
     for(unsigned int node = 0; node < components.number_of_nodes(); ++node)
     {
         GiNaC::ex totalnoise = 0;
         GiNaC::ex totalintegratednoise = 0;
-        for(const component& c : components)
+        for(const component& c : working)
         {
             if(c.is_noisy())
             {
-                componentlist components_tmp(components);
+                componentlist components_tmp(working);
 
                 GiNaC::ex noise = c.get_noise();
                 component source = c;
