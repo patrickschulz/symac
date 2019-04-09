@@ -1,15 +1,7 @@
-* Transistors terminals in the following order: gate drain source
-*MP1 vbias vout vdd
-*MN1 vin vout vss
-*
-*Vdd vdd 0 vdd
-*Vss vss 0 0
-*Vin vin 0 vin
-
-* simpler example: resistance with voltage source
-R0 vdd vout RL
-M0 vin vout 0
-V0 vdd 0 vdd 
+Mp vbias vout vdd
+Mn vin vout 0
+Vdd vdd 0 vdd 
+Vbias vbias 0 vbias
 Vin vin 0 vin ac=1
 
 .print V(vout) / V(vin)
