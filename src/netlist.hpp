@@ -14,7 +14,7 @@
 class netlist
 {
     public:
-        netlist(bool linearize = false);
+        netlist() = default;
 
         void read(const std::string& filename);
         
