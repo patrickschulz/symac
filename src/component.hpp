@@ -61,6 +61,7 @@ class component
 
         bool is_noisy() const;
         GiNaC::ex get_noise() const;
+        component get_noise_source() const;
 
         // getter and setter
         component_types get_type() const;
@@ -72,6 +73,7 @@ class component
         const GiNaC::ex& get_value() const;
         void set_value(const GiNaC::ex& e);
 
+        void set_parameter(const std::string& key, const std::string& value);
         std::string get_parameter(const std::string& key) const;
 
         friend std::ostream& operator<<(std::ostream& stream, const component& c);

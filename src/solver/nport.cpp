@@ -175,7 +175,7 @@ void insert_inactive_port(componentlist& components_tmp, port_mode mode, unsigne
     components_tmp.add_component(p);
 }
 
-GiNaC::matrix solve_nport_single(port_mode mode, const componentlist& components, nodemap& nmap, bool print)
+GiNaC::matrix solve_nport_single(port_mode mode, const componentlist& components, nodemap& nmap, bool linearize, bool print)
 {
     std::vector<component> ports = components.get_components_by_type(ct_port);
 
@@ -194,7 +194,7 @@ GiNaC::matrix solve_nport_single(port_mode mode, const componentlist& components
         }
 
         /* solve network and calculate parameters */
-        GiNaC::matrix res = solve_network(components_tmp, nmap, print);
+        GiNaC::matrix res = solve_network(components_tmp, nmap, linearize, print);
         for(unsigned int j = 0; j < ports.size(); ++j)
         {
             GiNaC::ex num = get_nport_numerator(mode, i, j, components_tmp, res, nmap);
@@ -208,7 +208,7 @@ GiNaC::matrix solve_nport_single(port_mode mode, const componentlist& components
     return port_matrix;
 }
 
-void solve_nport(const componentlist& components, nodemap& nmap, result& results)
+void solve_nport(const componentlist& components, nodemap& nmap, result& results, bool linearize, bool print)
 {
     std::vector<std::pair<port_mode, std::string>> matrix_container {
         { zport, "Z" },
@@ -217,7 +217,7 @@ void solve_nport(const componentlist& components, nodemap& nmap, result& results
     };
     for(auto& M : matrix_container)
     {
-        GiNaC::matrix nmatrix = solve_nport_single(M.first, components, nmap, false);
+        GiNaC::matrix nmatrix = solve_nport_single(M.first, components, nmap, linearize, print);
 
         boost::format fmter = boost::format("%d,%d");
         unsigned int number_of_ports = components.number_of_components(ct_port);

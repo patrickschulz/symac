@@ -47,17 +47,18 @@ GiNaC::ex squared_abs(const GiNaC::ex& e)
 componentlist remove_sources(const componentlist& components)
 {
     componentlist working;
-    for(const component& c : components)
+    for(component c : components)
     {
-        if(c.get_type() != ct_voltage_source && c.get_type() != ct_current_source)
+        if(c.get_type() == ct_voltage_source || c.get_type() == ct_current_source)
         {
-            working.add_component(c);
+            c.set_value(0);
         }
+        working.add_component(c);
     }
     return working;
 }
 
-void solve_noise(const componentlist& components, nodemap& nmap, result& results)
+void solve_noise(const componentlist& components, nodemap& nmap, result& results, bool linearize, bool print)
 {
     componentlist working = remove_sources(components);
 
@@ -69,23 +70,25 @@ void solve_noise(const componentlist& components, nodemap& nmap, result& results
         {
             if(c.is_noisy())
             {
+                // add noise source
                 componentlist components_tmp(working);
+                component noisesource = c.get_noise_source();
+                components_tmp.add_component(noisesource);
 
-                GiNaC::ex noise = c.get_noise();
-                component source = c;
-                source.set_type(ct_current_source);
-                source.set_value(noise);
-                components_tmp.add_component(source);
+                // solve network and calculate parameters
+                if(print)
+                {
+                    std::cout << "Node: " << nmap[node + 1] << ", Device: " << c.get_name() << '\n';
+                }
+                GiNaC::matrix res = solve_network(components_tmp, nmap, linearize, print); 
 
-                /* solve network and calculate parameters */
-                GiNaC::matrix res = solve_network(components_tmp, nmap, false);
-
+                // calculate noise
                 GiNaC::ex value = res(node, 0);
-                GiNaC::ex NTF = value / noise;
-                totalnoise += squared_abs(NTF) * noise;
-                totalintegratednoise += integrate_NTF_sabs(NTF) * noise;
+                GiNaC::ex NTF = value / noisesource.get_value();
+                totalnoise += squared_abs(NTF) * noisesource.get_value();
+                totalintegratednoise += integrate_NTF_sabs(NTF) * noisesource.get_value();
 
-                // add NTF
+                // add NTF to results
                 boost::format fmter = boost::format("%s,%s");
                 std::string key = str(fmter % c.get_name() % nmap[node + 1]);
                 results.add("NTF", key, NTF);
@@ -95,3 +98,4 @@ void solve_noise(const componentlist& components, nodemap& nmap, result& results
         results.add("VNI", nmap[node + 1], totalintegratednoise);
     }
 }
+

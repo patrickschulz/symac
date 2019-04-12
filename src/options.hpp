@@ -48,7 +48,6 @@ class options
                 ("version,v"  , "show version")
                 ("print,p"    , "print network matrices")
                 ("pretty,P"   , "print the results in a pretty way (display transfer functions as fractions) THIS IS PRELIMINARY, CHECK YOUR RESULTS!")
-                ("reslist,N"  , "print resulting netlist (after transformation of subcircuits)")
                 ("devices,D"  , "print information about the usage of all components")
                 ("simplify,S" , "simplify all results")
                 ("linearize,L", "transform (linearize) a large-signal netlist into a small-signal netlist")

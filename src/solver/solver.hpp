@@ -14,12 +14,12 @@
 class solver
 {
     public:
-        solver(componentlist components);
+        solver(const componentlist& components);
         result solve(bool linearize, bool print);
         void print_matrices();
 
     private:
-        componentlist components;
+        const componentlist& components;
         nodemap nmap;
 };
 

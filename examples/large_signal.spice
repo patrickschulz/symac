@@ -1,7 +1,8 @@
 Mp vbias vout vdd
-Mn vin vout 0
+Mn vin vout 0 noise=1
 Vdd vdd 0 vdd 
 Vbias vbias 0 vbias
-Vin vin 0 vin ac=1
+Vin vin 0 x ac=1
 
 .print V(vout) / V(vin)
+.print VN(vout)

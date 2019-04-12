@@ -6,6 +6,6 @@
 #include "../componentlist.hpp"
 #include "../nodemap.hpp"
 
-GiNaC::matrix solve_network(const componentlist& components, nodemap& nmap, bool print);
+GiNaC::matrix solve_network(componentlist components, nodemap& nmap, bool linearize, bool print);
 
 #endif // SOLVE_COMMON_HPP

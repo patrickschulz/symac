@@ -1,5 +1,4 @@
 #include "component.hpp"
-#include "config.hpp"
 
 #include <sstream>
 #include <map>
@@ -96,6 +95,8 @@ unsigned int component::element_size() const
 
 bool component::is_noisy() const
 {
+    return get_parameter("noise") == "1";
+    /*
     bool ret;
     switch(type)
     {
@@ -118,13 +119,55 @@ bool component::is_noisy() const
             break;
     }
     return ret;
+    */
 }
 
 GiNaC::ex component::get_noise() const
 {
     GiNaC::ex boltzmann = get_symbol("k");
     GiNaC::ex temperature = get_symbol("T");
-    return 4 * boltzmann * temperature / value;
+    GiNaC::ex ret = 0;
+    switch(type)
+    {
+        case ct_resistor:
+            ret = 4 * boltzmann * temperature / value;
+            break;
+        case ct_conductor:
+            ret = 4 * boltzmann * temperature * value;
+            break;
+        case ct_mosfet: 
+        default:
+            break;
+    }
+    return ret;
+}
+
+component component::get_noise_source() const
+{
+    GiNaC::ex boltzmann = get_symbol("k");
+    GiNaC::ex temperature = get_symbol("T");
+    component source;
+    switch(type)
+    {
+        case ct_resistor:
+            source.set_type(ct_current_source);
+            source.set_value(4 * boltzmann * temperature / value);
+            source.set_nodes(nodes);
+            source.set_parameter("ac", "1");
+            break;
+        case ct_conductor:
+            //ret = 4 * boltzmann * temperature * value;
+            break;
+        case ct_mosfet: 
+            source.set_name("transistornoise");
+            source.set_type(ct_current_source);
+            source.set_value(4 * boltzmann * temperature * get_symbol("y") * get_symbol("gm"));
+            source.set_nodes({ nodes[1], nodes[2] });
+            source.set_parameter("ac", "1");
+        default:
+            break;
+    }
+    return source;
 }
 
 component_types component::get_type() const
@@ -180,6 +223,21 @@ const GiNaC::ex& component::get_value() const
 void component::set_value(const GiNaC::ex& e)
 {
     value = e;
+}
+
+void component::set_parameter(const std::string& key, const std::string& value)
+{
+    // check if the parameter is already present
+    for(auto& param : parameters)
+    {
+        if(param.key == key)
+        {
+            param.value = value;
+            return; // finished
+        }
+    }
+    // only if parameter wasn't found
+    parameters.push_back({ key, value });
 }
 
 std::string component::get_parameter(const std::string& key) const
@@ -241,6 +299,7 @@ std::vector<component> get_small_signal_model(const component& c)
             break;
         }
         case ct_voltage_source:
+        case ct_current_source:
         {
             component s = c;
             if(c.get_parameter("ac") != "1")
@@ -251,6 +310,9 @@ std::vector<component> get_small_signal_model(const component& c)
             break;
         }
         case ct_resistor:
+        case ct_conductor:
+        case ct_capacitor:
+        case ct_inductor:
             ssm.push_back(c);
             break;
         default:

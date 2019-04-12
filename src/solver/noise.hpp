@@ -12,6 +12,6 @@ GiNaC::ex integrate_NTF_sabs(const transfer_function& tf);
 GiNaC::ex integrate_NTF_sabs(const GiNaC::ex& e);
 GiNaC::ex squared_abs(const GiNaC::ex& e);
 
-void solve_noise(const componentlist& components, nodemap& nmap, result& results);
+void solve_noise(const componentlist& components, nodemap& nmap, result& results, bool linearize, bool print);
 
 #endif // NOISE_HPP
