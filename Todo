@@ -27,8 +27,10 @@
     their own error messages.
 
 [x] Integrate simplification from Jan, improve
+[ ] Integrate simplifications into the netlist parser
 
 [ ] Enhance readability of output, similar perhaps to sympy. Also improve (and implement correctly) the latex report, because this provides the best output.
+[ ] Create an html report?
 
 [ ] Add a utility to generate matlab/octave files in order to postprocess the results.
 
