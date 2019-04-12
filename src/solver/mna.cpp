@@ -175,7 +175,7 @@ namespace mna
         return A;
     }
 
-    GiNaC::matrix create_x_vector(const componentlist& components)
+    GiNaC::matrix create_x_vector(nodemap& nmap, const componentlist& components)
     {
         unsigned int networksize = components.network_size();
         GiNaC::matrix x(networksize, 1);
@@ -183,9 +183,10 @@ namespace mna
         unsigned int row = 0;
         for(; row < components.number_of_nodes(); ++row)
         {
-            boost::format fmter = boost::format("v%d") % (row + 1);
-            std::string str = fmter.str();
-            x(row, 0) = get_symbol(str);
+            //boost::format fmter = boost::format("v%d") % (row + 1);
+            //std::string str = fmter.str();
+            std::string node = nmap[row + 1];
+            x(row, 0) = get_symbol(node);
         }        
 
         for(const auto& c : components)

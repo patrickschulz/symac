@@ -3,6 +3,8 @@
 
 #include <ginac/ginac.h>
 
-void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, const GiNaC::matrix& z);
+#include "../nodemap.hpp"
+
+void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, const GiNaC::matrix& z, nodemap& nmap);
 
 #endif // UTIL_HPP
