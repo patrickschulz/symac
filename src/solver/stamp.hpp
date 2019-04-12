@@ -5,7 +5,7 @@
 #include <string>
 #include <ginac/ginac.h>
 
-#include "symbol.hpp"
+#include "../symbol.hpp"
 
 class element
 {

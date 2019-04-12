@@ -22,7 +22,7 @@ GiNaC::matrix solve_network(componentlist components, nodemap& nmap, bool linear
 
     if(print)
     {
-        print_network_matrices(A, x, z, nmap);
+        print_network_matrices(A, x, z);
     }
 
     GiNaC::matrix res(A.rows(), 1);
@@ -33,7 +33,7 @@ GiNaC::matrix solve_network(componentlist components, nodemap& nmap, bool linear
     catch(std::runtime_error)
     {
         std::cerr << "could not solve network, inconsistent linear system:\n";
-        print_network_matrices(A, x, z, nmap);
+        print_network_matrices(A, x, z);
     }
     return res;
 }

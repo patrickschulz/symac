@@ -9,7 +9,7 @@
 
 #include <boost/format.hpp>
 
-void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, const GiNaC::matrix& z, nodemap& nmap)
+void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, const GiNaC::matrix& z)
 {
     const unsigned int sep = 3;
     const unsigned skip = 10;
@@ -35,7 +35,6 @@ void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, cons
             if(column == size)
             {
                 stream << format << x(row, 0);
-                //stream << format << nmap[row + 1];
             }
             if(column > size)
             {
@@ -78,7 +77,6 @@ void print_network_matrices(const GiNaC::matrix& A, const GiNaC::matrix& x, cons
             if(column == size)
             {
                 stream << format << x(row, 0);
-                //stream << format << nmap[row + 1];
                 width += skip;
             }
             if(column > size)
