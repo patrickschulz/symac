@@ -1,16 +1,16 @@
 [ ] Improve the parser: (this is actually critical for some other todo points, too, so focus on this)
  [ ] Add error reporting (!)
  [ ] Add spectre netlists
- [ ] Add parameters to devices and subcircuits
+ [x] Add parameters to devices and subcircuits
  [x] Add support for expressions to the parser
 
 [ ] Support n-port parameters (Z, Y, S, ABCD, ...)
-
  [x] Enable Z- and Y-Matrix simulations
  [x] Enable S-Matrix simulations
  [ ] Enable ABCD-, G-, H-, etc. Matrix simulations
  [x] Provide a generic interface in the results so that no specific simulation needs to be chosen by the user
  [ ] Make it possible to use ports also as sources. This enables the simultaneous use of netlists for "regular" simulations and n-port simulations
+
 [x] Enable the result browser to print currents for ALL devices (this could be done by some 'get_current' function for each device, with the actual node values (since these are all known))
 
 [ ] Implement Noise simulations
@@ -19,7 +19,9 @@
  [x] Rewrite the access function mechanism of the result browser, since regular and noise voltages need to be distinguished
  [x] Add output of noise transfer functions
  [x] Add non-integrated voltage noise
- [ ] Add noise parameters to devices (currently only resistors have noise)
+ [x] Add noise parameters to devices (currently only resistors have noise)
+ [ ] Add equivalent input noise and noise figure
+ [ ] Check noise simulations for all (sensible) devices
 
 [ ] While checking output expressions, check for any errors (wrong noise results or similar). For this, the error mechanisms of printing commands needs to be changed so that every quantity holds
     their own error messages.
@@ -32,6 +34,6 @@
 
 [ ] plot tool to show (qualitively) how the result behaves with regard to frequency/component values/...
 
-[ ] Add a linearization feature (small-signal simulations from large-signal circuits)
+[x] Add a linearization feature (small-signal simulations from large-signal circuits)
 
 [ ] Add behavioural models (in s-domain)
