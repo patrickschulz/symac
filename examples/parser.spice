@@ -3,4 +3,4 @@ V0 in 0 Vin
 
 R1 in out R1
 
-.print V(vout)
+.print V(out)

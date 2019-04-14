@@ -6,3 +6,4 @@ Vin vin 0 x ac=1
 
 .print V(vout) / V(vin)
 .print VN(vout)
+.print VNeq(vin, vout)

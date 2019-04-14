@@ -1,4 +1,4 @@
-E0 voutx 0 vin 0 2 * G
+E0 voutx 0 vin 0 {2 * G}
 Rin vin 0 Z0
 Rout voutx vout Z0
 

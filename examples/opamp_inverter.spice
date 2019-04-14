@@ -2,6 +2,6 @@
 V0 vin 0 Vin
 Rf vin vx Rf
 Rfb vx vout Rfb
-Op 0 vx vout A0
+Op 0 vx vout
 
 .print V(vout) / V(vin)
