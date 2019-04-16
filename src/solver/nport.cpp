@@ -45,7 +45,7 @@ GiNaC::ex get_nport_numerator(port_mode mode, unsigned int i, unsigned int j, co
             }
             else
             {
-                return -res(components.network_size() - 1, 0);
+                return -res(res.rows() - 1, 0);
             }
         case sport:
         {
@@ -85,7 +85,7 @@ GiNaC::ex get_nport_denominator(port_mode mode, unsigned int i, unsigned int j, 
     switch(mode)
     {
         case zport:
-            return -res(components.network_size() - 1, 0);
+            return -res(res.rows() - 1, 0);
         case yport:
             return get_port_voltage(ports[i], res, nmap);
         case sport:

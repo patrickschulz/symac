@@ -7,19 +7,17 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <boost/format.hpp>
 
-static stamp get_impedance_stamp(const GiNaC::ex& value, unsigned int offset, const std::vector<unsigned int>& nodes)
+static stamp get_impedance_stamp(const GiNaC::ex& value)
 {
-    // suppress warning
-    (void) offset;
-
     stamp stmp;
     // G-Matrix
-    stmp.write(nodes[0], nodes[0],  1 / value);
-    stmp.write(nodes[1], nodes[1],  1 / value);
-    stmp.write(nodes[0], nodes[1], -1 / value);
-    stmp.write(nodes[1], nodes[0], -1 / value);
+    stmp.write(1, 1,  1 / value);
+    stmp.write(2, 2,  1 / value);
+    stmp.write(1, 2, -1 / value);
+    stmp.write(2, 1, -1 / value);
     /* Impedance approach
     stmp.write(offset, nodes[0], 1);
     stmp.write(nodes[0], offset, 1);
@@ -30,10 +28,9 @@ static stamp get_impedance_stamp(const GiNaC::ex& value, unsigned int offset, co
     return stmp;
 }
 
-static stamp get_conductance_stamp(const GiNaC::ex& value, unsigned int offset, const std::vector<unsigned int>& nodes)
+static stamp get_conductance_stamp(const GiNaC::ex& value)
 {
-    // suppress warning
-    (void) offset;
+    std::vector<unsigned int> nodes = {1, 2, 3, 4};
 
     stamp stmp;
     // G-Matrix
@@ -51,8 +48,10 @@ static stamp get_conductance_stamp(const GiNaC::ex& value, unsigned int offset, 
     return stmp;
 }
 
-static stamp get_voltage_source_stamp(unsigned int offset, const std::vector<unsigned int>& nodes)
+static stamp get_voltage_source_stamp()
 {
+    std::vector<unsigned int> nodes = {1, 2};
+    unsigned int offset = 3;
     stamp stmp;
     stmp.write(offset, nodes[0], 1);
     stmp.write(nodes[0], offset, 1);
@@ -61,8 +60,10 @@ static stamp get_voltage_source_stamp(unsigned int offset, const std::vector<uns
     return stmp;
 }
 
-static stamp get_vcvs_stamp(const GiNaC::ex& value, unsigned int offset, const std::vector<unsigned int>& nodes)
+static stamp get_vcvs_stamp(const GiNaC::ex& value)
 {
+    std::vector<unsigned int> nodes = {1, 2, 3, 4};
+    unsigned int offset = 0;
     stamp stmp;
     stmp.write(offset, nodes[0], 1);
     stmp.write(nodes[0], offset, 1);
@@ -73,8 +74,10 @@ static stamp get_vcvs_stamp(const GiNaC::ex& value, unsigned int offset, const s
     return stmp;
 }
 
-static stamp get_ccvs_stamp(const GiNaC::ex& value, unsigned int offset, const std::vector<unsigned int>& nodes)
+static stamp get_ccvs_stamp(const GiNaC::ex& value)
 {
+    std::vector<unsigned int> nodes = {1, 2, 3, 4};
+    unsigned int offset = 0;
     stamp stmp;
     stmp.write(offset, nodes[0],     1);
     stmp.write(nodes[0], offset + 1, 1);
@@ -88,10 +91,10 @@ static stamp get_ccvs_stamp(const GiNaC::ex& value, unsigned int offset, const s
     return stmp;
 }
 
-static stamp get_vccs_stamp(const GiNaC::ex& value, unsigned int offset, const std::vector<unsigned int>& nodes)
+static stamp get_vccs_stamp(const GiNaC::ex& value)
 {
-    // suppress warning
-    (void) offset;
+    std::vector<unsigned int> nodes = {1, 2, 3, 4};
+    unsigned int offset = 0;
 
     stamp stmp;
     stmp.write(nodes[0], nodes[2], -value);
@@ -101,8 +104,10 @@ static stamp get_vccs_stamp(const GiNaC::ex& value, unsigned int offset, const s
     return stmp;
 }
 
-static stamp get_cccs_stamp(const GiNaC::ex& value, unsigned int offset, const std::vector<unsigned int>& nodes)
+static stamp get_cccs_stamp(const GiNaC::ex& value)
 {
+    std::vector<unsigned int> nodes = {1, 2, 3, 4};
+    unsigned int offset = 0;
     stamp stmp;
     stmp.write(nodes[0], offset, -value);
     stmp.write(nodes[1], offset,  value);
@@ -113,9 +118,10 @@ static stamp get_cccs_stamp(const GiNaC::ex& value, unsigned int offset, const s
     return stmp;
 }
 
-static stamp get_opamp_stamp(unsigned int offset, const std::vector<unsigned int>& nodes)
+static stamp get_opamp_stamp()
 {
-
+    std::vector<unsigned int> nodes = {1, 2, 3, 4};
+    unsigned int offset = 0;
     stamp stmp;
     stmp.write(offset, nodes[0], 1);
     stmp.write(offset, nodes[1], -1);
@@ -124,54 +130,87 @@ static stamp get_opamp_stamp(unsigned int offset, const std::vector<unsigned int
     return stmp;
 }
 
-static stamp get_stamp(const component& c, unsigned int offset, nodemap& nmap)
+static stamp get_port_stamp()
 {
-    std::vector<unsigned int> nodes = nmap[c.get_nodes()];
+    std::vector<unsigned int> nodes = {1, 2};
+    stamp stmp;
+    stmp.write(nodes[0], nodes[0], 0);
+    stmp.write(nodes[1], nodes[0], 0);
+    stmp.write(nodes[0], nodes[1], 0);
+    stmp.write(nodes[1], nodes[1], 0);
+    return stmp;
+}
+
+static stamp get_stamp(const component& c)
+{
     GiNaC::ex value = c.get_value();
     switch(c.get_type())
     {
         case ct_resistor:
-            return get_impedance_stamp(value, offset, nodes);
+            return get_impedance_stamp(value);
         case ct_inductor:
-            return get_impedance_stamp(value * get_complex_symbol("s"), offset, nodes);
+            return get_impedance_stamp(value * get_complex_symbol("s"));
         case ct_conductor:
-            return get_conductance_stamp(value, offset, nodes);
+            return get_conductance_stamp(value);
         case ct_capacitor:
-            return get_conductance_stamp(value * get_complex_symbol("s"), offset, nodes);
+            return get_conductance_stamp(value * get_complex_symbol("s"));
         case ct_voltage_source:
-            return get_voltage_source_stamp(offset, nodes);
+            return get_voltage_source_stamp();
         case ct_opamp:
-            return get_opamp_stamp(offset, nodes);
+            return get_opamp_stamp();
         case ct_voltage_controlled_voltage_source:
-            return get_vcvs_stamp(value, offset, nodes);
+            return get_vcvs_stamp(value);
         case ct_current_controlled_voltage_source:
-            return get_ccvs_stamp(value, offset, nodes);
+            return get_ccvs_stamp(value);
         case ct_voltage_controlled_current_source:
-            return get_vccs_stamp(value, offset, nodes);
+            return get_vccs_stamp(value);
         case ct_current_controlled_current_source:
-            return get_cccs_stamp(value, offset, nodes);
+            return get_cccs_stamp(value);
+        case ct_port:
+            return get_port_stamp();
+            return stamp();
         default: // suppress warning for sources that don't need any stamp (ct_port and ct_current_source)
             return stamp();
     }
 }
 
+unsigned int get_networksize(const componentlist& components)
+{
+    unsigned int networksize = 0;
+    // find network size
+    for(const auto& c : components)
+    {
+        stamp stmp = get_stamp(c);
+        networksize += stmp.size() - c.get_nodes().size();
+    }
+    networksize += components.number_of_nodes();
+    return networksize;
+}
+
 namespace mna
 {
+    void create_network_matrices(nodemap& nmap, const componentlist& components, GiNaC::matrix& A, GiNaC::matrix& x, GiNaC::matrix& z)
+    {
+    }
+
     GiNaC::matrix create_A_matrix(nodemap& nmap, const componentlist& components)
     {
-        unsigned int networksize = components.network_size();
+        unsigned int networksize = get_networksize(components);
+
         GiNaC::matrix A(networksize, networksize);
+
         unsigned int offset = components.number_of_nodes() + 1;
         for(const auto& c : components)
         {
-            stamp stmp = get_stamp(c, offset, nmap);
-            offset += c.element_size();
+            stamp stmp = get_stamp(c);
             for(const element& elem : stmp)
             {
                 // GiNaC matrices are 0-indexed, so we need to decrement the indices by 1
                 A(elem.get_row() - 1, elem.get_column() - 1) += elem.get_value();
             }
+            offset += stmp.size() - c.get_nodes().size();
         }
+
         return A;
     }
 
@@ -183,8 +222,6 @@ namespace mna
         unsigned int row = 0;
         for(; row < components.number_of_nodes(); ++row)
         {
-            //boost::format fmter = boost::format("v%d") % (row + 1);
-            //std::string str = fmter.str();
             std::string node = nmap[row + 1];
             x(row, 0) = get_symbol(node);
         }        
