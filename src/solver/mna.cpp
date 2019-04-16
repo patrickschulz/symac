@@ -210,7 +210,7 @@ namespace mna
 
         GiNaC::matrix A(networksize, networksize);
 
-        unsigned int offset = components.number_of_nodes() + 1;
+        unsigned int offset = components.number_of_nodes();
         for(const auto& c : components)
         {
             auto nodes = nmap[c.get_nodes()];
@@ -221,7 +221,7 @@ namespace mna
                 unsigned int col = 0;
                 if(elem.get_row() > nodes.size())
                 {
-                    row = offset;
+                    row = offset + elem.get_row() - nodes.size();
                 }
                 else
                 {
@@ -230,7 +230,7 @@ namespace mna
 
                 if(elem.get_column() > nodes.size())
                 {
-                    col = offset;
+                    col = offset + elem.get_column() - nodes.size();
                 }
                 else
                 {
