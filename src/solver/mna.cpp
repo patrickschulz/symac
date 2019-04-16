@@ -141,6 +141,17 @@ static stamp get_port_stamp()
     return stmp;
 }
 
+static stamp get_dummy_stamp()
+{
+    std::vector<unsigned int> nodes = {1, 2};
+    stamp stmp;
+    stmp.write(nodes[0], nodes[0], 0);
+    stmp.write(nodes[1], nodes[0], 0);
+    stmp.write(nodes[0], nodes[1], 0);
+    stmp.write(nodes[1], nodes[1], 0);
+    return stmp;
+}
+
 static stamp get_stamp(const component& c)
 {
     GiNaC::ex value = c.get_value();
@@ -169,8 +180,8 @@ static stamp get_stamp(const component& c)
         case ct_port:
             return get_port_stamp();
             return stamp();
-        default: // suppress warning for sources that don't need any stamp (ct_port and ct_current_source)
-            return stamp();
+        case ct_current_source: 
+            return get_dummy_stamp();
     }
 }
 
@@ -202,13 +213,37 @@ namespace mna
         unsigned int offset = components.number_of_nodes() + 1;
         for(const auto& c : components)
         {
+            auto nodes = nmap[c.get_nodes()];
             stamp stmp = get_stamp(c);
             for(const element& elem : stmp)
             {
-                // GiNaC matrices are 0-indexed, so we need to decrement the indices by 1
-                A(elem.get_row() - 1, elem.get_column() - 1) += elem.get_value();
+                unsigned int row = 0;
+                unsigned int col = 0;
+                if(elem.get_row() > nodes.size())
+                {
+                    row = offset;
+                }
+                else
+                {
+                    row = nodes[elem.get_row() - 1];
+                }
+
+                if(elem.get_column() > nodes.size())
+                {
+                    col = offset;
+                }
+                else
+                {
+                    col = nodes[elem.get_column() - 1];
+                }
+
+                if(row > 0 && col > 0)
+                {
+                    // GiNaC matrices are 0-indexed, so we need to decrement the indices by 1
+                    A(row - 1, col - 1) += elem.get_value();
+                }
             }
-            offset += stmp.size() - c.get_nodes().size();
+            offset += stmp.size() - nodes.size();
         }
 
         return A;
