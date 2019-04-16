@@ -1,3 +1,6 @@
+[ ] Improve the creation of the network matrices. Currently, each component knows their mna size, but with ports as sources this changed. The mna size needs to be moved out of the component class.
+    Furthermore, the stamps system needs to be reworked to be independent of the offset and the nodes. Stamps should be formulated for devices in general, not one particular one.
+
 [ ] Improve the parser: (this is actually critical for some other todo points, too, so focus on this)
  [ ] Add error reporting (!)
  [ ] Add spectre netlists
@@ -39,3 +42,10 @@
 [x] Add a linearization feature (small-signal simulations from large-signal circuits)
 
 [ ] Add behavioural models (in s-domain)
+
+[ ] Reworke the structure of the A, x and z creation. Remove the mna_size member variable from the component class, this is now calculated with the stamps.
+ [ ] Remove 'get_component_index' from the componentlist class, which is currently needed for the results browser
+
+[ ] Add numerical alternatives to netlists, so that symbolic results can automatically be converted to numeric results, enabling plotting.
+
+[ ] Add poles and zeros to the results browser
