@@ -43,14 +43,23 @@ class resultmap_t
 class result
 {
     public:
+        result();
         result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap);
 
         void add(const std::string& domain, const std::string& key, const GiNaC::ex& res)
         {
             resultmap.add(domain, key, res);
         }
-        //bool exists(const std::string& domain, const std::string& key);
-        //GiNaC::ex get(const std::string& domain, const std::string& key);
+
+        bool exists(const std::string& domain, const std::string& key)
+        {
+            return resultmap.exists(domain, key);
+        }
+
+        GiNaC::ex get(const std::string& domain, const std::string& key)
+        {
+            return resultmap.get(domain, key);
+        }
 
         void print(const std::vector<command>& print_cmd, bool pretty, bool simpl) const;
 

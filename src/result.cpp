@@ -19,11 +19,15 @@ BOOST_FUSION_ADAPT_STRUCT(
     (std::string, symbol)
 )
 
-result::result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap)
+result::result()
 {
     // insert ground
     add("V", "0", 0);
+}
 
+result::result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap) :
+    result()
+{
     // voltages
     for(unsigned int row = 0; row < components.number_of_nodes(); ++row)
     {
@@ -40,52 +44,52 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
             {
                 GiNaC::ex value = c.get_value();
                 std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = resultmap.get("V", nodes[0]) - resultmap.get("V", nodes[1]);
+                GiNaC::ex voltage = get("V", nodes[0]) - get("V", nodes[1]);
                 boost::format fmter = boost::format("%s.%s");
-                resultmap.add("I", str(fmter % c.get_name() % "p"),  voltage / value);
-                resultmap.add("I", str(fmter % c.get_name() % "n"), -voltage / value);
+                add("I", str(fmter % c.get_name() % "p"),  voltage / value);
+                add("I", str(fmter % c.get_name() % "n"), -voltage / value);
                 break;
             }
             case ct_conductor:
             {
                 GiNaC::ex value = c.get_value();
                 std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = resultmap.get("V", nodes[0]) - resultmap.get("V", nodes[1]);
+                GiNaC::ex voltage = get("V", nodes[0]) - get("V", nodes[1]);
                 boost::format fmter = boost::format("%s.%s");
-                resultmap.add("I", str(fmter % c.get_name() % "p"),  voltage * value);
-                resultmap.add("I", str(fmter % c.get_name() % "n"), -voltage * value);
+                add("I", str(fmter % c.get_name() % "p"),  voltage * value);
+                add("I", str(fmter % c.get_name() % "n"), -voltage * value);
                 break;
             }
             case ct_inductor:
             {
                 GiNaC::ex value = c.get_value();
                 std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = resultmap.get("V", nodes[0]) - resultmap.get("V", nodes[1]);
+                GiNaC::ex voltage = get("V", nodes[0]) - get("V", nodes[1]);
                 boost::format fmter = boost::format("%s.%s");
                 GiNaC::ex s = get_complex_symbol("s");
-                resultmap.add("I", str(fmter % c.get_name() % "p"),  voltage / s / value);
-                resultmap.add("I", str(fmter % c.get_name() % "n"), -voltage / s / value);
+                add("I", str(fmter % c.get_name() % "p"),  voltage / s / value);
+                add("I", str(fmter % c.get_name() % "n"), -voltage / s / value);
                 break;
             }
             case ct_capacitor:
             {
                 GiNaC::ex value = c.get_value();
                 std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = resultmap.get("V", nodes[0]) - resultmap.get("V", nodes[1]);
+                GiNaC::ex voltage = get("V", nodes[0]) - get("V", nodes[1]);
                 boost::format fmter = boost::format("%s.%s");
                 GiNaC::ex s = get_complex_symbol("s");
-                resultmap.add("I", str(fmter % c.get_name() % "p"),  voltage * s * value);
-                resultmap.add("I", str(fmter % c.get_name() % "n"), -voltage * s * value);
+                add("I", str(fmter % c.get_name() % "p"),  voltage * s * value);
+                add("I", str(fmter % c.get_name() % "n"), -voltage * s * value);
                 break;
             }
             case ct_voltage_controlled_current_source:
             {
                 GiNaC::ex value = c.get_value();
                 std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = resultmap.get("V", nodes[2]) - resultmap.get("V", nodes[3]);
+                GiNaC::ex voltage = get("V", nodes[2]) - get("V", nodes[3]);
                 boost::format fmter = boost::format("%s.%s");
-                resultmap.add("I", str(fmter % c.get_name() % "p"),  voltage * value);
-                resultmap.add("I", str(fmter % c.get_name() % "n"), -voltage * value);
+                add("I", str(fmter % c.get_name() % "p"),  voltage * value);
+                add("I", str(fmter % c.get_name() % "n"), -voltage * value);
                 break;
             }
             case ct_voltage_source:
@@ -95,25 +99,25 @@ result::result(const componentlist& components, const GiNaC::matrix& results, co
             {
                 unsigned int offset = components.number_of_nodes() + components.component_index(c);
                 boost::format fmter = boost::format("%s.%s");
-                resultmap.add("I", str(fmter % c.get_name() % "p"),  results(offset, 0));
-                resultmap.add("I", str(fmter % c.get_name() % "n"), -results(offset, 0));
+                add("I", str(fmter % c.get_name() % "p"),  results(offset, 0));
+                add("I", str(fmter % c.get_name() % "n"), -results(offset, 0));
                 break;
             }
             case ct_current_source:
             {
                 boost::format fmter = boost::format("%s.%s");
-                resultmap.add("I", str(fmter % c.get_name() % "p"),  c.get_value());
-                resultmap.add("I", str(fmter % c.get_name() % "n"), -c.get_value());
+                add("I", str(fmter % c.get_name() % "p"),  c.get_value());
+                add("I", str(fmter % c.get_name() % "n"), -c.get_value());
                 break;
             }
             case ct_current_controlled_voltage_source:
             {
                 unsigned int offset = components.number_of_nodes() + components.component_index(c);
                 boost::format fmter = boost::format("%s.%s");
-                resultmap.add("I", str(fmter % c.get_name() % "cp"),  results(offset, 0));
-                resultmap.add("I", str(fmter % c.get_name() % "cn"), -results(offset, 0));
-                resultmap.add("I", str(fmter % c.get_name() % "p"),  results(offset + 1, 0));
-                resultmap.add("I", str(fmter % c.get_name() % "n"), -results(offset + 1, 0));
+                add("I", str(fmter % c.get_name() % "cp"),  results(offset, 0));
+                add("I", str(fmter % c.get_name() % "cn"), -results(offset, 0));
+                add("I", str(fmter % c.get_name() % "p"),  results(offset + 1, 0));
+                add("I", str(fmter % c.get_name() % "n"), -results(offset + 1, 0));
                 break;
             }
             case ct_port:
@@ -136,13 +140,15 @@ std::vector<std::string> chop_arguments(const quantity& q)
     return arguments;
 }
 
-std::string concat_arguments(const std::vector<std::string>& arguments)
+std::string concat_arguments(const std::vector<std::string>& arguments, const std::string& sep)
 {
     std::string res;
-    for(const auto& s : arguments)
+    for(unsigned int i = 0; i < arguments.size() - 1; ++i)
     {
-        res += s;
+        res += arguments[i];
+        res += sep;
     }
+    res += arguments[arguments.size() - 1];
     return res;
 }
 

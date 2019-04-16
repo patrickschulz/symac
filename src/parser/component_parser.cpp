@@ -130,8 +130,8 @@ component_parser_type::component_parser_type() : component_parser_type::base_typ
 
     two_terminal_device   = two_terminal_identifier   >> no_skip[name] >> terminals(2) >> value >> parameters;
     three_terminal_device = three_terminal_identifier >> no_skip[name] >> terminals(3) >> attr("OPDUMMY") >> parameters;
-    four_terminal_device  = four_terminal_identifier  >> no_skip[name] >> terminals(4) >> value;
-    port                  = port_identifier           >> no_skip[name] >> terminals(2) >> attr("PORTDUMMY");
+    four_terminal_device  = four_terminal_identifier  >> no_skip[name] >> terminals(4) >> value >> parameters;
+    port                  = port_identifier           >> no_skip[name] >> terminals(2) >> attr("PORTDUMMY") >> parameters;
 
     main = two_terminal_device   |
            three_terminal_device |

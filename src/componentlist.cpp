@@ -70,13 +70,6 @@ unsigned int componentlist::component_index(const component& c) const
     return idx;
 }
 
-unsigned int componentlist::network_size() const
-{
-    unsigned int num = 0;
-    std::for_each(components.begin(), components.end(), [&num] (const component& c) { num += c.element_size(); });
-    return number_of_nodes() + num;
-}
-
 std::vector<component>::const_iterator componentlist::begin() const
 {
     return components.begin();
