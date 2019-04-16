@@ -1,0 +1,5 @@
+R0 vx 0 Z0
+P0 vx 0 v=vin
+
+.print V(vx)
+.print Z(1, 1)

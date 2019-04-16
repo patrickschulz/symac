@@ -1,5 +1,6 @@
 Mp vbias vout vdd
-Mn vin vout 0 noise=1
+*Mn vin vout 0 noise=1
+Mn vin vout 0 
 Vdd vdd 0 vdd 
 Vbias vbias 0 vbias
 Vin vin 0 x ac=1

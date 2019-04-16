@@ -4,6 +4,7 @@ Rin vin vx Rin
 Rout vout 0 Rout
 F0 vout 0 vx 0 Rtrans
 
+.print V(vout)
 .print I(V0.n)
 .print I(F0.cp)
 .print I(Rout.p)
