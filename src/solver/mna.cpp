@@ -63,7 +63,7 @@ static stamp get_voltage_source_stamp()
 static stamp get_vcvs_stamp(const GiNaC::ex& value)
 {
     std::vector<unsigned int> nodes = {1, 2, 3, 4};
-    unsigned int offset = 0;
+    unsigned int offset = 5;
     stamp stmp;
     stmp.write(offset, nodes[0], 1);
     stmp.write(nodes[0], offset, 1);
@@ -77,7 +77,7 @@ static stamp get_vcvs_stamp(const GiNaC::ex& value)
 static stamp get_ccvs_stamp(const GiNaC::ex& value)
 {
     std::vector<unsigned int> nodes = {1, 2, 3, 4};
-    unsigned int offset = 0;
+    unsigned int offset = 5;
     stamp stmp;
     stmp.write(offset, nodes[0],     1);
     stmp.write(nodes[0], offset + 1, 1);
@@ -94,7 +94,7 @@ static stamp get_ccvs_stamp(const GiNaC::ex& value)
 static stamp get_vccs_stamp(const GiNaC::ex& value)
 {
     std::vector<unsigned int> nodes = {1, 2, 3, 4};
-    unsigned int offset = 0;
+    unsigned int offset = 5;
 
     stamp stmp;
     stmp.write(nodes[0], nodes[2], -value);
@@ -107,7 +107,7 @@ static stamp get_vccs_stamp(const GiNaC::ex& value)
 static stamp get_cccs_stamp(const GiNaC::ex& value)
 {
     std::vector<unsigned int> nodes = {1, 2, 3, 4};
-    unsigned int offset = 0;
+    unsigned int offset = 5;
     stamp stmp;
     stmp.write(nodes[0], offset, -value);
     stmp.write(nodes[1], offset,  value);
@@ -120,8 +120,8 @@ static stamp get_cccs_stamp(const GiNaC::ex& value)
 
 static stamp get_opamp_stamp()
 {
-    std::vector<unsigned int> nodes = {1, 2, 3, 4};
-    unsigned int offset = 0;
+    std::vector<unsigned int> nodes = {1, 2, 3};
+    unsigned int offset = 4;
     stamp stmp;
     stmp.write(offset, nodes[0], 1);
     stmp.write(offset, nodes[1], -1);
