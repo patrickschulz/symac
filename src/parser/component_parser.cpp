@@ -124,7 +124,7 @@ component_parser_type::component_parser_type() : component_parser_type::base_typ
 
     name = +alnum;
     terminal = +(alnum | char_("-:_!"));
-    value    = +alnum | (lit('{') >> +(char_ - lit('}')) >> lit('}'));
+    value    = +alnum | ('{' >> +(char_ - '}') >> '}');
     parameters = *parameter_parser;
     terminals = repeat(_r1)[terminal];
 

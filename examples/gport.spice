@@ -1,0 +1,12 @@
+H12 0 v1 v2 v2x g12
+R11 v1 0 {1/g11}
+R22 v2x vx g22
+E21 vx 0 v1 0 g21
+
+P1 v1 0 
+P2 v2 0 
+
+.print G(1, 1)
+.print G(1, 2)
+.print G(2, 1)
+.print G(2, 2)

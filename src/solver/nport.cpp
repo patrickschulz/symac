@@ -24,24 +24,24 @@ GiNaC::ex get_port_voltage(const component& pp, const GiNaC::matrix& res, nodema
     return value;
 }
 
-GiNaC::ex get_nport_numerator(port_mode mode, unsigned int i, unsigned int j, const componentlist& components, const GiNaC::matrix& res, nodemap& nmap)
+GiNaC::ex get_nport_numerator(port_mode mode, unsigned int row, unsigned int col, const componentlist& components, const GiNaC::matrix& res, nodemap& nmap)
 {
     std::vector<component> ports = components.get_components_by_type(ct_port);
     switch(mode)
     {
         case zport:
-            if(j == i)
+            if(col == row)
             {
-                return ports[i].get_value();
+                return ports[col].get_value();
             }
             else
             {
-                return get_port_voltage(ports[j], res, nmap);
+                return get_port_voltage(ports[row], res, nmap);
             }
         case yport:
-            if(j == i)
+            if(col == row)
             {
-                return ports[i].get_value();
+                return ports[col].get_value();
             }
             else
             {
@@ -49,13 +49,13 @@ GiNaC::ex get_nport_numerator(port_mode mode, unsigned int i, unsigned int j, co
             }
         case sport:
         {
-            component p = ports[j];
+            component p = ports[row];
             unsigned int inodep = nmap[p.get_nodes()[0]];
 
             GiNaC::ex vj, ij;
             GiNaC::possymbol Z0 = get_symbol("Z0");
 
-            if(j == i)
+            if(col == row)
             {
                 unsigned int inoden = nmap[portdummynode];
 
@@ -73,24 +73,46 @@ GiNaC::ex get_nport_numerator(port_mode mode, unsigned int i, unsigned int j, co
 
             return vj - ij * Z0;
         }
+        case hport:
+        {
+            if(row == 0)
+            {
+                return res(nmap[ports[row].get_nodes()[0]] - 1, 0);
+            }
+            else
+            {
+                return -res(res.rows() - 1, 0);
+            }
+        }
+        case gport:
+        {
+            if(row == 0)
+            {
+                return -res(res.rows() - 1, 0);
+            }
+            else
+            {
+                return res(nmap[ports[row].get_nodes()[0]] - 1, 0);
+            }
+        }
         default: // dummy
             return GiNaC::ex();
     }
 }
 
-GiNaC::ex get_nport_denominator(port_mode mode, unsigned int i, unsigned int j, const componentlist& components, const GiNaC::matrix& res, nodemap& nmap)
+GiNaC::ex get_nport_denominator(port_mode mode, unsigned int row, unsigned int col, const componentlist& components, const GiNaC::matrix& res, nodemap& nmap)
 {
     std::vector<component> ports = components.get_components_by_type(ct_port);
-    (void) j;
+    (void) row;
     switch(mode)
     {
         case zport:
             return -res(res.rows() - 1, 0);
         case yport:
-            return get_port_voltage(ports[i], res, nmap);
+            return get_port_voltage(ports[col], res, nmap);
         case sport:
         {
-            component p = ports[i];
+            component p = ports[row];
             unsigned int inodep = nmap[p.get_nodes()[0]];
             unsigned int inoden = nmap[portdummynode];
             GiNaC::possymbol Z0 = get_symbol("Z0");
@@ -103,14 +125,18 @@ GiNaC::ex get_nport_denominator(port_mode mode, unsigned int i, unsigned int j, 
 
             return vi + ii * Z0;
         }
+        case hport:
+            return get_symbol("PORTDUMMY");
+        case gport:
+            return get_symbol("PORTDUMMY");
         default: // dummy
             return GiNaC::ex();
     }
 }
 
-void insert_active_port(componentlist& components_tmp, port_mode mode, unsigned int i, const std::vector<component>& ports)
+void insert_active_port(componentlist& components_tmp, port_mode mode, unsigned int col, const std::vector<component>& ports)
 {
-    component p = ports[i];
+    component p = ports[col];
     std::vector<component> for_insertion;
     switch(mode)
     {
@@ -145,18 +171,26 @@ void insert_active_port(componentlist& components_tmp, port_mode mode, unsigned 
             for_insertion.push_back(pres);
             break;
         }
+        case hport:
+            p.set_type(col == 0 ? ct_current_source : ct_voltage_source);
+            for_insertion.push_back(p);
+            break;
+        case gport:
+            p.set_type(col == 0 ? ct_voltage_source : ct_current_source);
+            for_insertion.push_back(p);
+            break;
         default: // dummy
             break;
     }
     for(auto& ci : for_insertion)
     {
-        components_tmp.add_component(ci);
+        components_tmp.add(ci);
     }
 }
 
-void insert_inactive_port(componentlist& components_tmp, port_mode mode, unsigned int j, const std::vector<component>& ports)
+void insert_inactive_port(componentlist& components_tmp, port_mode mode, unsigned int row, const std::vector<component>& ports)
 {
-    component p = ports[j];
+    component p = ports[row];
     p.set_value(0);
     switch(mode)
     {
@@ -169,39 +203,44 @@ void insert_inactive_port(componentlist& components_tmp, port_mode mode, unsigne
         case sport:
             p.set_type(ct_resistor);
             p.set_value(get_symbol("Z0"));
+            break;
+        case hport:
+            p.set_type(row == 0 ? ct_current_source : ct_voltage_source);
+            break;
+        case gport:
+            p.set_type(row == 0 ? ct_voltage_source : ct_current_source);
+            break;
         default: // dummy
             break;
     }
-    components_tmp.add_component(p);
+    components_tmp.add(p);
 }
 
 GiNaC::matrix solve_nport_single(port_mode mode, const componentlist& components, nodemap& nmap, bool linearize, bool print)
 {
     std::vector<component> ports = components.get_components_by_type(ct_port);
-
     GiNaC::matrix port_matrix(ports.size(), ports.size());
-
-    for(unsigned int i = 0; i < ports.size(); ++i)
+    for(unsigned int col = 0; col < ports.size(); ++col)
     {
         componentlist components_tmp(components);
-        insert_active_port(components_tmp, mode, i, ports);
-        for(unsigned int j = 0; j < ports.size(); ++j)
+        insert_active_port(components_tmp, mode, col, ports);
+        for(unsigned int row = 0; row < ports.size(); ++row)
         {
-            if(j != i)
+            if(row != col)
             {
-                insert_inactive_port(components_tmp, mode, j, ports);
+                insert_inactive_port(components_tmp, mode, row, ports);
             }
         }
 
-        /* solve network and calculate parameters */
+        // solve network and calculate parameters
         GiNaC::matrix res = solve_network(components_tmp, nmap, linearize, print);
-        for(unsigned int j = 0; j < ports.size(); ++j)
+        for(unsigned int row = 0; row < ports.size(); ++row)
         {
-            GiNaC::ex num = get_nport_numerator(mode, i, j, components_tmp, res, nmap);
-            GiNaC::ex den = get_nport_denominator(mode, i, j, components_tmp, res, nmap);
+            GiNaC::ex num = get_nport_numerator(mode, row, col, components_tmp, res, nmap);
+            GiNaC::ex den = get_nport_denominator(mode, row, col, components_tmp, res, nmap);
             if(!den.is_zero())
             {
-                port_matrix(j, i) = num / den;
+                port_matrix(row, col) = num / den;
             }
         }
     }
@@ -213,7 +252,9 @@ void solve_nport(const componentlist& components, nodemap& nmap, result& results
     std::vector<std::pair<port_mode, std::string>> matrix_container {
         { zport, "Z" },
         { yport, "Y" },
-        { sport, "S" }
+        { sport, "S" },
+        { hport, "H" },
+        { gport, "G" }
     };
     for(auto& M : matrix_container)
     {
@@ -221,12 +262,12 @@ void solve_nport(const componentlist& components, nodemap& nmap, result& results
 
         boost::format fmter = boost::format("%d,%d");
         unsigned int number_of_ports = components.number_of_components(ct_port);
-        for(unsigned int i = 0; i < number_of_ports; ++i)
+        for(unsigned int row = 0; row < number_of_ports; ++row)
         {
-            for(unsigned int j = 0; j < number_of_ports; ++j)
+            for(unsigned int col = 0; col < number_of_ports; ++col)
             {
-                std::string key = str(fmter % (i + 1) % (j + 1));
-                results.add(M.second, key, nmatrix(i, j));
+                std::string key = str(fmter % (row + 1) % (col + 1));
+                results.add(M.second, key, nmatrix(row, col));
             }
         }
     }

@@ -1,0 +1,6 @@
+Gm vout vin vin 0 gm
+Rout vout vin rout
+Rpi vin 0 rpi
+
+P1 vin 0
+P2 vout 0

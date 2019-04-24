@@ -3,16 +3,16 @@
 #include <set>
 #include <algorithm>
 
-void componentlist::add_component(const component& c)
+void componentlist::add(const component& c)
 {
     components.push_back(c);
 }
 
-void componentlist::add_component(const std::vector<component>& cv)
+void componentlist::add(const std::vector<component>& cv)
 {
     for(const auto& c : cv)
     {
-        add_component(c);
+        add(c);
     }
 }
 
@@ -56,18 +56,6 @@ unsigned int componentlist::number_of_nodes() const
 {
     const auto& nodes = get_nodes();
     return nodes.size();
-}
-
-unsigned int componentlist::component_index(const component& c) const
-{
-    unsigned int idx = 0;
-    unsigned int i = 0;
-    while(!(components[i] == c))
-    {
-        idx += components[i].element_size();
-        ++i;
-    }
-    return idx;
 }
 
 std::vector<component>::const_iterator componentlist::begin() const

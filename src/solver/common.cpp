@@ -11,7 +11,7 @@ GiNaC::matrix solve_network(componentlist components, nodemap& nmap, bool linear
         componentlist newcomponents;
         for(const component& c : components)
         {
-            newcomponents.add_component(get_small_signal_model(c));
+            newcomponents.add(get_small_signal_model(c));
         }
         components = newcomponents;
     }

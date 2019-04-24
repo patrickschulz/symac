@@ -78,7 +78,7 @@ void component::set_name(const std::string& s)
     name = s;
 }
 
-std::string component::get_name() const
+const std::string& component::get_name() const
 {
     return name;
 }
@@ -86,11 +86,6 @@ std::string component::get_name() const
 void component::name_prepend(const std::string& prefix)
 {
     name = prefix + name;
-}
-
-unsigned int component::element_size() const
-{
-    return mna_size;
 }
 
 bool component::is_noisy() const
@@ -120,26 +115,6 @@ bool component::is_noisy() const
     }
     return ret;
     */
-}
-
-GiNaC::ex component::get_noise() const
-{
-    GiNaC::ex boltzmann = get_symbol("k");
-    GiNaC::ex temperature = get_symbol("T");
-    GiNaC::ex ret = 0;
-    switch(type)
-    {
-        case ct_resistor:
-            ret = 4 * boltzmann * temperature / value;
-            break;
-        case ct_conductor:
-            ret = 4 * boltzmann * temperature * value;
-            break;
-        case ct_mosfet: 
-        default:
-            break;
-    }
-    return ret;
 }
 
 component component::get_noise_source() const
@@ -178,30 +153,6 @@ component_types component::get_type() const
 void component::set_type(component_types ct)
 {
     type = ct;
-    switch(ct)
-    {
-        case ct_resistor:
-        case ct_conductor:
-        case ct_capacitor:
-        case ct_mosfet: // dummy value, since a mosfet (a nonlinear device) should never make it into the mna algorithm
-            mna_size = 0;
-            break;
-        case ct_inductor:
-        case ct_voltage_source:
-        case ct_voltage_controlled_voltage_source:
-        case ct_current_controlled_current_source:
-        case ct_opamp:
-            mna_size = 1;
-            break;
-        case ct_current_controlled_voltage_source:
-            mna_size = 2;
-            break;
-        case ct_voltage_controlled_current_source:
-        case ct_current_source:
-        case ct_port:
-            mna_size = 0;
-            break;
-    }
 }
 
 

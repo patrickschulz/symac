@@ -4,6 +4,8 @@
 
 #include <boost/format.hpp>
 
+#include "mna.hpp"
+
 static GiNaC::ex get_value_passive_device(const component& c)
 {
     GiNaC::ex value = c.get_value();
@@ -24,6 +26,20 @@ static GiNaC::ex get_value_passive_device(const component& c)
     }
 }
 
+static unsigned int get_component_index(const componentlist& components, const component& c)
+{
+    unsigned int idx = 0;
+    for(const component& cc : components)
+    {
+        if(c == cc)
+        {
+            break;
+        }
+        idx += get_element_size(cc);
+    }
+    return idx;
+}
+
 void solve_ac(const componentlist& components, nodemap& nmap, result& results, bool linearize, bool print)
 {
     GiNaC::matrix res = solve_network(components, nmap, linearize, print);
@@ -39,6 +55,7 @@ void solve_ac(const componentlist& components, nodemap& nmap, result& results, b
     // currents must be calculated in two ways:
     //  - derived currents, by using the node voltages and the device values (e.g. resistors)
     //  - simulated currents for voltage sources, op amps etc.
+    // The first way is easy, for the second one we need to know the mna size of the devices 
     for(const component& c : components)
     {
         switch(c.get_type())
@@ -78,7 +95,7 @@ void solve_ac(const componentlist& components, nodemap& nmap, result& results, b
             case ct_voltage_controlled_voltage_source:
             case ct_current_controlled_current_source:
             {
-                unsigned int offset = components.number_of_nodes() + components.component_index(c);
+                unsigned int offset = components.number_of_nodes() + get_component_index(components, c);
                 boost::format fmter = boost::format("%s.%s");
                 results.add("I", str(fmter % c.get_name() % "p"),  res(offset, 0));
                 results.add("I", str(fmter % c.get_name() % "n"), -res(offset, 0));
@@ -86,7 +103,7 @@ void solve_ac(const componentlist& components, nodemap& nmap, result& results, b
             }
             case ct_current_controlled_voltage_source:
             {
-                unsigned int offset = components.number_of_nodes() + components.component_index(c);
+                unsigned int offset = components.number_of_nodes() + get_component_index(components, c);
                 boost::format fmter = boost::format("%s.%s");
                 results.add("I", str(fmter % c.get_name() % "cp"),  res(offset, 0));
                 results.add("I", str(fmter % c.get_name() % "cn"), -res(offset, 0));

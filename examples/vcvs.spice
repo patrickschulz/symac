@@ -1,0 +1,6 @@
+*E0 vout 0 vin 0 gain
+E0 vout 0 vin 0 gain
+V0 vin 0 vin
+R0 vout 0 R0
+
+.print V(vout)

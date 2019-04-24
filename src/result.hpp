@@ -44,7 +44,6 @@ class result
 {
     public:
         result();
-        result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap);
 
         void add(const std::string& domain, const std::string& key, const GiNaC::ex& res)
         {

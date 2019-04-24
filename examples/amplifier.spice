@@ -5,13 +5,16 @@ Gm s d g s gm
 Ro d s ro
 .end
 
-R0 vin vinx Rs
-X0 mosfet vinx 0 vout
+X0 mosfet vin 0 vout
 
 P1 vin 0
 P2 vout 0
 
-.print Z(1, 1)
-.print Y(1, 1)
-.print Z(2, 2)
-.print Y(2, 2)
+.print H(1, 1)
+.print H(1, 2)
+.print H(2, 1)
+.print H(2, 2)
+*.print G(1, 1)
+*.print G(1, 2)
+*.print G(2, 1)
+*.print G(2, 2)

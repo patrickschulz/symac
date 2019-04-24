@@ -9,17 +9,34 @@
 
 struct parameter_t
 {
+    void set_key(const std::string& k) { key = k; }
+    const std::string& get_key() const { return key; }
+    void set_value(const std::string& v) { value = v; }
+    const std::string& get_value() const { return value; }
+
     std::string key;
     std::string value;
 };
 
 struct spice_component_proxy
 {
-    component_types type;
-    std::string name;
-    std::vector<std::string> nodes;
-    std::string value;
-    std::vector<parameter_t> parameters;
+    public:
+        void set_name(const std::string& n) { name = n; }
+        const std::string& get_name() const { return name; }
+        void set_type(component_types ct) { type = ct; }
+        component_types get_type() const { return type; }
+        void set_nodes(const std::vector<std::string>& n) { nodes = n; }
+        const std::vector<std::string>& get_nodes() const { return nodes; }
+        void set_value(const std::string& v) { value = v; }
+        const std::string& get_value() const { return value; }
+        void set_parameters(const std::vector<parameter_t>& p) { parameters = p; }
+        const std::vector<parameter_t>& get_parameters() const { return parameters; }
+    public:
+        component_types type;
+        std::string name;
+        std::vector<std::string> nodes;
+        std::string value;
+        std::vector<parameter_t> parameters;
 };
 struct spectre_component_proxy
 {
@@ -39,13 +56,10 @@ class component
         component(const spectre_component_proxy& p);
         
         void set_name(const std::string&);
-        std::string get_name() const;
+        const std::string& get_name() const;
         void name_prepend(const std::string& prefix);
 
-        unsigned int element_size() const;
-
         bool is_noisy() const;
-        GiNaC::ex get_noise() const;
         component get_noise_source() const;
 
         // getter and setter
@@ -74,9 +88,6 @@ class component
         std::vector<std::string> nodes;
         GiNaC::ex value;
         std::vector<parameter_t> parameters;
-
-        // constant component attributes
-        unsigned int mna_size;
 };
 
 // a small signal model can be made up of several components, therefore a vector of components is the return type

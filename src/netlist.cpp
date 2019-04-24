@@ -9,7 +9,7 @@
 
 void netlist::add_component(const component& c)
 {
-    components.add_component(c);
+    components.add(c);
 }
 
 void netlist::add_command(const command& c)

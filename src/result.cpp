@@ -25,109 +25,6 @@ result::result()
     add("V", "0", 0);
 }
 
-result::result(const componentlist& components, const GiNaC::matrix& results, const nodemap& nmap) :
-    result()
-{
-    // voltages
-    for(unsigned int row = 0; row < components.number_of_nodes(); ++row)
-    {
-        std::string usernode = nmap[row + 1];
-        add("V", usernode, results(row, 0));
-    }
-
-    // currents
-    for(const component& c : components)
-    {
-        switch(c.get_type())
-        {
-            case ct_resistor:
-            {
-                GiNaC::ex value = c.get_value();
-                std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = get("V", nodes[0]) - get("V", nodes[1]);
-                boost::format fmter = boost::format("%s.%s");
-                add("I", str(fmter % c.get_name() % "p"),  voltage / value);
-                add("I", str(fmter % c.get_name() % "n"), -voltage / value);
-                break;
-            }
-            case ct_conductor:
-            {
-                GiNaC::ex value = c.get_value();
-                std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = get("V", nodes[0]) - get("V", nodes[1]);
-                boost::format fmter = boost::format("%s.%s");
-                add("I", str(fmter % c.get_name() % "p"),  voltage * value);
-                add("I", str(fmter % c.get_name() % "n"), -voltage * value);
-                break;
-            }
-            case ct_inductor:
-            {
-                GiNaC::ex value = c.get_value();
-                std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = get("V", nodes[0]) - get("V", nodes[1]);
-                boost::format fmter = boost::format("%s.%s");
-                GiNaC::ex s = get_complex_symbol("s");
-                add("I", str(fmter % c.get_name() % "p"),  voltage / s / value);
-                add("I", str(fmter % c.get_name() % "n"), -voltage / s / value);
-                break;
-            }
-            case ct_capacitor:
-            {
-                GiNaC::ex value = c.get_value();
-                std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = get("V", nodes[0]) - get("V", nodes[1]);
-                boost::format fmter = boost::format("%s.%s");
-                GiNaC::ex s = get_complex_symbol("s");
-                add("I", str(fmter % c.get_name() % "p"),  voltage * s * value);
-                add("I", str(fmter % c.get_name() % "n"), -voltage * s * value);
-                break;
-            }
-            case ct_voltage_controlled_current_source:
-            {
-                GiNaC::ex value = c.get_value();
-                std::vector<std::string> nodes = c.get_nodes();
-                GiNaC::ex voltage = get("V", nodes[2]) - get("V", nodes[3]);
-                boost::format fmter = boost::format("%s.%s");
-                add("I", str(fmter % c.get_name() % "p"),  voltage * value);
-                add("I", str(fmter % c.get_name() % "n"), -voltage * value);
-                break;
-            }
-            case ct_voltage_source:
-            case ct_opamp:
-            case ct_voltage_controlled_voltage_source:
-            case ct_current_controlled_current_source:
-            {
-                unsigned int offset = components.number_of_nodes() + components.component_index(c);
-                boost::format fmter = boost::format("%s.%s");
-                add("I", str(fmter % c.get_name() % "p"),  results(offset, 0));
-                add("I", str(fmter % c.get_name() % "n"), -results(offset, 0));
-                break;
-            }
-            case ct_current_source:
-            {
-                boost::format fmter = boost::format("%s.%s");
-                add("I", str(fmter % c.get_name() % "p"),  c.get_value());
-                add("I", str(fmter % c.get_name() % "n"), -c.get_value());
-                break;
-            }
-            case ct_current_controlled_voltage_source:
-            {
-                unsigned int offset = components.number_of_nodes() + components.component_index(c);
-                boost::format fmter = boost::format("%s.%s");
-                add("I", str(fmter % c.get_name() % "cp"),  results(offset, 0));
-                add("I", str(fmter % c.get_name() % "cn"), -results(offset, 0));
-                add("I", str(fmter % c.get_name() % "p"),  results(offset + 1, 0));
-                add("I", str(fmter % c.get_name() % "n"), -results(offset + 1, 0));
-                break;
-            }
-            case ct_port:
-            case ct_mosfet:
-                // auxiliary devices which have no currents
-                break;
-        }
-    }
-}
-
 std::vector<std::string> chop_arguments(const quantity& q)
 {
     std::vector<std::string> arguments;
@@ -157,7 +54,7 @@ bool check_expression(const ast::expression<quantity>& expression, const resultm
     auto f = [](const quantity& q, const resultmap_t& resmap) -> bool
     {
         std::string key = q.symbol;
-        if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF")
+        if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF" || q.function == "H" || q.function == "G")
         {
             std::vector<std::string> args = chop_arguments(q);
             key.clear();
@@ -175,12 +72,13 @@ GiNaC::ex evaluate_expression(const ast::expression<quantity>& expression, const
     auto f = [](const quantity& q, const resultmap_t& resmap) -> GiNaC::ex
     {
         std::string key = q.symbol;
-        if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF")
+        if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF" || q.function == "H" || q.function == "G")
         {
             std::vector<std::string> args = chop_arguments(q);
             key.clear();
             key = args[0] + "," + args[1];
         }
+        //std::cout << q.function << ':' << key << '\n';
         return resmap.get(q.function, key);
     };
     using namespace std::placeholders;

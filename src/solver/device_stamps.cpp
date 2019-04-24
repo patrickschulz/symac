@@ -55,8 +55,8 @@ stamp get_vcvs_stamp(const GiNaC::ex& value)
     stmp.write(0, 5, 1);
     stmp.write(5, 1, -1);
     stmp.write(2, 5, -1);
-    stmp.write(5, 3, -value);
-    stmp.write(5, 4, value);
+    stmp.write(5, 3, value);
+    stmp.write(5, 4, -value);
     return stmp;
 }
 
@@ -153,9 +153,13 @@ stamp get_stamp(const component& c)
         case ct_current_controlled_current_source:
             return get_cccs_stamp(value);
         case ct_port:
+            if(c.get_parameter("v") != "")
+            {
+                return get_voltage_source_stamp();
+            }
             return get_port_stamp();
-            return stamp();
         case ct_current_source: 
             return get_dummy_stamp();
     }
 }
+

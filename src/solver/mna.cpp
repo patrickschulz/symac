@@ -17,7 +17,7 @@ unsigned int get_element_size(const component& c)
     return stmp.size() - c.get_nodes().size();
 }
 
-unsigned int get_networksize(const componentlist& components)
+static unsigned int get_networksize(const componentlist& components)
 {
     unsigned int networksize = 0;
     // find network size

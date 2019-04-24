@@ -53,7 +53,7 @@ componentlist remove_sources(const componentlist& components)
         {
             c.set_value(0);
         }
-        working.add_component(c);
+        working.add(c);
     }
     return working;
 }
@@ -73,7 +73,7 @@ void solve_noise(const componentlist& components, nodemap& nmap, result& results
                 // add noise source
                 componentlist components_tmp(working);
                 component noisesource = c.get_noise_source();
-                components_tmp.add_component(noisesource);
+                components_tmp.add(noisesource);
 
                 // solve network and calculate parameters
                 if(print)

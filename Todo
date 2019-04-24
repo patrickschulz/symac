@@ -1,5 +1,10 @@
-[ ] Improve the creation of the network matrices. Currently, each component knows their mna size, but with ports as sources this changed. The mna size needs to be moved out of the component class.
+[ ] It seems that the vcvs is broken. Fix this! Check the stamping of the device with some example netlists
+
+[x] Improve the creation of the network matrices. Currently, each component knows their mna size, but with ports as sources this changed. The mna size needs to be moved out of the component class.
     Furthermore, the stamps system needs to be reworked to be independent of the offset and the nodes. Stamps should be formulated for devices in general, not one particular one.
+ [x] Reworke the structure of the A, x and z creation. Remove the mna_size member variable from the component class, this is now calculated with the stamps.
+ [x] Remove 'get_component_index' from the componentlist class, which is currently needed for the results browser
+
 
 [ ] Improve the parser: (this is actually critical for some other todo points, too, so focus on this)
  [ ] Add error reporting (!)
@@ -11,8 +16,12 @@
  [x] Enable Z- and Y-Matrix simulations
  [x] Enable S-Matrix simulations
  [ ] Enable ABCD-, G-, H-, etc. Matrix simulations
+  [ ] ABCD-Matrix
+  [x] G-Matrix
+  [x] H-Matrix
  [x] Provide a generic interface in the results so that no specific simulation needs to be chosen by the user
  [ ] Make it possible to use ports also as sources. This enables the simultaneous use of netlists for "regular" simulations and n-port simulations
+ [ ] Make sure n-port parameters work also with ports that are not grounded. Currently all functions assume that one terminal is on ground.
 
 [x] Enable the result browser to print currents for ALL devices (this could be done by some 'get_current' function for each device, with the actual node values (since these are all known))
 
@@ -42,9 +51,6 @@
 [x] Add a linearization feature (small-signal simulations from large-signal circuits)
 
 [ ] Add behavioural models (in s-domain)
-
-[ ] Reworke the structure of the A, x and z creation. Remove the mna_size member variable from the component class, this is now calculated with the stamps.
- [ ] Remove 'get_component_index' from the componentlist class, which is currently needed for the results browser
 
 [ ] Add numerical alternatives to netlists, so that symbolic results can automatically be converted to numeric results, enabling plotting.
 
