@@ -54,7 +54,7 @@ bool check_expression(const ast::expression<quantity>& expression, const resultm
     auto f = [](const quantity& q, const resultmap_t& resmap) -> bool
     {
         std::string key = q.symbol;
-        if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF" || q.function == "H" || q.function == "G")
+        if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF" || q.function == "H" || q.function == "G" || q.function == "ABCD")
         {
             std::vector<std::string> args = chop_arguments(q);
             key.clear();
@@ -72,7 +72,7 @@ GiNaC::ex evaluate_expression(const ast::expression<quantity>& expression, const
     auto f = [](const quantity& q, const resultmap_t& resmap) -> GiNaC::ex
     {
         std::string key = q.symbol;
-        if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF" || q.function == "H" || q.function == "G")
+        if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF" || q.function == "H" || q.function == "G" || q.function == "ABCD")
         {
             std::vector<std::string> args = chop_arguments(q);
             key.clear();

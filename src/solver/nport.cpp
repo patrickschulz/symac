@@ -95,6 +95,17 @@ GiNaC::ex get_nport_numerator(port_mode mode, unsigned int row, unsigned int col
                 return res(nmap[ports[row].get_nodes()[0]] - 1, 0);
             }
         }
+        case abcdport:
+        {
+            if(row == 0)
+            {
+                return ports[0].get_value();
+            }
+            else
+            {
+                return -res(res.rows() - col - 1, 0);
+            }
+        }
         default: // dummy
             return GiNaC::ex();
     }
@@ -129,6 +140,17 @@ GiNaC::ex get_nport_denominator(port_mode mode, unsigned int row, unsigned int c
             return get_symbol("PORTDUMMY");
         case gport:
             return get_symbol("PORTDUMMY");
+        case abcdport:
+        {
+            if(col == 0)
+            {
+                return res(nmap[ports[1].get_nodes()[0]] - 1, 0);
+            }
+            else
+            {
+                return -res(res.rows() - 1, 0);
+            }
+        }
         default: // dummy
             return GiNaC::ex();
     }
@@ -179,6 +201,12 @@ void insert_active_port(componentlist& components_tmp, port_mode mode, unsigned 
             p.set_type(col == 0 ? ct_voltage_source : ct_current_source);
             for_insertion.push_back(p);
             break;
+        case abcdport:
+        {
+            component p = ports[0];
+            p.set_type(ct_voltage_source);
+            for_insertion.push_back(p);
+        }
         default: // dummy
             break;
     }
@@ -188,7 +216,7 @@ void insert_active_port(componentlist& components_tmp, port_mode mode, unsigned 
     }
 }
 
-void insert_inactive_port(componentlist& components_tmp, port_mode mode, unsigned int row, const std::vector<component>& ports)
+void insert_inactive_port(componentlist& components_tmp, port_mode mode, unsigned int row, unsigned int col, const std::vector<component>& ports)
 {
     component p = ports[row];
     p.set_value(0);
@@ -210,6 +238,10 @@ void insert_inactive_port(componentlist& components_tmp, port_mode mode, unsigne
         case gport:
             p.set_type(row == 0 ? ct_voltage_source : ct_current_source);
             break;
+        case abcdport:
+            p = ports[1];
+            p.set_type(col == 0 ? ct_current_source : ct_voltage_source);
+            break;
         default: // dummy
             break;
     }
@@ -228,7 +260,7 @@ GiNaC::matrix solve_nport_single(port_mode mode, const componentlist& components
         {
             if(row != col)
             {
-                insert_inactive_port(components_tmp, mode, row, ports);
+                insert_inactive_port(components_tmp, mode, row, col, ports);
             }
         }
 
@@ -254,7 +286,8 @@ void solve_nport(const componentlist& components, nodemap& nmap, result& results
         { yport, "Y" },
         { sport, "S" },
         { hport, "H" },
-        { gport, "G" }
+        { gport, "G" },
+        { abcdport, "ABCD" }
     };
     for(auto& M : matrix_container)
     {

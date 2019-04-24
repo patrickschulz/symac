@@ -1,19 +1,12 @@
 R1 v1x v1c h11
-*E1 v1c 0 0 0 h12
+E1 v1c 0 v2 0 h12
 R2 v2 0 {1/h22}
 H2 0 v2 v1 v1x h21
-Vs2 v1c 0 0
 
-V1 v1 0 vin
-V2 v2 0 0
+P1 v1 0
+P2 v2 0
 
-.print V(v1) / -I(V1.p)
-*.print -I(V2.p) / V(v2)
-
-*P1 v1 0
-*P2 v2 0
-
-*.print H(1, 1)
-*.print H(1, 2)
-*.print H(2, 1)
-*.print H(2, 2)
+.print H(1, 1)
+.print H(1, 2)
+.print H(2, 1)
+.print H(2, 2)

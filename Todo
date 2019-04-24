@@ -23,6 +23,8 @@
  [ ] Make it possible to use ports also as sources. This enables the simultaneous use of netlists for "regular" simulations and n-port simulations
  [ ] Make sure n-port parameters work also with ports that are not grounded. Currently all functions assume that one terminal is on ground.
 
+[ ] Add Transmission Lines?
+
 [x] Enable the result browser to print currents for ALL devices (this could be done by some 'get_current' function for each device, with the actual node values (since these are all known))
 
 [ ] Implement Noise simulations
