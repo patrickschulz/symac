@@ -51,12 +51,12 @@ stamp get_voltage_source_stamp()
 stamp get_vcvs_stamp(const GiNaC::ex& value)
 {
     stamp stmp;
-    stmp.write(5, 0, 1);
-    stmp.write(0, 5, 1);
-    stmp.write(5, 1, -1);
+    stmp.write(5, 1, 1);
+    stmp.write(1, 5, 1);
+    stmp.write(5, 2, -1);
     stmp.write(2, 5, -1);
-    stmp.write(5, 3, value);
-    stmp.write(5, 4, -value);
+    stmp.write(5, 3, -value);
+    stmp.write(5, 4, value);
     return stmp;
 }
 

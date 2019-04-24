@@ -1,4 +1,4 @@
-[ ] It seems that the vcvs is broken. Fix this! Check the stamping of the device with some example netlists
+[x] It seems that the vcvs is broken. Fix this! Check the stamping of the device with some example netlists
 
 [x] Improve the creation of the network matrices. Currently, each component knows their mna size, but with ports as sources this changed. The mna size needs to be moved out of the component class.
     Furthermore, the stamps system needs to be reworked to be independent of the offset and the nodes. Stamps should be formulated for devices in general, not one particular one.
