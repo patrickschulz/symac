@@ -99,11 +99,18 @@ GiNaC::ex get_nport_numerator(port_mode mode, unsigned int row, unsigned int col
         {
             if(row == 0)
             {
-                return ports[0].get_value();
+                return get_port_voltage(ports[0], res, nmap);
             }
             else
             {
-                return -res(res.rows() - col - 1, 0);
+                if(col == 0)
+                {
+                    return -res(res.rows() - 1, 0);
+                }
+                else
+                {
+                    return ports[0].get_value();
+                }
             }
         }
         default: // dummy
@@ -148,7 +155,7 @@ GiNaC::ex get_nport_denominator(port_mode mode, unsigned int row, unsigned int c
             }
             else
             {
-                return -res(res.rows() - 1, 0);
+                return res(res.rows() - 1, 0); // denominator is negative for ABCD-Matrix 
             }
         }
         default: // dummy
@@ -204,7 +211,7 @@ void insert_active_port(componentlist& components_tmp, port_mode mode, unsigned 
         case abcdport:
         {
             component p = ports[0];
-            p.set_type(ct_voltage_source);
+            p.set_type(col == 0 ? ct_voltage_source : ct_current_source);
             for_insertion.push_back(p);
         }
         default: // dummy
@@ -241,6 +248,7 @@ void insert_inactive_port(componentlist& components_tmp, port_mode mode, unsigne
         case abcdport:
             p = ports[1];
             p.set_type(col == 0 ? ct_current_source : ct_voltage_source);
+            p.set_value(0);
             break;
         default: // dummy
             break;
@@ -291,6 +299,10 @@ void solve_nport(const componentlist& components, nodemap& nmap, result& results
     };
     for(auto& M : matrix_container)
     {
+        if(print)
+        {
+            std::cout << "Solving for " << M.second << "-Matrix\n";
+        }
         GiNaC::matrix nmatrix = solve_nport_single(M.first, components, nmap, linearize, print);
 
         boost::format fmter = boost::format("%d,%d");

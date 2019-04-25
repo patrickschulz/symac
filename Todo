@@ -5,7 +5,6 @@
  [x] Reworke the structure of the A, x and z creation. Remove the mna_size member variable from the component class, this is now calculated with the stamps.
  [x] Remove 'get_component_index' from the componentlist class, which is currently needed for the results browser
 
-
 [ ] Improve the parser: (this is actually critical for some other todo points, too, so focus on this)
  [ ] Add error reporting (!)
  [ ] Add spectre netlists
@@ -15,8 +14,8 @@
 [ ] Support n-port parameters (Z, Y, S, ABCD, ...)
  [x] Enable Z- and Y-Matrix simulations
  [x] Enable S-Matrix simulations
- [ ] Enable ABCD-, G-, H-, etc. Matrix simulations
-  [ ] ABCD-Matrix
+ [x] Enable ABCD-, G-, H-, etc. Matrix simulations
+  [x] ABCD-Matrix
   [x] G-Matrix
   [x] H-Matrix
  [x] Provide a generic interface in the results so that no specific simulation needs to be chosen by the user

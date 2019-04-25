@@ -1,7 +1,9 @@
 R1 v1 v2 Z
+*R1 v1 0 {1/Y}
 
 P1 v1 0
 P2 v2 0
+*P2 v1 0
 
 .print ABCD(1, 1)
 .print ABCD(1, 2)

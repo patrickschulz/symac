@@ -78,7 +78,6 @@ GiNaC::ex evaluate_expression(const ast::expression<quantity>& expression, const
             key.clear();
             key = args[0] + "," + args[1];
         }
-        //std::cout << q.function << ':' << key << '\n';
         return resmap.get(q.function, key);
     };
     using namespace std::placeholders;
