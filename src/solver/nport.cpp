@@ -260,6 +260,10 @@ GiNaC::matrix solve_nport_single(port_mode mode, const componentlist& components
 {
     std::vector<component> ports = components.get_components_by_type(ct_port);
     GiNaC::matrix port_matrix(ports.size(), ports.size());
+    if((mode == hport || mode == gport || mode == abcdport) && ports.size() != 2)
+    {
+        return port_matrix;
+    }
     for(unsigned int col = 0; col < ports.size(); ++col)
     {
         componentlist components_tmp(components);
