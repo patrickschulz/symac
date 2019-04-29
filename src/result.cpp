@@ -53,6 +53,10 @@ bool check_expression(const ast::expression<quantity>& expression, const resultm
 {
     auto f = [](const quantity& q, const resultmap_t& resmap) -> bool
     {
+        if(q.function == "NUMBER")
+        {
+            return true;
+        }
         std::string key = q.symbol;
         if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF" || q.function == "H" || q.function == "G" || q.function == "ABCD")
         {
@@ -71,6 +75,10 @@ GiNaC::ex evaluate_expression(const ast::expression<quantity>& expression, const
 {
     auto f = [](const quantity& q, const resultmap_t& resmap) -> GiNaC::ex
     {
+        if(q.function == "NUMBER")
+        {
+            return std::stod(q.symbol);
+        }
         std::string key = q.symbol;
         if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF" || q.function == "H" || q.function == "G" || q.function == "ABCD")
         {
@@ -125,7 +133,8 @@ void result::print(const std::vector<command>& print_cmd, bool pretty, bool simp
     // create the expression parser
     qi::rule<Iterator, std::string()> function = +qi::alpha;
     qi::rule<Iterator, std::string()> symbol = +(qi::alnum | qi::char_(" ,."));
-    qi::rule<Iterator, quantity(), Skipper_type> identifier = function >> "(" >> symbol >> ")";
+    qi::rule<Iterator, std::string()> number = +qi::digit >> -(qi::char_(".") >> +qi::digit);
+    qi::rule<Iterator, quantity(), Skipper_type> identifier = (function >> "(" >> symbol >> ")") | (qi::attr("NUMBER") >> number);
     symbolic_expression_type<quantity> symbolic_expression(identifier);
 
     std::cout << GiNaC::dflt; // set output format

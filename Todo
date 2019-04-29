@@ -1,3 +1,7 @@
+[ ] Improve the print expression parser
+ [x] Add number support to the print expressions
+ [ ] Add the power operator (^ or **)
+
 [x] It seems that the vcvs is broken. Fix this! Check the stamping of the device with some example netlists
 
 [x] Improve the creation of the network matrices. Currently, each component knows their mna size, but with ports as sources this changed. The mna size needs to be moved out of the component class.
