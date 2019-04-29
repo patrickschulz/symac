@@ -28,6 +28,8 @@ void print_devices()
               << "  Current-controlled voltage sources: F N1 N2 C1 C2 VALUE\n"  
               << "  Voltage-controlled current sources: G N1 N2 C1 C2 VALUE\n"
               << "  Current-controlled current sources: H N1 N2 C1 C2 VALUE\n"
+              << "Ports:\n"
+              << "  Px N1 N2 (x is the port number (actually, the order in the netlist matters, not the portnumber. This is a bug. Make sure your ports have the right order))\n"
               ;
 }
 
