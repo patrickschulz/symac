@@ -4,10 +4,7 @@
 
 void stamp::write(unsigned int node1, unsigned int node2, const GiNaC::ex& value)
 {
-    if((node1 != 0) && (node2 != 0))
-    {
-        elements.push_back(element(node1, node2, value));
-    }
+    elements.push_back(element(node1, node2, value));
 }
 
 void stamp::clear()

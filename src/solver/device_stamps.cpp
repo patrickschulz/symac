@@ -158,7 +158,7 @@ stamp get_stamp(const component& c)
                 return get_voltage_source_stamp();
             }
             return get_port_stamp();
-        case ct_current_source: 
+        default: // includes ct_current_source: 
             return get_dummy_stamp();
     }
 }
