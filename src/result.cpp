@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <algorithm>
+#include <fstream>
 #include <boost/format.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
@@ -12,6 +13,7 @@
 #include "symbol.hpp"
 #include "transfer_function/transfer_function.hpp"
 #include "simplification/simplification.hpp"
+#include "export/html.hpp"
 
 BOOST_FUSION_ADAPT_STRUCT(
     quantity,
@@ -93,9 +95,12 @@ GiNaC::ex evaluate_expression(const ast::expression<quantity>& expression, const
     return eval(expression);
 }
 
-void print_command(command cmd, const symbolic_expression_type<quantity>& symbolic_expression, const resultmap_t& resultmap, const weightmap_t& weightmap, bool pretty, bool simpl)
+std::string print_command(command cmd, const symbolic_expression_type<quantity>& symbolic_expression, const resultmap_t& resultmap, const weightmap_t& weightmap, bool pretty, bool simpl)
 {
     ast::expression<quantity> expression;
+
+    std::ostringstream stream;
+    stream << GiNaC::dflt; // set output format
 
     bool r = phrase_parse(cmd.content.begin(), cmd.content.end(), symbolic_expression, qi::blank, expression);
     if (r)
@@ -110,11 +115,11 @@ void print_command(command cmd, const symbolic_expression_type<quantity>& symbol
             }
             if(pretty)
             {
-                tf.pretty_print(std::cout, cmd.content + " = ");
+                tf.pretty_print(stream, cmd.content + " = ");
             }
             else
             {
-                std::cout << tf.to_ginac(get_complex_symbol("s")) << '\n';
+                stream << tf.to_ginac(get_complex_symbol("s"));
             }
         }
         else
@@ -126,10 +131,42 @@ void print_command(command cmd, const symbolic_expression_type<quantity>& symbol
     {
         std::cerr << "could not parse expression " << '"' << cmd.content << '"' << '\n';
     }
+    return stream.str();
 }
 
-void result::print(const std::vector<command>& print_cmd, bool pretty, bool simpl) const
+std::string write_html_command(command cmd, const symbolic_expression_type<quantity>& symbolic_expression, const resultmap_t& resultmap, const weightmap_t& weightmap, bool simpl)
 {
+    ast::expression<quantity> expression;
+
+    std::ostringstream stream;
+    stream << GiNaC::latex; // set output format
+    stream << "<p>" << '\n';
+    stream << cmd.content << " = \\(";
+
+    bool r = phrase_parse(cmd.content.begin(), cmd.content.end(), symbolic_expression, qi::blank, expression);
+    if (r)
+    {
+        if(check_expression(expression, resultmap))
+        {
+            GiNaC::ex res = evaluate_expression(expression, resultmap);
+            transfer_function tf(res);
+            stream << tf.to_ginac(get_complex_symbol("s"));
+        }
+    }
+    stream << "\\)" << '\n';
+    stream << "</p>" << '\n';
+    return stream.str();
+}
+
+void result::report(const std::vector<command>& print_cmd, bool pretty, bool simpl) const
+{
+    std::ofstream html_file("report.html");
+
+    if(html)
+    {
+        write_html_header(html_file);
+    }
+
     // create the expression parser
     qi::rule<Iterator, std::string()> function = +qi::alpha;
     qi::rule<Iterator, std::string()> symbol = +(qi::alnum | qi::char_(" ,."));
@@ -137,10 +174,18 @@ void result::print(const std::vector<command>& print_cmd, bool pretty, bool simp
     qi::rule<Iterator, quantity(), Skipper_type> identifier = (function >> "(" >> symbol >> ")") | (qi::attr("NUMBER") >> number);
     symbolic_expression_type<quantity> symbolic_expression(identifier);
 
-    std::cout << GiNaC::dflt; // set output format
     for(const command& cmd : print_cmd)
     {
-        print_command(cmd, symbolic_expression, resultmap, weightmap, pretty, simpl);
+        std::cout << print_command(cmd, symbolic_expression, resultmap, weightmap, pretty, simpl) << '\n';
+        if(html)
+        {
+            html_file << write_html_command(cmd, symbolic_expression, resultmap, weightmap, simpl) << '\n';
+        }
+    }
+
+    if(html)
+    {
+        write_html_footer(html_file);
     }
 }
 

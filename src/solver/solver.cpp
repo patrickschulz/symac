@@ -5,17 +5,14 @@
 #include "nport.hpp"
 #include "noise.hpp"
 
-solver::solver(const componentlist& components) :
-    components(components)
+solver::solver(const componentlist& components, result& results) :
+    components(components), results(results)
 {
 }
 
-result solver::solve(bool linearize, bool print)
+void solver::solve(bool linearize, bool print)
 {
-    result results;
     solve_ac   (components, nmap, results, linearize, print);
     solve_nport(components, nmap, results, linearize, print);
     solve_noise(components, nmap, results, linearize, print);
-
-    return results;
 }

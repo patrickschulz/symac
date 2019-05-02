@@ -60,13 +60,21 @@ class result
             return resultmap.get(domain, key);
         }
 
-        void print(const std::vector<command>& print_cmd, bool pretty, bool simpl) const;
+        void report(const std::vector<command>& print_cmd, bool pretty, bool simpl) const;
 
         void set_weightmap(const weightmap_t& weightmap);
+
+        void enable_html_report(bool h)
+        {
+            html = h;
+        }
 
     private:
         resultmap_t resultmap;
         weightmap_t weightmap;
+
+        // options
+        bool html;
 };
 
 #endif // RESULT_HPP

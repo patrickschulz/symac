@@ -59,6 +59,7 @@ class options
                 ("nodemap"   , "print the nodemap (mapping from user (string-) nodes to internal (integer-) nodes)")
                 ("nosolve,s" , "don't solve the network")
                 ("report,r"  , "create a report")
+                ("html,H"    , "create an HTML report")
                 ("matlab"    , value<std::string>(), "export results to MatLab, specify filename")
                 ;
 

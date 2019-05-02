@@ -5,36 +5,29 @@
 #include "options.hpp"
 #include "solver/solver.hpp"
 #include "result.hpp"
-#include "symbol.hpp"
 
 int main(int argc, char** argv)
 {
-    options opt(argc, argv);
-    auto commandline_options = opt.get_options();
-    if(commandline_options.count("netlist"))
+    options commandline_options(argc, argv);
+    auto opt = commandline_options.get_options();
+    if(opt.count("netlist"))
     {
-        std::string filename = commandline_options["netlist"].as<std::string>();
+        std::string filename = opt["netlist"].as<std::string>();
         netlist nlist;
         nlist.read(filename);
         if(nlist)
         {
-            if(!commandline_options.count("nosolve"))
+            if(!opt.count("nosolve"))
             {
-                solver S(nlist.get_components());
-
-                result res = S.solve
-                    (
-                        commandline_options.count("linearize"),
-                        commandline_options.count("print")
-                    );
+                result res;
+                res.enable_html_report(opt.count("html"));
                 auto weightmap = compute_weightmap(nlist.get_inequalities());
                 res.set_weightmap(weightmap);
-                res.print
-                    (
-                        nlist.get_print_cmds(),
-                        commandline_options.count("pretty"),
-                        commandline_options.count("simplify")
-                    );
+
+                solver S(nlist.get_components(), res);
+                S.solve(opt.count("linearize"), opt.count("print"));
+
+                res.report(nlist.get_print_cmds(), opt.count("pretty"), opt.count("simplify"));
             }
         }
         else
