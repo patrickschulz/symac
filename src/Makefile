@@ -13,6 +13,7 @@ SOURCES  += $(wildcard parser/*.$(EXT))
 SOURCES  += $(wildcard transfer_function/*.$(EXT))
 SOURCES  += $(wildcard simplification/*.$(EXT))
 SOURCES  += $(wildcard solver/*.$(EXT))
+SOURCES  += $(wildcard export/*.$(EXT))
 OBJECTS  := $(patsubst %.$(EXT), $(BUILDDIR)/%.o, $(SOURCES))
 DEPS     := $(patsubst %.$(EXT), $(BUILDDIR)/%.dep, $(SOURCES))
 
