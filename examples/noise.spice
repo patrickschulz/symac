@@ -3,6 +3,6 @@ Rout vout 0 rout
 
 V0 vin 0 0
 
-In vout 0 noise=1
+In vout 0 0 noise=1
 
 .print V(vout)

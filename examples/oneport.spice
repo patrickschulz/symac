@@ -1,7 +1,8 @@
 R0 v1 0 Z0
 
-P0 v1 0
+P0 v1 0 i=i0
 
+.print V(v1)
 .print Z(1, 1)
 .print Y(1, 1)
 .print S(1, 1)

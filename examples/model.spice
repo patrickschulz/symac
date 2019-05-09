@@ -1,9 +1,12 @@
-*.behavioural mul in out
-*    out = 2 * in
-*.end
-
-V0 vin 0 vin
-E0 vout 0 vin 0 2
-*B0 mul vin vout
-
-.print V(vout)
+.behavioural mul in out
+    2
+*   V(out) = 2 * V(in)
+.end
+*
+*I0 vin 0 I0
+*R0 vin 0 R0
+*E0 vout 0 vin 0 A0
+*R1 vout 0 R1
+**B0 mul vin vout
+*
+*.print V(vout)
