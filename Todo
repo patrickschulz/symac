@@ -40,7 +40,7 @@
  [x] Add output of noise transfer functions
  [x] Add non-integrated voltage noise
  [x] Add noise parameters to devices (currently only resistors have noise)
- [ ] Add equivalent input noise and noise figure
+ [x] Add equivalent input noise and noise figure
  [ ] Check noise simulations for all (sensible) devices
 
 [ ] While checking output expressions, check for any errors (wrong noise results or similar). For this, the error mechanisms of printing commands needs to be changed so that every quantity holds

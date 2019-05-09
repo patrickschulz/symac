@@ -78,7 +78,7 @@ void solve_noise(const componentlist& components, nodemap& nmap, result& results
                 // solve network and calculate parameters
                 if(print)
                 {
-                    std::cout << "Node: " << nmap[node + 1] << ", Device: " << c.get_name() << '\n';
+                    std::cout << "Node: " << nmap[node] << ", Device: " << c.get_name() << '\n';
                 }
                 GiNaC::matrix res = solve_network(components_tmp, nmap, linearize, print); 
 
@@ -90,27 +90,27 @@ void solve_noise(const componentlist& components, nodemap& nmap, result& results
 
                 // add NTF to results
                 boost::format fmter = boost::format("%s,%s");
-                std::string key = str(fmter % c.get_name() % nmap[node + 1]);
+                std::string key = str(fmter % c.get_name() % nmap[node]);
                 results.add("NTF", key, NTF);
             }
         }
-        results.add("VN", nmap[node + 1], totalnoise);
-        results.add("VNI", nmap[node + 1], totalintegratednoise);
+        results.add("VN", nmap[node], totalnoise);
+        results.add("VNI", nmap[node], totalintegratednoise);
     }
 
     for(unsigned int refnode = 0; refnode < components.number_of_nodes(); ++refnode)
     {
         for(unsigned int noisenode = 0; noisenode < components.number_of_nodes(); ++noisenode)
         {
-            GiNaC::ex noise = results.get("VN", "vout");
-            GiNaC::ex numerator = results.get("V", nmap[refnode + 1]);
-            GiNaC::ex denominator = results.get("V", "vout");
+            GiNaC::ex noise = results.get("VN", nmap[noisenode]);
+            GiNaC::ex numerator = results.get("V", nmap[refnode]);
+            GiNaC::ex denominator = results.get("V", nmap[noisenode]);
 
             if(!denominator.is_zero())
             {
                 GiNaC::ex equal = noise * pow(numerator / denominator, 2);
                 boost::format fmter = boost::format("%s,%s");
-                std::string key = str(fmter % nmap[refnode + 1] % nmap[noisenode + 1]);
+                std::string key = str(fmter % nmap[refnode] % nmap[noisenode]);
                 results.add("VNeq", key, equal);
             }
         }
