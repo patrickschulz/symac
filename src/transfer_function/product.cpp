@@ -63,6 +63,7 @@ std::ostream& operator<<(std::ostream& stream, const product& p)
 {
     if(p.prefix != 1 || p.elements.size() == 0)
     {
+        /*
         if(p.prefix != -1)
         {
             stream << p.prefix;
@@ -74,6 +75,12 @@ std::ostream& operator<<(std::ostream& stream, const product& p)
         else
         {
             stream << "-";
+        }
+        */
+        stream << p.prefix;
+        if(p.elements.size() > 0)
+        {
+            stream << ' ' << multsign << ' ';
         }
     }
     for(unsigned int i = 0; i < p.elements.size(); ++i)

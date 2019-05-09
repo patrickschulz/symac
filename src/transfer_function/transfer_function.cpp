@@ -239,6 +239,27 @@ GiNaC::ex transfer_function::to_ginac(const GiNaC::symbol& s) const
     return pre * num / den;
 }
 
+std::string get_prefix_string(const sum& prefix)
+{
+    std::ostringstream stream;
+    stream << prefix;
+    return stream.str();
+}
+
+std::string get_numerator_string(const polynom& numerator)
+{
+    std::ostringstream stream;
+    stream << numerator;
+    return stream.str();
+}
+
+std::string get_denominator_string(const polynom& denominator)
+{
+    std::ostringstream stream;
+    stream << denominator;
+    return stream.str();
+}
+
 void transfer_function::pretty_print(std::ostream& stream, const std::string& strpre) const
 {
     if(denominator.to_ginac(get_complex_symbol("s")).is_equal(GiNaC::ex(1)))
