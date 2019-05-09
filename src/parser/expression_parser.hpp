@@ -166,10 +166,45 @@ namespace ast
 template<typename atom_type>
 struct symbolic_expression_type : qi::grammar<Iterator, ast::expression<atom_type>(), Skipper_type>
 {
+    symbolic_expression_type() : symbolic_expression_type::base_type(expression)
+    { }
+
     symbolic_expression_type(const qi::rule<Iterator, atom_type(), Skipper_type> idf) : 
         symbolic_expression_type::base_type(expression),
         identifier(idf)
     {
+        using qi::char_;
+
+        expression =
+            term
+            >> *(   
+                    (char_('+') >> term) |
+                    (char_('-') >> term)
+                )
+            >> qi::eoi
+            ;
+
+        term =
+            factor
+            >> *(   
+                    (char_('*') >> factor) |
+                    (char_('/') >> factor)
+                )
+            ;
+
+        factor =
+            identifier
+            |   '(' >> expression >> ')'
+            |   (char_('-') >> factor)
+            |   (char_('+') >> factor)
+            ;
+    }
+    
+    void set_identifier(const qi::rule<Iterator, atom_type(), Skipper_type> idf)
+    {
+        identifier = idf;
+
+        // configure parser
         using qi::char_;
 
         expression =

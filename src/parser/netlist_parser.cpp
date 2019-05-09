@@ -5,6 +5,7 @@
 #include "command_parser.hpp"
 #include "comment_parser.hpp"
 #include "subcircuit_parser.hpp"
+#include "behavioural.hpp"
 
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
@@ -23,6 +24,7 @@ netlist_parser_type::netlist_parser_type() :
     spice = component_parser            | 
             command_parser              |  
             comment_parser              | 
+            behavioural_parser          |
             subcircuit_parser           | 
             subcircuit_instance_parser;
 

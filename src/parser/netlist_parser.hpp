@@ -7,12 +7,13 @@
 #include "../comment.hpp"
 #include "../subcircuit.hpp"
 #include "../command.hpp"
+#include "../behavioural.hpp"
 
 #include "parser_common.hpp"
 
 namespace qi = boost::spirit::qi;
 
-typedef boost::variant<component, command, comment, subcircuit, subcircuit_instance> netlist_attribute_type;
+typedef boost::variant<component, command, comment, behavioural, subcircuit, subcircuit_instance> netlist_attribute_type;
 typedef qi::rule<Iterator, Skipper_type, netlist_attribute_type()>* netlist_parser_local;
 
 struct netlist_parser_type : public qi::grammar<Iterator, Skipper_type, std::vector<netlist_attribute_type>()>
