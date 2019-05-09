@@ -1,3 +1,5 @@
+[ ] Add an interactive shell (where devices can be added with commands)
+
 [ ] Improve the print expression parser
  [x] Add number support to the print expressions
  [ ] Add the power operator (^ or **)
@@ -14,6 +16,7 @@
  [ ] Add spectre netlists
  [x] Add parameters to devices and subcircuits
  [x] Add support for expressions to the parser
+ [ ] Simplify parser hierarchy. Currently (with parser_common.hpp) simple changes result in huge rebuilds
 
 [ ] Support n-port parameters (Z, Y, S, ABCD, ...)
  [x] Enable Z- and Y-Matrix simulations
