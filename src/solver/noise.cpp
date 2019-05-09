@@ -97,5 +97,23 @@ void solve_noise(const componentlist& components, nodemap& nmap, result& results
         results.add("VN", nmap[node + 1], totalnoise);
         results.add("VNI", nmap[node + 1], totalintegratednoise);
     }
+
+    for(unsigned int refnode = 0; refnode < components.number_of_nodes(); ++refnode)
+    {
+        for(unsigned int noisenode = 0; noisenode < components.number_of_nodes(); ++noisenode)
+        {
+            GiNaC::ex noise = results.get("VN", "vout");
+            GiNaC::ex numerator = results.get("V", nmap[refnode + 1]);
+            GiNaC::ex denominator = results.get("V", "vout");
+
+            if(!denominator.is_zero())
+            {
+                GiNaC::ex equal = noise * pow(numerator / denominator, 2);
+                boost::format fmter = boost::format("%s,%s");
+                std::string key = str(fmter % nmap[refnode + 1] % nmap[noisenode + 1]);
+                results.add("VNeq", key, equal);
+            }
+        }
+    }
 }
 
