@@ -84,7 +84,7 @@ namespace mna
         unsigned int row = 0;
         for(; row < components.number_of_nodes(); ++row)
         {
-            std::string node = nmap[row + 1];
+            std::string node = nmap[row];
             x(row, 0) = get_symbol(node);
         }        
 

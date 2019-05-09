@@ -50,7 +50,7 @@ unsigned int nodemap::operator[](const std::string& snode) const
 
 std::string nodemap::operator[](unsigned int inode) const
 {
-    auto it = reverse_map.find(inode);
+    auto it = reverse_map.find(inode + 1);
     if(it != reverse_map.end())
     {
         return it->second;

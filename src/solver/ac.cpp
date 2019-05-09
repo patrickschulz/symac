@@ -47,7 +47,7 @@ void solve_ac(const componentlist& components, nodemap& nmap, result& results, b
     // voltages
     for(unsigned int row = 0; row < components.number_of_nodes(); ++row)
     {
-        std::string usernode = nmap[row + 1];
+        std::string usernode = nmap[row];
         results.add("V", usernode, res(row, 0));
     }
 

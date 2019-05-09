@@ -1,9 +1,10 @@
 Mp vbias vout vdd
 Mn vin vout 0 noise=1
+Cl vout 0 Cl
 Vdd vdd 0 vdd 
 Vbias vbias 0 vbias
 Vin vin 0 x ac=1
 
-.print V(vout) / V(vin)
 .print VN(vout)
+.print VNI(vout)
 .print VNeq(vin, vout)
