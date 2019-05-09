@@ -15,12 +15,6 @@
 #include "simplification/simplification.hpp"
 #include "export/html.hpp"
 
-BOOST_FUSION_ADAPT_STRUCT(
-    quantity,
-    (std::string, function)
-    (std::string, symbol)
-)
-
 result::result()
 {
     // insert ground
@@ -59,13 +53,10 @@ bool check_expression(const ast::expression<quantity>& expression, const resultm
         {
             return true;
         }
-        std::string key = q.symbol;
-        if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF" || q.function == "H" || q.function == "G" || q.function == "ABCD")
-        {
-            std::vector<std::string> args = chop_arguments(q);
-            key.clear();
-            key = args[0] + "," + args[1];
-        }
+
+        std::vector<std::string> args = chop_arguments(q);
+        std::string key = concat_arguments(args, ",");
+
         return resmap.exists(q.function, key);
     };
     using namespace std::placeholders;
@@ -81,13 +72,10 @@ GiNaC::ex evaluate_expression(const ast::expression<quantity>& expression, const
         {
             return std::stod(q.symbol);
         }
-        std::string key = q.symbol;
-        if(q.function == "Z" || q.function == "Y" || q.function == "S" || q.function == "NTF" || q.function == "H" || q.function == "G" || q.function == "ABCD")
-        {
-            std::vector<std::string> args = chop_arguments(q);
-            key.clear();
-            key = args[0] + "," + args[1];
-        }
+
+        std::vector<std::string> args = chop_arguments(q);
+        std::string key = concat_arguments(args, ",");
+
         return resmap.get(q.function, key);
     };
     using namespace std::placeholders;

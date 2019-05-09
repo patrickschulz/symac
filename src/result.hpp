@@ -9,12 +9,7 @@
 #include "nodemap.hpp"
 #include "command.hpp"
 #include "simplification/weightmap.hpp"
-
-struct quantity
-{
-    std::string function;
-    std::string symbol;
-};
+#include "quantity.hpp"
 
 class resultmap_t
 {
