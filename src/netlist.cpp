@@ -33,6 +33,15 @@ struct netlist_processor_type : public boost::static_visitor<>
         nlist.add_command(c);
     }
 
+    void operator() (const behavioural& b) const
+    {
+        std::cout << b.name << '\n';
+        for(auto s : b.terminals)
+        {
+            std::cout << "  " << s << '\n';
+        }
+    }
+
     void operator() (const subcircuit& s)
     {
         subcircuits[s.name] = s;
