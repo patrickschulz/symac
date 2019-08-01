@@ -47,8 +47,19 @@ void solve_ac(const componentlist& components, nodemap& nmap, result& results, b
     // voltages
     for(unsigned int row = 0; row < components.number_of_nodes(); ++row)
     {
+        // single ended (vs. ground)
         std::string usernode = nmap[row];
         results.add("V", usernode, res(row, 0));
+        // differential voltages (vx - vy)
+        for(unsigned int row2 = 0; row2 < components.number_of_nodes(); ++row2)
+        {
+            if(row != row2)
+            {
+                std::string usernode1 = nmap[row];
+                std::string usernode2 = nmap[row2];
+                results.add("V", make_key(usernode1, usernode2), res(row, 0) - res(row2, 0));
+            }
+        }
     }
 
     // currents

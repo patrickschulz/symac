@@ -27,6 +27,11 @@ int main(int argc, char** argv)
                 solver S(nlist.get_components(), res);
                 S.solve(opt.count("linearize"), opt.count("print"));
 
+                if(opt.count("resmap"))
+                {
+                    res.print_all();
+                }
+
                 res.report(nlist.get_print_cmds(), opt.count("pretty"), opt.count("simplify"));
             }
         }

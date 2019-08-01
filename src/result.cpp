@@ -15,6 +15,11 @@
 #include "simplification/simplification.hpp"
 #include "export/html.hpp"
 
+std::string make_key(const std::string& str1, const std::string& str2)
+{
+    return str1 + "." + str2;
+}
+
 result::result()
 {
     // insert ground
@@ -146,12 +151,21 @@ std::string write_html_command(command cmd, const symbolic_expression_type<quant
     return stream.str();
 }
 
+void result::print_all() const
+{
+    for(auto e : resultmap)
+    {
+        std::cout << e.first << " = " << e.second << '\n';
+    }
+}
+
 void result::report(const std::vector<command>& print_cmd, bool pretty, bool simpl) const
 {
-    std::ofstream html_file("report.html");
+    std::ofstream html_file;
 
     if(html)
     {
+        html_file.open("report.html");
         write_html_header(html_file);
     }
 

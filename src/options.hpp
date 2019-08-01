@@ -53,6 +53,7 @@ class options
                 ("devices,D"  , "print information about the usage of all components")
                 ("simplify,S" , "simplify all results")
                 ("linearize,L", "transform (linearize) a large-signal netlist into a small-signal netlist")
+                ("resmap"     , "print the entire result map")
                 ;
             options_description unimplemented("Unimplemented options");
             unimplemented.add_options()
