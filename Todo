@@ -64,6 +64,8 @@
 
 [ ] Add behavioural models (in s-domain)
 
+[ ] Small signal models should not be hard coded in the simulator, but supplied as config files (this way, the user can also change the small signal models)
+
 [ ] Add numerical alternatives to netlists, so that symbolic results can automatically be converted to numeric results, enabling plotting.
 
 [ ] Add poles and zeros to the results browser
