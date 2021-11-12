@@ -148,5 +148,3 @@ component_parser_type::component_parser_type() : component_parser_type::base_typ
 
     //qi::on_error<qi::fail>(two_terminal_device, report_error(qi::_1, qi::_2, qi::_3, qi::_4));
 }
-
-component_parser_type component_parser;

@@ -11,9 +11,6 @@
 class behavioural
 {
     public:
-
-    private:
-    public:
         std::string name;
         std::vector<std::string> terminals;
         std::vector<ast::expression<quantity>> expressions;

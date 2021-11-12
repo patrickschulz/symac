@@ -81,6 +81,7 @@ void netlist::read(const std::string& filename)
     std::string str = buffer.str();
     auto iter = str.begin();
     std::vector<netlist_attribute_type> lines;
+    netlist_parser_type netlist_parser;
     bool r = qi::phrase_parse(iter, str.end(), netlist_parser, qi::blank, lines);
 
     netlist_processor_type visitor(*this);

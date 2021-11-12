@@ -10,6 +10,7 @@
 #include "../behavioural.hpp"
 #include "parser_common.hpp"
 #include "expression_parser.hpp"
+#include "comment_parser.hpp"
 #include "../quantity.hpp"
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -36,8 +37,8 @@ struct behavioural_parser_type : public qi::grammar<Iterator, Skipper_type, beha
     symbolic_expression_type<quantity> symbolic_expression;
 
     qi::rule<Iterator, Skipper_type, behavioural()> main;
-};
 
-extern behavioural_parser_type behavioural_parser;
+    comment_parser_type comment_parser;
+};
 
 #endif // BEHAVIOURAL_PARSER_HPP

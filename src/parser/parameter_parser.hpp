@@ -13,6 +13,4 @@ struct parameter_parser_type : public qi::grammar<Iterator, Skipper_type, parame
     qi::rule<Iterator, Skipper_type, parameter_t()> main;
 };
 
-extern parameter_parser_type parameter_parser;
-
 #endif // PARAMETER_PARSER_HPP

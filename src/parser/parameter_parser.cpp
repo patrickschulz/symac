@@ -10,5 +10,3 @@ parameter_parser_type::parameter_parser_type() : parameter_parser_type::base_typ
     value = +alnum;
     main = key >> lit("=") >> value;
 }
-
-parameter_parser_type parameter_parser;

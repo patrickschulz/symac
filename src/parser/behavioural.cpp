@@ -25,5 +25,3 @@ behavioural_parser_type::behavioural_parser_type() : behavioural_parser_type::ba
 
     main      = ".behavioural" >> name >> terminals >> eol >> body >> eol >> ".end";
 }
-
-behavioural_parser_type behavioural_parser;

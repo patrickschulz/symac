@@ -22,6 +22,5 @@ struct comment_parser_type : public qi::grammar<Iterator, comment()>
     qi::rule<Iterator, comment()> main;
 
 };
-extern comment_parser_type comment_parser;
 
 #endif // COMMENT_PARSER_HPP

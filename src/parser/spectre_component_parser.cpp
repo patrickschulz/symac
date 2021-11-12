@@ -34,5 +34,3 @@ spectre_component_parser_type::spectre_component_parser_type() : spectre_compone
     device = name >> terminals >> spectre_identifier >> value;
     main = device;
 }
-
-spectre_component_parser_type spectre_component_parser;

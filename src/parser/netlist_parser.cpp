@@ -50,5 +50,3 @@ netlist_parser_type::netlist_parser_type() :
         >> qi::eoi
         ;
 }
-
-netlist_parser_type netlist_parser;

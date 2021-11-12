@@ -26,6 +26,4 @@ struct command_parser_type : public qi::grammar<Iterator, Skipper_type, command(
     qi::rule<Iterator, Skipper_type, command()> main;
 };
 
-extern command_parser_type command_parser;
-
 #endif // COMMAND_PARSER_HPP

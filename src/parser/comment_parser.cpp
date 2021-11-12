@@ -9,5 +9,3 @@ comment_parser_type::comment_parser_type() : comment_parser_type::base_type(main
     content = *(char_ - eol);
     main = (lit("*") | lit("//")) >> content;
 }
-
-comment_parser_type comment_parser;

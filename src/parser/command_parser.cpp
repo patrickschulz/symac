@@ -22,5 +22,3 @@ command_parser_type::command_parser_type() : command_parser_type::base_type(main
     content = +(char_ - eol);
     main = identifier >> content;
 }
-
-command_parser_type command_parser;

@@ -43,7 +43,10 @@ struct subcircuit_parser_type : public qi::grammar<Iterator, Skipper_type, subci
     qi::rule<Iterator, Skipper_type, std::vector<component>()> body;
     qi::rule<Iterator, Skipper_type, std::vector<std::string>()> terminals;
     qi::rule<Iterator, Skipper_type, subcircuit()> main;
-} subcircuit_parser;
+
+    component_parser_type component_parser;
+    comment_parser_type comment_parser;
+};
 
 BOOST_FUSION_ADAPT_STRUCT(
     subcircuit_instance,
@@ -73,6 +76,6 @@ struct subcircuit_instance_parser_type : public qi::grammar<Iterator, Skipper_ty
     qi::rule<Iterator, std::string()> name, terminal;
     qi::rule<Iterator, Skipper_type, std::vector<std::string>()> terminals;
     qi::rule<Iterator, Skipper_type, subcircuit_instance()> main;
-} subcircuit_instance_parser;
+};
 
 #endif // SUBCIRCUIT_PARSER_HPP

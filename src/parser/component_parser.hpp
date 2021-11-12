@@ -10,6 +10,7 @@
 #include <boost/fusion/include/vector.hpp>
 
 #include "parser_common.hpp"
+#include "parameter_parser.hpp"
 
 struct component_parser_type : public qi::grammar<Iterator, Skipper_type, component()>
 {
@@ -20,8 +21,7 @@ struct component_parser_type : public qi::grammar<Iterator, Skipper_type, compon
     qi::rule<Iterator, Skipper_type, std::vector<std::string>(int)> terminals;
     qi::rule<Iterator, Skipper_type, spice_component_proxy()> two_terminal_device, three_terminal_device, four_terminal_device, port;
     qi::rule<Iterator, Skipper_type, component()> main;
+    parameter_parser_type parameter_parser;
 };
-
-extern component_parser_type component_parser;
 
 #endif // COMPONENT_PARSER_HPP

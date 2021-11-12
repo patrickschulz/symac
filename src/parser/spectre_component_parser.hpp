@@ -21,6 +21,4 @@ struct spectre_component_parser_type : public qi::grammar<Iterator, Skipper_type
     qi::rule<Iterator, Skipper_type, component()> main;
 };
 
-extern spectre_component_parser_type spectre_component_parser;
-
 #endif // SPECTRE_COMPONENT_PARSER_HPP
