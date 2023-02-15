@@ -73,6 +73,7 @@ class component
         void set_value(const GiNaC::ex& e);
 
         void set_parameter(const std::string& key, const std::string& value);
+        bool has_parameter(const std::string& key) const;
         std::string get_parameter(const std::string& key) const;
 
         friend std::ostream& operator<<(std::ostream& stream, const component& c);

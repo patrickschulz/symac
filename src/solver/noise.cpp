@@ -12,7 +12,7 @@ GiNaC::ex integrate_NTF_sabs(const transfer_function& tf)
     switch(poles.size())
     {
         case 0:
-            //std::cerr << "No poles found, can't integrate constant functions. Noise result will be wrong.\n";
+            std::cerr << "No poles found, can't integrate constant functions. Noise result will be wrong.\n";
             break;
         case 1:
             res = gain * gain * abs(poles[0]) / 4;
@@ -25,7 +25,7 @@ GiNaC::ex integrate_NTF_sabs(const transfer_function& tf)
                 break;
             }
         default:
-            //std::cerr << "No implementation for transfer functions with more than two poles. Noise result will be wrong.\n";
+            std::cerr << "No implementation for transfer functions with more than two poles. Noise result will be wrong.\n";
             break;
     }
     return res;

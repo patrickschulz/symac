@@ -90,7 +90,7 @@ void component::name_prepend(const std::string& prefix)
 
 bool component::is_noisy() const
 {
-    return get_parameter("noise") == "1";
+    return has_parameter("noise");
     /*
     bool ret;
     switch(type)
@@ -138,6 +138,12 @@ component component::get_noise_source() const
             source.set_type(ct_current_source);
             source.set_value(4 * boltzmann * temperature * get_symbol("y") * get_symbol("gm"));
             source.set_nodes({ nodes[1], nodes[2] });
+            source.set_parameter("ac", "1");
+            break;
+        case ct_current_source:
+            source.set_type(ct_current_source);
+            source.set_value(get_symbol(get_parameter("noise"))); // FIXME
+            source.set_nodes(nodes);
             source.set_parameter("ac", "1");
         default:
             break;
@@ -189,6 +195,18 @@ void component::set_parameter(const std::string& key, const std::string& value)
     }
     // only if parameter wasn't found
     parameters.push_back({ key, value });
+}
+
+bool component::has_parameter(const std::string& key) const
+{
+    for(const auto& param : parameters)
+    {
+        if(param.key == key)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 std::string component::get_parameter(const std::string& key) const

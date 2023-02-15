@@ -1,8 +1,10 @@
 Gm 0 vout vin 0 gm
 Rout vout 0 rout
+Cout vout 0 cout
 
-V0 vin 0 0
+V0 vin 0 vin
 
-In vout 0 0 noise=1
+In vout 0 0 noise=In
 
-.print V(vout)
+.print VN(vout)
+.print VNI(vout)
