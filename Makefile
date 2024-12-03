@@ -1,3 +1,6 @@
+symac: src/symac
+	cp src/symac .
+
 src/symac:
 	$(MAKE) -C src symac
 

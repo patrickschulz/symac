@@ -40,4 +40,4 @@ $(DEPS): $(BUILDDIR)/%.dep: %.$(EXT) $(BUILDDIR)/.tag
 
 .PHONY: clean
 clean:
-	$(RM) -r $(BUILDDIR)
+	$(RM) -r $(BUILDDIR) symac
