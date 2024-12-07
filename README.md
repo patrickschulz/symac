@@ -6,7 +6,7 @@ The basic features of SymAC (as network solving, basic calculations, printing of
 Some work on scattering parameters, noise and simplification is still on-going, although development speed has halted due to me focusing on other things.
 Please let me know if you are in need of these features as it might spark my motivation ;).
 
-There is a [web-interface](www.patrickkurth.de/symac) where symAC can be tried out easily.
+There is a [web-interface](http://patrickkurth.de/symac) where symAC can be tried out easily.
 This is only a basic prototype and under development (as of 2024/2025).
 Still, it offers almost all of the functionality of the command-line program.
 
