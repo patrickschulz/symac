@@ -1,0 +1,8 @@
+Gmd vout vdd vdd vout gmd
+Rds vout 0 Rds
+Gm 0 vout vin 0 gm
+
+Vdd vdd 0 0
+Vin vin 0 vin
+
+.print V(vout) / V(vin)
