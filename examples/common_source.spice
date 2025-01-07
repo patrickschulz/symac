@@ -1,4 +1,4 @@
-Gmd vout vdd vdd vout gmd
+Gmd vdd vout vout vdd gmd
 Rds vout 0 Rds
 Gm 0 vout vin 0 gm
 
