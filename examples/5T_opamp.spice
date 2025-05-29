@@ -1,0 +1,32 @@
+* MOSFET amplifier
+.subckt mosfet g s d
+Cgs g s cgs
+Gm s d g s gm
+Ro d s ro
+.end
+
+* nMOS input 5T opamp with single-ended output
+* assume virtual ground at tail node
+*Xbias  mosfet vbias 0 vtail
+Vtail  vtail 0 0
+Xin1   mosfet vinp vtail vmir
+Xin2   mosfet vinn vtail vout
+Xdiode mosfet vmir vdd vmir
+Xmir   mosfet vmir vdd vout
+
+Vvdd vdd 0 0
+Vvbias vbias 0 0
+* short vinn with vout:
+Vvinn vinn vout 0
+
+* for gain calculation:
+*Vvinp vinp 0 {vin/2}
+
+* for output impedance calculation:
+Vvout vout 0 vout
+
+* gain:
+*.print V(vout)
+
+* output impedance:
+.print V(vout) / I(Vvout.n)
